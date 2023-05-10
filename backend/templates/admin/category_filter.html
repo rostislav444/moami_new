@@ -1,0 +1,14 @@
+{% load i18n %}
+{% load mptt_tags %}
+
+{% if choices %}
+    <ul class="category-filter">
+        {% for choice in choices %}
+            <li style="margin-left:{{ choice.level}}0px;">
+                <a {% if choice.selected %}style="text-decoration: underline; font-weight: bold; color: #417690;"{% endif %} href="{{ choice.query_string }}">
+                    {{ choice.display }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

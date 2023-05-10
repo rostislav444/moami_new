@@ -1,0 +1,42 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/core": "^11.0.0",
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@reduxjs/toolkit": "^1.9.3",
+    "@types/cookie": "^0.5.1",
+    "@types/node": "18.15.3",
+    "@types/react": "18.0.28",
+    "@types/react-dom": "18.0.11",
+    "axios": "^1.3.4",
+    "cookie": "^0.5.0",
+    "cookies-next": "^2.1.1",
+    "eslint": "8.36.0",
+    "eslint-config-next": "13.2.4",
+    "import": "^0.0.6",
+    "js-cookie": "^3.0.1",
+    "keen-slider": "^6.8.5",
+    "next": "13.2.4",
+    "next-translate": "^2.0.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-hook-form": "^7.43.9",
+    "react-input-mask": "^2.0.4",
+    "react-ionicons": "^4.2.0",
+    "react-redux": "^8.0.5",
+    "styled-components": "^5.3.9",
+    "typescript": "5.0.2"
+  },
+  "devDependencies": {
+    "@types/react-input-mask": "^3.0.2"
+  }
+}
