@@ -6,17 +6,17 @@ data = [{
         'waist': {
             'name': 'Талия',
             'slug': 'waist',
-            'unit': 'in'
+            'unit': 'см'
         },
         'hips': {
             'name': 'Бедра',
             'slug': 'hips',
-            'unit': 'in'
+            'unit': 'см'
         },
         'inseam': {
             'name': 'Внутренний шов',
             'slug': 'inseam',
-            'unit': 'in'
+            'unit': 'см'
         }
     },
     'sizes': [
