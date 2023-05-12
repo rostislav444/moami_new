@@ -1,5 +1,6 @@
 # Compiled Python files
 *.pyc
+*.swp
 
 # Local settings
 .venv/
@@ -33,3 +34,5 @@ log/
 
 # VSCode related files
 .vscode/
+.DS_Store
+static_root/
