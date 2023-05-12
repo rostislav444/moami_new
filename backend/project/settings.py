@@ -1,11 +1,16 @@
 from datetime import timedelta
 from pathlib import Path
 import os
+import environ
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 STATICFILE_DIR = os.path.join(BASE_DIR, 'static')
+
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -15,8 +20,11 @@ SECRET_KEY = 'django-insecure-hm#r1xssp!bmbqka4mxgtzfe#)ugfo*i6#1pf#oq!hx)xpo8xb
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+PRODUCTION = True
 
 ALLOWED_HOSTS = [
+    '212.8.246.22',
+    'moami.com.ua',
     '0.0.0.0',
     'localhost',
     '127.1.0.1',
@@ -26,7 +34,6 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'django_non_dark_admin',
     # Django
     'django.contrib.admin',
     'django.contrib.auth',
@@ -53,8 +60,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'nested_inline',
     'mptt',
-    'rest_framework_simplejwt',
-
 ]
 
 MIDDLEWARE = [
@@ -92,14 +97,24 @@ WSGI_APPLICATION = 'project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if PRODUCTION:   
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': env('DB_NAME'),
+            'USER': env('DB_USER'),
+            'PASSWORD': env('DB_PASSWORD'),
+            'HOST': 'localhost',
+            'PORT': '',
+        }
     }
-}
-
+else:
+    DATABASES = {
+        'default': {
+           'ENGINE': 'django.db.backends.sqlite3',
+           'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -184,21 +199,10 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
+
 CORS_ALLOWED_ORIGIN_REGEXES = [
     'http://localhost:3000',
 ]
-
-#
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-#     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-#     'AUTH_HEADER_TYPES': ('JWT',), # Use 'JWT' as the authorization header
-#     'AUTHENTICATION_BACKENDS': [
-#         'rest_framework_simplejwt.authentication.JWTAuthentication',
-#         'django.contrib.auth.backends.ModelBackend', # Add the ModelBackend for session authentication
-#     ],
-#     'SESSION_AUTH_TOKEN': 'session_auth', # Use a custom token for session authentication
-# }
 
 # Use the custom session auth token
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'

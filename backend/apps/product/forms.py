@@ -12,7 +12,6 @@ class VariantSizeAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        print(self.instance)
 
         if self.instance:
             self.fields['size'].queryset = self.instance.product.category.size_group.sizes.all()
@@ -30,7 +29,7 @@ class ProductAttributeFormSet(forms.BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if self.instance:
+        if self.instance and hasattr(self.instance, 'category'):
             category = self.instance.category
             categories = category.get_ancestors(include_self=True)
             attr_groups = AttributeGroup.objects.filter(categories__category__in=categories).distinct()
