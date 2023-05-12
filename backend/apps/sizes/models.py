@@ -58,6 +58,7 @@ class SizeInterpretation(models.Model):
 
 
 class SizeProperty(NameSlug):
+    slug = models.SlugField(max_length=255, blank=True, editable=False)
     size_group = models.ForeignKey(SizeGroup, on_delete=models.CASCADE, related_name='properties')
     unit = models.ForeignKey('core.Unit', on_delete=models.PROTECT)
 

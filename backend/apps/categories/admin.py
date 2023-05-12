@@ -1,10 +1,12 @@
 from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
 from apps.categories.models import Category, CategoryAttributeGroup, Collections
+from apps.categories.forms import CategoryAttributeGroupForm
 
 
 class CategoryAttributeGroupInline(admin.TabularInline):
     model = CategoryAttributeGroup
+    form = CategoryAttributeGroupForm
     extra = 0
 
 

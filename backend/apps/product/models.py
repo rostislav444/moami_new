@@ -17,23 +17,38 @@ from apps.sizes.models import Size
 from apps.translation.models import Translatable
 
 
-class Brand(models.Model):
+class Brand(Translatable):
     name = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = 'Бренд'
+        verbose_name_plural = 'Бренды'
+        ordering = ['name']
 
     def __str__(self):
         return self.name
 
 
-class Country(models.Model):
+class Country(Translatable):
     name = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = 'Страна'
+        verbose_name_plural = 'Страны'
+        ordering = ['name']
 
     def __str__(self):
         return self.name
 
 
-class Color(models.Model):
+class Color(Translatable):
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = 'Цвет'
+        verbose_name_plural = 'Цвета'
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -43,6 +58,12 @@ class Product(Translatable):
     name = models.CharField(max_length=255, verbose_name='Название')
     category = models.ForeignKey('categories.Category', on_delete=models.CASCADE, related_name='products',
                                  verbose_name='Категория')
+
+    rozetka_category = models.ForeignKey('integrations.RozetkaCategories', on_delete=models.CASCADE,
+                                         related_name='products', verbose_name='Категория Rozetka', blank=True,
+                                         null=True)
+    taxonomy = models.ForeignKey('integrations.GoogleTaxonomy', on_delete=models.CASCADE, related_name='products',
+                                    verbose_name='Категория Google Taxonomy', blank=True, null=True)
     collections = models.ManyToManyField(Collections, blank=True, related_name='products', verbose_name='Коллекции')
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='products', verbose_name='Бренд')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='products', verbose_name='Страна')
@@ -52,6 +73,11 @@ class Product(Translatable):
     old_price = models.PositiveIntegerField(default=0, verbose_name='Старая цена')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Товар'
+        verbose_name_plural = 'Товары'
+        ordering = ['name']
 
     def save(self, *args, **kwargs):
         self.slug = slugify(unidecode(f'{self.name}-{self.brand.name}'))
@@ -79,7 +105,12 @@ class ProductAttribute(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
     attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE)
     attributes = models.ManyToManyField(Attribute, blank=True)
-    #
+
+    class Meta:
+        unique_together = ('product', 'attribute_group')
+        verbose_name = 'Атрибут'
+        verbose_name_plural = 'Атрибуты'
+
     # def __str__(self):
     #     return f'{str(self.product)} ({self.attribute_group.name})'
 
@@ -88,6 +119,10 @@ class CustomProperty(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='properties')
     key = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = 'Свойство'
+        verbose_name_plural = 'Свойства'
 
     def __str__(self):
         return f'{self.key}: {self.value}'
@@ -98,6 +133,11 @@ class Variant(models.Model):
     slug = models.SlugField(max_length=512, unique=True, blank=True)
     color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='variants')
     code = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = 'Вариант'
+        verbose_name_plural = 'Варианты'
+        ordering = ['product', 'color']
 
     def __str__(self):
         return f'{self.product.name} - {self.code}'
@@ -124,6 +164,8 @@ class VariantSize(models.Model):
     stock = models.PositiveIntegerField(default=1)
 
     class Meta:
+        verbose_name = 'Размер'
+        verbose_name_plural = 'Размеры'
         unique_together = ('variant', 'size')
 
     @property
@@ -148,6 +190,10 @@ class VariantImage(models.Model):
     slug = models.SlugField(max_length=255, blank=True)
 
     objects = VariantImageManager()
+
+    class Meta:
+        verbose_name = 'Изображение'
+        verbose_name_plural = 'Изображения'
 
     def save(self, *args, **kwargs):
         if not self.pk:

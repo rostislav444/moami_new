@@ -1,8 +1,13 @@
 from rest_framework import viewsets, mixins, generics
 
-from apps.product.models import Variant
+from apps.product.models import Variant, Product
 
-from apps.product.serializers import VariantSerializer
+from apps.product.serializers import VariantSerializer, ProductSerializer
+
+
+class ProductList(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 
 class VariantViewSet(viewsets.ModelViewSet):

@@ -12,5 +12,7 @@ class TranslationConfig(AppConfig):
 
         for model in Translatable.__subclasses__():
             translation_model = create_translation_model(model)
+
             create_model_admin(model, translation_model)
+
 

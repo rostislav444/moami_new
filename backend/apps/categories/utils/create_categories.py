@@ -1,14 +1,7 @@
 from apps.categories.models import Category
 from apps.sizes.models import SizeGroup
 from apps.product.factories import ProductFactory
-
-categories = [{
-    'name': 'Женская одежда',
-    'children': [
-        {'name': 'Блузы', 'size_group': 'Блузы женские'},
-        {'name': 'Джинсы', 'size_group': 'Джинсы женские'}
-    ]
-}, {'name': 'Обувь', 'size_group': 'Обувь женская'}]
+from apps.categories.data.categories import categories
 
 
 def create_category_products(category):
@@ -20,10 +13,11 @@ def create_categories():
         for item in categories:
             category, _ = Category.objects.get_or_create(name=item['name'], parent=parent)
             if 'size_group' in item:
-                size_group = SizeGroup.objects.get(name=item['size_group'])
+                print('item size_group ', item['size_group'])
+                size_group = SizeGroup.objects.get(slug=item['size_group'])
                 category.size_group = size_group
                 category.save()
-                create_category_products(category)
+                # create_category_products(category)
             if 'children' in item:
                 recursive(item['children'], category)
 

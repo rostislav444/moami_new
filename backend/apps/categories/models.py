@@ -3,12 +3,13 @@ from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 
 from apps.abstract.fields import DeletableImageField
-from apps.sizes.models import SizeGroup
 from apps.abstract.models import NameSlug
 from apps.attributes.models import AttributeGroup
+from apps.sizes.models import SizeGroup
+from apps.translation.models import Translatable
 
 
-class Category(NameSlug, MPTTModel):
+class Category(NameSlug, MPTTModel, Translatable):
     parent = TreeForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
     size_group = models.ForeignKey(SizeGroup, null=True, blank=True, on_delete=models.PROTECT,
                                    related_name='categories')
@@ -17,7 +18,8 @@ class Category(NameSlug, MPTTModel):
         order_insertion_by = ['name']
 
     class Meta:
-        verbose_name_plural = 'categories'
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
@@ -56,7 +58,8 @@ class CategoryAttributeGroup(models.Model):
         verbose_name_plural = 'Attribute groups'
 
     def __str__(self):
-        return '{} - {}'.format(self.category, self.attribute_group)
+        return ''
+        # return '{} - {}'.format(self.category, self.attribute_group)
 
 
 class Collections(NameSlug):

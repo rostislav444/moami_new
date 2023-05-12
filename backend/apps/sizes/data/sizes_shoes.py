@@ -1,6 +1,7 @@
 data = [{
-    'name': 'Обувь женская',
-    'grids': ['ua', 'eu', 'us'],
+    'name': 'Обувь',
+    'slug': 'shoes',
+    'grids': ['ua', 'eu', 'int'],
     'properties': {
         'foot_length': {
             'name': 'Длина ноги',
@@ -12,7 +13,7 @@ data = [{
         {
             'ua': '35',
             'eu': '36',
-            'us': '4',
+            'int': '4',
             'properties': {
                 'foot_length': '22.8'
             }
@@ -20,7 +21,7 @@ data = [{
         {
             'ua': '36',
             'eu': '37',
-            'us': '5',
+            'int': '5',
             'properties': {
                 'foot_length': '23.5'
             }
@@ -28,7 +29,7 @@ data = [{
         {
             'ua': '37',
             'eu': '38',
-            'us': '6',
+            'int': '6',
             'properties': {
                 'foot_length': '24.1'
             }
@@ -36,7 +37,7 @@ data = [{
         {
             'ua': '38',
             'eu': '39',
-            'us': '7',
+            'int': '7',
             'properties': {
                 'foot_length': '24.8'
             }
@@ -44,7 +45,7 @@ data = [{
         {
             'ua': '39',
             'eu': '40',
-            'us': '8',
+            'int': '8',
             'properties': {
                 'foot_length': '25.4'
             }
@@ -52,7 +53,7 @@ data = [{
         {
             'ua': '40',
             'eu': '41',
-            'us': '9',
+            'int': '9',
             'properties': {
                 'foot_length': '26.3'
             }
@@ -60,7 +61,7 @@ data = [{
         {
             'ua': '41',
             'eu': '42',
-            'us': '10',
+            'int': '10',
             'properties': {
                 'foot_length': '27.6'
             }
@@ -68,7 +69,7 @@ data = [{
         {
             'ua': '42',
             'eu': '43',
-            'us': '11',
+            'int': '11',
             'properties': {
                 'foot_length': '28.3'
             }
@@ -76,7 +77,7 @@ data = [{
         {
             'ua': '43',
             'eu': '44',
-            'us': '12',
+            'int': '12',
             'properties': {
                 'foot_length': '29.2'
             }
@@ -84,7 +85,7 @@ data = [{
         {
             'ua': '44',
             'eu': '45',
-            'us': '13',
+            'int': '13',
             'properties': {
                 'foot_length': '29.8'
             }
@@ -92,7 +93,7 @@ data = [{
         {
             'ua': '45',
             'eu': '46',
-            'us': '14',
+            'int': '14',
             'properties': {
                 'foot_length': '30.6'
             }

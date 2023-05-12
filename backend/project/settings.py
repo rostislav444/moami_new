@@ -11,6 +11,7 @@ STATICFILE_DIR = os.path.join(BASE_DIR, 'static')
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+print('PRODUCTION', env('PRODUCTION'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -20,7 +21,7 @@ SECRET_KEY = 'django-insecure-hm#r1xssp!bmbqka4mxgtzfe#)ugfo*i6#1pf#oq!hx)xpo8xb
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-PRODUCTION = True
+PRODUCTION = env('PRODUCTION') == 'true'
 
 ALLOWED_HOSTS = [
     '212.8.246.22',

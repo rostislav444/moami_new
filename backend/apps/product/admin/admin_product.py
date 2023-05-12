@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.categories.models import Category, CategoryAttributeGroup
 from apps.product.admin.admin_variant import VariantInline
 from apps.product.forms import ProductAttributeFormSet
-from apps.product.models import Brand, Country, CustomProperty, Product, ProductAttribute, ProductComposition
+from apps.product.models import Brand, Color, Country, CustomProperty, Product, ProductAttribute, ProductComposition
 
 
 @admin.register(Brand)
@@ -16,6 +16,11 @@ class BrandAdmin(admin.ModelAdmin):
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
+
+@admin.register(Color)
+class ColorAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
 
@@ -113,10 +118,10 @@ class ProductAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'category', 'collections')
+            'fields': ('name', 'category', 'brand', 'country', 'collections',)
         }),
-        ('Параметры', {
-            'fields': ('brand', 'country',)
+        ('Интеграции', {
+            'fields': ('rozetka_category', 'taxonomy',)
         }),
         ('Цена', {
             'fields': (('price', 'old_price'),)

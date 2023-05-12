@@ -49,10 +49,22 @@ class SizeInline(NestedStackedInline):
     readonly_fields = ('link_field',)
 
 
+@admin.register(SizeProperty)
+class SizePropertyAdmin(admin.ModelAdmin):
+   pass
+
+
+class SizePropertyInline(NestedStackedInline):
+    model = SizeProperty
+    extra = 0
+    show_change_link = True
+
+
+
 @admin.register(SizeGroup)
 class SizeGroupAdmin(NestedModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
     ordering = ('name',)
 
-    inlines = [SizeInline]
+    inlines = [SizePropertyInline, SizeInline]

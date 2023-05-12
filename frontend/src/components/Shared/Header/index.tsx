@@ -6,11 +6,8 @@ import Link from 'next/link'
 import React from "react";
 import {CartIcon} from "./CartIcon";
 import {NavMenu} from "@/components/Shared/Header/NavMenu";
-import {languageOptions, selectLanguage} from "@/state/reducers/language";
-import {useAppSelector} from "@/state/hooks";
+import {languageOptions} from "@/state/reducers/language";
 import {DropdownSelect} from "@/components/Shared/choices";
-import {updateLanguage} from "@/state/reducers/language";
-import store from "@/state/store";
 import {useLanguage} from "@/context/language";
 
 export const Header = () => {
