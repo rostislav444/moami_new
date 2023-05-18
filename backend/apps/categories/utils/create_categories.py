@@ -17,7 +17,7 @@ def create_categories():
                 size_group = SizeGroup.objects.get(slug=item['size_group'])
                 category.size_group = size_group
                 category.save()
-                # create_category_products(category)
+                create_category_products(category)
             if 'children' in item:
                 recursive(item['children'], category)
 

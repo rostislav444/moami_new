@@ -10,6 +10,7 @@ from django.utils.text import slugify
 from PIL import Image
 from unidecode import unidecode
 
+from adminsortable.models import SortableMixin
 from apps.abstract.fields import DeletableImageField
 from apps.attributes.models import Attribute, AttributeGroup, Composition
 from apps.categories.models import Collections
@@ -184,16 +185,18 @@ class VariantImageManager(models.Manager):
         return super().get_queryset().select_related('variant').prefetch_related('thumbnails')
 
 
-class VariantImage(models.Model):
+class VariantImage(SortableMixin):
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='images')
     image = DeletableImageField(upload_to='variant_images', get_parent='variant')
     slug = models.SlugField(max_length=255, blank=True)
+    index = models.PositiveIntegerField(default=0, editable=False)
 
     objects = VariantImageManager()
 
     class Meta:
         verbose_name = 'Изображение'
         verbose_name_plural = 'Изображения'
+        ordering = ['index']
 
     def save(self, *args, **kwargs):
         if not self.pk:
