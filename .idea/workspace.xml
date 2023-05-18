@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0aeb8c56-975f-42c2-97d5-8d95cea0dfbb" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/style.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/NavMenu/Categories/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/NavMenu/Categories/style.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/NavMenu/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/NavMenu/style.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/style.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/components/Logo/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/components/Logo/style.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/components/Phone/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/components/Phone/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/CartIcon/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/CartIcon/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/NavMenu/DesctopMenu/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/NavMenu/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/NavMenu/DesctopMenu/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/NavMenu/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/NavMenu/MobileMenu/index.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/NavMenu/MobileMenu/style.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/NavMenu/index.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/Breadcrumbs/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/Breadcrumbs/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/styles/Blocks/Content.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/Blocks/Content.tsx" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/frontend/src/interfaces/catalogue.tsx" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2NHvj0u48eRbfi3WMYaEDr1HAOn" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/Users/rostislavnikolaev/Desktop/Sites/moami",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "yarn",
+    "settings.editor.selected.configurable": "com.jetbrains.django.DjangoModulesConfigurable",
+    "ts.external.directory.path": "/Users/rostislavnikolaev/Desktop/Sites/moami/frontend/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/backend/apps" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader" />
+      <recent name="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/NavMenu" />
+      <recent name="$PROJECT_DIR$/frontend/src/components/Shared/Header" />
+      <recent name="$PROJECT_DIR$/backend/static" />
+      <recent name="$PROJECT_DIR$/backend" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0aeb8c56-975f-42c2-97d5-8d95cea0dfbb" name="Changes" comment="" />
+      <created>1679333955021</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1679333955021</updated>
+      <workItem from="1679333956612" duration="7153000" />
+      <workItem from="1679474441732" duration="13152000" />
+      <workItem from="1679653909174" duration="4337000" />
+      <workItem from="1679659509875" duration="3283000" />
+      <workItem from="1679663943960" duration="688000" />
+      <workItem from="1679673324265" duration="4441000" />
+      <workItem from="1679911882409" duration="4357000" />
+      <workItem from="1679923837597" duration="6000" />
+      <workItem from="1680015867001" duration="16986000" />
+      <workItem from="1680111363772" duration="8128000" />
+      <workItem from="1680165970451" duration="536000" />
+      <workItem from="1680166518264" duration="8000" />
+      <workItem from="1680171959586" duration="629000" />
+      <workItem from="1680198814110" duration="141000" />
+      <workItem from="1680253181415" duration="2734000" />
+      <workItem from="1680264475496" duration="1061000" />
+      <workItem from="1680267830245" duration="7306000" />
+      <workItem from="1680300802321" duration="2748000" />
+      <workItem from="1680519260301" duration="26000" />
+      <workItem from="1680519300690" duration="191000" />
+      <workItem from="1680519501099" duration="30851000" />
+      <workItem from="1680632202420" duration="26065000" />
+      <workItem from="1680783436993" duration="17471000" />
+      <workItem from="1681144279910" duration="448000" />
+      <workItem from="1681145295267" duration="3362000" />
+      <workItem from="1681207081283" duration="24388000" />
+      <workItem from="1681392541316" duration="6487000" />
+      <workItem from="1681489407220" duration="10727000" />
+      <workItem from="1681834699514" duration="9253000" />
+      <workItem from="1681926959730" duration="1070000" />
+      <workItem from="1682072795242" duration="3305000" />
+      <workItem from="1682166450876" duration="1000" />
+      <workItem from="1682166461818" duration="5748000" />
+      <workItem from="1682320313757" duration="10000" />
+      <workItem from="1682358631812" duration="9131000" />
+      <workItem from="1682525628583" duration="2435000" />
+      <workItem from="1682592623331" duration="6751000" />
+      <workItem from="1682617932082" duration="8545000" />
+      <workItem from="1682692378742" duration="19184000" />
+      <workItem from="1683057009925" duration="864000" />
+      <workItem from="1683135370069" duration="3247000" />
+      <workItem from="1683367049549" duration="17818000" />
+      <workItem from="1683567435886" duration="9140000" />
+      <workItem from="1683656334334" duration="3216000" />
+      <workItem from="1683668039661" duration="1046000" />
+      <workItem from="1683703841446" duration="3656000" />
+      <workItem from="1683742132747" duration="6807000" />
+      <workItem from="1683907082525" duration="18371000" />
+      <workItem from="1683935132652" duration="2257000" />
+      <workItem from="1684244002802" duration="268000" />
+      <workItem from="1684244608039" duration="34000" />
+      <workItem from="1684399048839" duration="1280000" />
+      <workItem from="1684416988923" duration="62000" />
+      <workItem from="1684417054523" duration="8630000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/frontend/src/components/App/Order/index.tsx</url>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

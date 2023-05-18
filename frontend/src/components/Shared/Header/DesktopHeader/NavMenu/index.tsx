@@ -11,7 +11,7 @@ interface Props {
     collections: CollectionsState[];
 }
 
-export const DesktopMenu = ({categories, collections}: Props) => {
+export const DesktopNavMenu = ({categories, collections}: Props) => {
     return <s.NavWrapper>
         <s.NavUl>
             {categories.map((category) =>

@@ -9,14 +9,12 @@ export const DescriptionContainer = styled.div`
     margin-bottom: 24px;
 `;
 
-export const DescriptionText = styled.div<{ showMore: boolean }>`
+export const DescriptionText = styled.div`
     display: block;
     position: relative;
     width: 100%;
     height: auto;
     overflow: hidden;
-    max-height: ${props => props.showMore ? '100%' : '100px'};
-    transition: max-height 0.3s ease-in-out;
 `;
 
 export const ShowMoreButton = styled.button`

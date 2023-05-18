@@ -1,5 +1,4 @@
-import {DescriptionContainer, DescriptionText, ShowMoreButton} from "@/components/App/Product/Description/style";
-import {useState} from "react";
+import {DescriptionContainer, DescriptionText} from "@/components/App/Product/Description/style";
 
 
 interface DescriptionProps {
@@ -8,16 +7,12 @@ interface DescriptionProps {
 
 
 export const ProductDescription = ({description}: DescriptionProps) => {
-    const [showMore, setShowMore] = useState(false)
 
     return (
         <DescriptionContainer>
-            <DescriptionText showMore={showMore}>
+            <DescriptionText>
                 {description}
             </DescriptionText>
-            <ShowMoreButton onClick={() => setShowMore(!showMore)}>
-                {showMore ? 'Скрыть' : 'Показать еще'}
-            </ShowMoreButton>
         </DescriptionContainer>
     )
 };

@@ -26,18 +26,6 @@ export const HeaderfirstLine = styled.div`
   
 `
 
-export const LogoWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`
-
-export const Logo = styled.span`
-  font-family: 'Lora', serif;
-  font-size: 40px;
-  font-weight: 400;
-`
-
 export const IconsWrapper = styled.div`
   display: flex;
   justify-content: flex-end;

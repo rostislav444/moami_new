@@ -4,6 +4,7 @@ import {Header} from "@/components/Shared/Header";
 import {Content, Main} from "@/styles/Blocks/Content";
 import CustomThemeProvider from "@/styles/ThemeProvider";
 import {Breadcrumbs} from './Breadcrumbs'
+import {Footer} from "@/components/Shared/Footer";
 
 export interface BreadcrumbsState {
     title: string,
@@ -25,14 +26,15 @@ export default function Layout({children, breadcrumbs}: LayoutProps) {
         </Head>
         <CustomThemeProvider>
             <Header/>
-            <Content>
-                <Breadcrumbs breadcrumbs={breadcrumbs}/>
-            </Content>
             <Main>
+                <Content>
+                    <Breadcrumbs breadcrumbs={breadcrumbs}/>
+                </Content>
                 <Content>
                     {children}
                 </Content>
             </Main>
+            <Footer/>
         </CustomThemeProvider>
     </>
 }

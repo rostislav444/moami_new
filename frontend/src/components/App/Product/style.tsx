@@ -4,6 +4,10 @@ import styled from '@emotion/styled';
 export const ProductContainer = styled.div`
   display: flex;
   padding-bottom: 48px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 export const ImageColumn = styled.div`
@@ -12,6 +16,11 @@ export const ImageColumn = styled.div`
   display: block;
   height: auto;
   margin-right: 10px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-right: 0;
+  }
 `;
 
 export const ImageWrapper = styled.div`
@@ -40,6 +49,14 @@ export const DescriptionColumn = styled.div`
   width: 400px;
   height: 320px;
   padding-left: 24px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    padding-left: 0;
+    position: relative;
+    margin-top: 24px;
+  }
 `;
 
 
