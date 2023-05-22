@@ -5,33 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0aeb8c56-975f-42c2-97d5-8d95cea0dfbb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/style.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/NavMenu/Categories/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/NavMenu/Categories/style.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/NavMenu/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/NavMenu/style.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/style.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/components/Logo/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/components/Logo/style.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/components/Phone/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/components/Phone/style.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/style.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/style.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/CartIcon/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/CartIcon/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/NavMenu/DesctopMenu/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/NavMenu/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/NavMenu/DesctopMenu/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/NavMenu/style.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/NavMenu/MobileMenu/index.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/NavMenu/MobileMenu/style.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/NavMenu/index.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/style.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/Breadcrumbs/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/Breadcrumbs/style.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/styles/Blocks/Content.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/Blocks/Content.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/apps/integrations/management/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/apps/integrations/management/commands/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/apps/integrations/management/commands/mk_photo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/emotion.d.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/emotion.d.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,22 +36,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/Users/rostislavnikolaev/Desktop/Sites/moami",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "yarn",
-    "settings.editor.selected.configurable": "com.jetbrains.django.DjangoModulesConfigurable",
-    "ts.external.directory.path": "/Users/rostislavnikolaev/Desktop/Sites/moami/frontend/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/rostislavnikolaev/Desktop/Sites/moami&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.django.DjangoModulesConfigurable&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/rostislavnikolaev/Desktop/Sites/moami/frontend/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/backend/apps" />
@@ -146,7 +125,8 @@
       <workItem from="1684244608039" duration="34000" />
       <workItem from="1684399048839" duration="1280000" />
       <workItem from="1684416988923" duration="62000" />
-      <workItem from="1684417054523" duration="8630000" />
+      <workItem from="1684417054523" duration="9591000" />
+      <workItem from="1684744185015" duration="1628000" />
     </task>
     <servers />
   </component>
