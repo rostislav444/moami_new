@@ -5,12 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0aeb8c56-975f-42c2-97d5-8d95cea0dfbb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/integrations/management/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/integrations/management/commands/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/integrations/management/commands/mk_photo.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/emotion.d.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/emotion.d.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/product/admin/admin_variant.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/admin/admin_variant.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/product/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/categories.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/actions/categories.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/sizeGrids.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/actions/sizeGrids.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/utils/requestHeaders.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/requestHeaders.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +127,9 @@
       <workItem from="1684399048839" duration="1280000" />
       <workItem from="1684416988923" duration="62000" />
       <workItem from="1684417054523" duration="9591000" />
-      <workItem from="1684744185015" duration="1628000" />
+      <workItem from="1684744185015" duration="2326000" />
+      <workItem from="1684776146354" duration="2874000" />
+      <workItem from="1685023262618" duration="169000" />
     </task>
     <servers />
   </component>

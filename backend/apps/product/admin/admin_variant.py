@@ -92,7 +92,7 @@ class VariantAdmin(NonSortableParentAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('product_link', 'code', 'color', 'slug')
+            'fields': ('product_link', 'product', 'code', 'color', 'slug')
         }),
     )
 

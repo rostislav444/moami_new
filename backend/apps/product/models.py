@@ -85,7 +85,7 @@ class Product(Translatable):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return f'{self.name} id: {str(self.id)}'
 
 
 class ProductComposition(models.Model):

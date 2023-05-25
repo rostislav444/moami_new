@@ -38,8 +38,6 @@ function App({Component, pageProps}: AppProps) {
 
             }
         }
-
-
     }, []);
 
     return <Provider store={store}>
@@ -55,14 +53,21 @@ function App({Component, pageProps}: AppProps) {
 }
 
 
-App.getInitialProps = async ({Component, ctx}: AppContext) => {
-    !store.getState().categories.categories.length && await store.dispatch(fetchCategories());
-    !store.getState().sizes.sizeGrids.length && await store.dispatch(fetchSizeGrids());
+App.getStaticProps = async ({Component, ctx}: AppContext) => {
+    console.log('getStaticProps')
 
     const language = getCookie('language', ctx) as string;
     if (language !== undefined && language !== null) {
         store.dispatch(updateLanguage(language))
     }
+
+    return {};
+}
+
+
+App.getServerSideProps = async ({Component, ctx}: AppContext) => {
+    !store.getState().categories.categories.length && await store.dispatch(fetchCategories());
+    !store.getState().sizes.sizeGrids.length && await store.dispatch(fetchSizeGrids());
 
     const categories = store.getState().categories.categories;
     const sizes = store.getState().sizes;
