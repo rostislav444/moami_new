@@ -5,18 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0aeb8c56-975f-42c2-97d5-8d95cea0dfbb" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/apps/product/management/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/apps/product/management/commands/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/apps/product/management/commands/resave_variants.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/product/admin/admin_variant.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/admin/admin_variant.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/apps/product/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/categories.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/actions/categories.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/sizeGrids.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/actions/sizeGrids.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/utils/requestHeaders.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/requestHeaders.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/reducers/language.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/reducers/language.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -129,7 +135,9 @@
       <workItem from="1684417054523" duration="9591000" />
       <workItem from="1684744185015" duration="2326000" />
       <workItem from="1684776146354" duration="2874000" />
-      <workItem from="1685023262618" duration="169000" />
+      <workItem from="1685023262618" duration="1068000" />
+      <workItem from="1685027395065" duration="5267000" />
+      <workItem from="1685098244264" duration="5014000" />
     </task>
     <servers />
   </component>

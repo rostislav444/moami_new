@@ -1,6 +1,7 @@
 import {LanguageState} from "@/interfaces/language";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {setCookie, getCookie} from 'cookies-next';
+import {cookies} from "next/headers";
 
 
 export const languageOptions = [

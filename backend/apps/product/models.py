@@ -155,6 +155,7 @@ class Variant(models.Model):
         return slugify(f'p-{self.product.slug}-c-{self.code}')
 
     def save(self, *args, **kwargs):
+        self.code = self.code.replace(' ', '-').upper()
         self.slug = self.get_slug
         super().save(*args, **kwargs)
 
