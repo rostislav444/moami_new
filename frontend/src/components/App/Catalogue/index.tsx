@@ -5,11 +5,12 @@ import {useEffect, useState} from "react";
 import {Pagination} from "@/components/App/Catalogue/Pagination";
 import {Button} from "@/components/Shared/Buttons";
 import {useRouter} from "next/router";
+import fetchWithLocale from "@/utils/fetchWrapper";
 
 
 export const Catalogue = ({initialVariants, count, url}: CatalogueProps) => {
     const perPage = 12
-    const {apiFetch} = useApi()
+    const apiFetch = fetchWithLocale()
     const [variants, setVariants] = useState(initialVariants)
     const [page, setPage] = useState<number | null>(null)
     const [showMore, setShowMore] = useState(false)
@@ -24,13 +25,13 @@ export const Catalogue = ({initialVariants, count, url}: CatalogueProps) => {
             if (showMore) {
                 const pageUrl = page === 1 ? url : `${url}&page=${page}`
                 apiFetch.get(pageUrl).then(data => {
-                    setVariants([...variants, ...data.results])
+                    setVariants([...variants, ...data.data.results])
                     setLoading(false)
                 })
             } else {
                 const pageUrl = page === 1 ? url : `${url}&page=${page}`
                 apiFetch.get(pageUrl).then(data => {
-                    setVariants(data.results)
+                    setVariants(data.data.results)
                     setLoading(false)
                 })
             }

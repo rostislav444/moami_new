@@ -3,13 +3,11 @@ import categoriesReducer from '@/state/reducers/categories'
 import cartReducer from '@/state/reducers/cart'
 import userReducer from '@/state/reducers/user'
 import sizeGridsReducer from '@/state/reducers/sizes'
-import languageReducer from '@/state/reducers/language'
 import collectionsReducer from '@/state/reducers/collections'
 
 const store = configureStore({
     reducer: {
         user: userReducer,
-        language: languageReducer,
         categories: categoriesReducer,
         collections: collectionsReducer,
         cart: cartReducer,

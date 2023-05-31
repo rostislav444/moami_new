@@ -7,6 +7,7 @@ import {selectCollections} from "@/state/reducers/collections";
 import {PaginatedVariants} from "@/interfaces/variant";
 import Error from 'next/error';
 import {Catalogue} from "@/components/App/Catalogue";
+import fetchWithLocale from "@/utils/fetchWrapper";
 
 interface CollectionProps {
     paginatedVariants: PaginatedVariants,
@@ -45,6 +46,8 @@ export default function Collection({paginatedVariants, statusCode, slug, url}: C
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const {slug} = context.query
+    const locale = context.locale
+    const apiFetch = fetchWithLocale(locale)
     const url = `catalogue/?collection=${slug}`
 
     const props = {
@@ -54,9 +57,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         url: url
     }
 
-    const response = await fetch(BASE_URL + props.url, {
-        headers: RequestHeaders(context)
-    })
+    // const response = await fetch(BASE_URL + props.url, {
+    //     headers: RequestHeaders(context)
+    // })
+
+    const response = await apiFetch.get(props.url)
 
     if (!response.ok) {
         return {
@@ -66,7 +71,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
-    props.paginatedVariants = await response.json()
+    props.paginatedVariants = response.data
 
     return {props}
 }

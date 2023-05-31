@@ -5,23 +5,29 @@ import {Icon} from "@/components/Shared/Icons";
 import Link from 'next/link'
 import React from "react";
 import {CartIcon} from "./CartIcon";
-import {languageOptions} from "@/state/reducers/language";
+import {useRouter} from 'next/router';
 import {DropdownSelect} from "@/components/Shared/choices";
-import {useLanguage} from "@/context/language";
+
 import {useAppSelector} from "@/state/hooks";
 import {selectCategories} from "@/state/reducers/categories";
 import {selectCollections} from "@/state/reducers/collections";
 import {DesktopNavMenu} from "@/components/Shared/Header/DesktopHeader/NavMenu";
 import {Logo} from "@/components/Shared/Header/components/Logo";
 
-
 export const DesktopHeader = () => {
+    const router = useRouter();
+    const {locale, asPath} = router;
     const {categories} = useAppSelector(selectCategories)
     const {collections} = useAppSelector(selectCollections)
-    const {language, setLanguage} = useLanguage();
+
+    const localeOptions = [
+        {value: 'uk', label: 'Укр'},
+        {value: 'ru', label: 'Рус'},
+        {value: 'en', label: 'Eng'},
+    ]
 
     const handleLanguageChange = (value: string) => {
-        setLanguage(value)
+        router.push(asPath, asPath, {locale: value})
     }
 
     return <s.HeaderWrapper>
@@ -31,14 +37,14 @@ export const DesktopHeader = () => {
                     <Icon mr={1} src='/icons/phone.svg'/>
                     <a href="tel:+380985402447">+38 (098) 540 2447</a>
                 </div>
-                <Logo />
+                <Logo/>
                 <IconsWrapper>
                     <DropdownSelect
-                        value={language}
+                        value={locale || 'uk'}
                         transparent={true}
                         pd={0}
                         onChange={handleLanguageChange}
-                        options={languageOptions}
+                        options={localeOptions}
                     />
                     <Icon src='/icons/user.svg' ml={0}/>
                     <Icon src='/icons/heart.svg' ml={3} count={0}/>

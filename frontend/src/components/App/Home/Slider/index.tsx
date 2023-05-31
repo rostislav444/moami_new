@@ -9,6 +9,8 @@ import {H1, P} from "@/components/Shared/Typograpy";
 import {SlideWrapper} from "@/components/App/Home/Slider/style";
 
 import Link from 'next/link'
+import fetchWithLocale from "@/utils/fetchWrapper";
+import {useLocale} from "@/context/localeFetchWrapper";
 
 interface HomeSliderState {
     type: 'category' | 'collection' | 'product';
@@ -21,6 +23,11 @@ interface HomeSliderState {
 
 interface HomeSliderProps {
     slides: HomeSliderState[];
+}
+
+interface response {
+    ok: boolean;
+    data: HomeSliderState[];
 }
 
 export const HomeSlider = () => {
@@ -36,10 +43,13 @@ export const HomeSlider = () => {
         ]
     )
 
-    const {apiFetch} = useApi();
+    // const apiFetch = fetchWithLocale();
+    const apiFetch = useLocale();
+
+    console.log('apiFetch', apiFetch)
 
     useEffect(() => {
-        apiFetch.get('pages/home-slider').then((data: HomeSliderState[]) => {
+        apiFetch.get('/pages/home-slider').then(({data}: response) => {
             setSlides(data);
         })
     }, [])

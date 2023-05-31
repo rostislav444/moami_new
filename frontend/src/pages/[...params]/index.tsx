@@ -1,13 +1,12 @@
 import Layout from '@/components/Shared/Layout'
-import {BASE_URL} from "@/context/api";
 import {GetServerSideProps} from 'next'
 import {useAppSelector} from "@/state/hooks";
 import {selectCategories} from "@/state/reducers/categories";
 import {Catalogue} from "@/components/App/Catalogue";
-import {RequestHeaders} from "@/utils/requestHeaders";
 import Error from 'next/error';
 import {categoriesBySlugList} from "@/utils/categories";
 import {PaginatedVariants} from "@/interfaces/variant";
+import fetchWithLocale from "@/utils/fetchWrapper";
 
 
 interface CatalogueCategoryProps {
@@ -32,7 +31,7 @@ export default function CatalogueCategory({paginatedVariants, statusCode, params
         <Layout
             key={JSON.stringify(params)}
             breadcrumbs={[{title: 'Главная', link: '/'}, ...breadcrumbsCategories]
-        }>
+            }>
             <Catalogue initialVariants={results} count={count} url={url}/>
         </Layout>
     )
@@ -41,8 +40,10 @@ export default function CatalogueCategory({paginatedVariants, statusCode, params
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const {params} = context.query
+    const locale = context.req.headers['accept-language'] || 'uk'
+    const apiFetch = fetchWithLocale(locale)
     const paramArray = Array.isArray(params) ? params : []
-    const url = `catalogue/?category=${paramArray.join(',')}`
+    const url = `/catalogue/?category=${paramArray.join(',')}`
 
     const props = {
         paginatedVariants: null,
@@ -51,9 +52,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         url: url
     }
 
-    const response = await fetch(BASE_URL + props.url, {
-        headers: RequestHeaders(context)
-    })
+    const response = await apiFetch.get(url)
 
     if (!response.ok) {
         return {
@@ -63,7 +62,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
-    props.paginatedVariants = await response.json()
+    props.paginatedVariants = response.data
 
     return {props}
 }

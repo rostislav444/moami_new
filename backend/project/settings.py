@@ -140,11 +140,11 @@ DISABLE_DARK_MODE = True
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'ru-ru'
+LANGUAGE_CODE = 'ru'
 LANGUAGES = (
-    ('uk-ua', 'Ukrainian'),
-    ('ru-ru', 'Russian'),
-    ('en-us', 'English')
+    ('uk', 'Ukrainian'),
+    ('ru', 'Russian'),
+    ('en', 'English')
 )
 FOREIGN_LANGUAGES = [lang for lang in LANGUAGES if lang[0] != LANGUAGE_CODE]
 FOREIGN_LANGUAGES_COUNT = len(FOREIGN_LANGUAGES)

@@ -5,16 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0aeb8c56-975f-42c2-97d5-8d95cea0dfbb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/apps/product/management/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/product/management/commands/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/apps/product/management/commands/resave_variants.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/utils/fetchWrapper.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/product/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/project/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/project/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/next.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/next.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/context/api.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/context/api.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/context/language.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/[...params]/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/[...params]/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/collections/[slug]/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/collections/[slug]/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/collections/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/collections/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/collections/style.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/product/[slug]/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/product/[slug]/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/categories.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/actions/categories.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/reducers/language.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/reducers/language.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/collections.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/actions/collections.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/sizeGrids.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/actions/sizeGrids.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/reducers/language.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/store.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/store.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +48,9 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2NHvj0u48eRbfi3WMYaEDr1HAOn" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -137,12 +149,27 @@
       <workItem from="1684776146354" duration="2874000" />
       <workItem from="1685023262618" duration="1068000" />
       <workItem from="1685027395065" duration="5267000" />
-      <workItem from="1685098244264" duration="5014000" />
+      <workItem from="1685098244264" duration="7813000" />
+      <workItem from="1685389564827" duration="2253000" />
+      <workItem from="1685472074894" duration="6860000" />
+      <workItem from="1685532795849" duration="1427000" />
+      <workItem from="1685564405111" duration="1705000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

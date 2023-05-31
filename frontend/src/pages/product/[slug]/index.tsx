@@ -6,6 +6,7 @@ import {GetServerSideProps} from "next";
 
 import {BASE_URL} from "@/context/api";
 import {VariantPageProps} from "@/interfaces/variant";
+import fetchWithLocale from "@/utils/fetchWrapper";
 
 
 export default function Product({variant}: VariantPageProps) {
@@ -27,14 +28,24 @@ export default function Product({variant}: VariantPageProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    const locale = context.locale || 'uk'
+    const apiFetch = fetchWithLocale(locale)
     const { slug } = context.params as { slug: string }
 
-    const res = await fetch(`${BASE_URL}product/variants/${slug}/`)
-    const variant = await res.json()
+    // const res = await fetch(`${BASE_URL}product/variants/${slug}/`)
+    // const variant = await res.json()
+
+    const response = await apiFetch.get(`/product/variants/${slug}/`)
+
+    if (!response.ok) {
+        return {
+            notFound: true
+        }
+    }
 
     return {
         props: {
-            variant
+            variant: response.data
         }
     }
 }
