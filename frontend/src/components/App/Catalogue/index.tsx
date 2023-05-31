@@ -1,6 +1,6 @@
 import {ProductsList} from "@/components/App/Catalogue/VarinatList";
 import {CatalogueProps} from "@/interfaces/catalogue";
-import {useApi} from "@/context/api";
+
 import {useEffect, useState} from "react";
 import {Pagination} from "@/components/App/Catalogue/Pagination";
 import {Button} from "@/components/Shared/Buttons";

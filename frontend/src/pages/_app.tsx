@@ -14,7 +14,6 @@ import {fetchSizeGrids} from "@/state/actions/sizeGrids";
 import {useRouter} from "next/router";
 
 
-
 function App({Component, pageProps}: AppProps) {
     const router = useRouter();
     const {locale} = router;
@@ -38,12 +37,10 @@ function App({Component, pageProps}: AppProps) {
 
     return <Provider store={store}>
         <LocaleProvider>
-            {/*<ApiProvider>*/}
-                <ThemeProvider>
-                    <Global styles={globalStyles}/>
-                    <Component {...pageProps} />
-                </ThemeProvider>
-            {/*</ApiProvider>*/}
+            <ThemeProvider>
+                <Global styles={globalStyles}/>
+                <Component {...pageProps} />
+            </ThemeProvider>
         </LocaleProvider>
     </Provider>
 }

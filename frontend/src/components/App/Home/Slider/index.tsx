@@ -3,13 +3,11 @@ import {useState, useEffect} from 'react';
 import 'keen-slider/keen-slider.min.css'
 import {useKeenSlider} from 'keen-slider/react'
 
-import {useApi} from '@/context/api';
 import * as s from "@/components/App/Home/Slider/style";
 import {H1, P} from "@/components/Shared/Typograpy";
 import {SlideWrapper} from "@/components/App/Home/Slider/style";
 
 import Link from 'next/link'
-import fetchWithLocale from "@/utils/fetchWrapper";
 import {useLocale} from "@/context/localeFetchWrapper";
 
 interface HomeSliderState {
