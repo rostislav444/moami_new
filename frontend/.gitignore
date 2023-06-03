@@ -29,3 +29,5 @@ yarn-error.log*
 out/
 dist/
 .env
+
+src/local.tsx
