@@ -19,12 +19,12 @@ class CategoryAdmin(MPTTModelAdmin):
     inlines = [CategoryAttributeGroupInline]
 
 
-class CollectionProductInline(admin.TabularInline):
-    model = Collections.products.through
-    extra = 0
+# class CollectionProductInline(admin.TabularInline):
+#     model = Collections.products.through
+#     extra = 0
 
 
 @admin.register(Collections)
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ('name',)
-    inlines = [CollectionProductInline]
+    # inlines = [CollectionProductInline]

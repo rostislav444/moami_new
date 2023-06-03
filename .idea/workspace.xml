@@ -6,25 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="0aeb8c56-975f-42c2-97d5-8d95cea0dfbb" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/product/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/product/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/categories/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/categories/admin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/project/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/project/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Cart/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Cart/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/Areas/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/Areas/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/Cities/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/Cities/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/Department/intex.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/Department/intex.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/context/api.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/collections/[slug]/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/collections/[slug]/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/product/[slug]/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/product/[slug]/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/cart.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/categories.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/actions/categories.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/collections.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/actions/collections.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/sizeGrids.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/actions/sizeGrids.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/utils/fetchWrapper.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/fetchWrapper.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -181,7 +164,7 @@
       <workItem from="1685472074894" duration="6860000" />
       <workItem from="1685532795849" duration="1427000" />
       <workItem from="1685564405111" duration="6885000" />
-      <workItem from="1685785720121" duration="7846000" />
+      <workItem from="1685785720121" duration="9006000" />
     </task>
     <servers />
   </component>
