@@ -11,8 +11,7 @@ class NameSlug(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
-        if hasattr(self, 'slug') and not self.slug:
-            self.slug = slugify(unidecode(self.name), allow_unicode=True)
+        self.slug = slugify(unidecode(self.name), allow_unicode=True)
         super().save(*args, **kwargs)
 
     def __str__(self):
