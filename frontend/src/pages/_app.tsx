@@ -9,7 +9,6 @@ import globalStyles from "@/styles/Global";
 import {LocaleProvider} from '@/context/localeFetchWrapper';
 import {Global} from '@emotion/react';
 import type {AppProps} from 'next/app'
-import {ApiProvider} from "@/context/api";
 import {fetchSizeGrids} from "@/state/actions/sizeGrids";
 import {useRouter} from "next/router";
 

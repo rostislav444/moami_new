@@ -1,7 +1,5 @@
 import Layout from '@/components/Shared/Layout'
 import {GetServerSideProps} from "next";
-import {BASE_URL} from "@/context/api";
-import {RequestHeaders} from "@/utils/requestHeaders";
 import {useAppSelector} from "@/state/hooks";
 import {selectCollections} from "@/state/reducers/collections";
 import {PaginatedVariants} from "@/interfaces/variant";

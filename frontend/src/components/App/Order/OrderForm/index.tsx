@@ -3,11 +3,12 @@ import {Form, Input, InputWrapper, StyledInputMask, Textarea} from "@/components
 import {useState} from "react";
 
 import {useForm} from "react-hook-form";
-import {useApi} from "@/context/api";
+
 import {selectCart} from "@/state/reducers/cart";
 import {useAppSelector} from "@/state/hooks";
 
 import {NewPostForm} from "@/components/App/Order/OrderForm/NewPost"
+import {useLocale} from "@/context/localeFetchWrapper";
 
 
 export const OrderForm = () => {
@@ -16,7 +17,7 @@ export const OrderForm = () => {
     const [selectDepartment, setSelectDepartment] = useState<string | null>(null)
 
     const {register, handleSubmit, formState: {errors}} = useForm();
-    const {apiFetch} = useApi();
+    const apiFetch = useLocale()
     const {items} = useAppSelector(selectCart)
 
 

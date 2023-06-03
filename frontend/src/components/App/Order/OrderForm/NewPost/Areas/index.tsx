@@ -1,8 +1,5 @@
-import {useEffect, useState} from "react";
-import {useApi} from "@/context/api";
 import {DropdownSelect} from "@/components/Shared/choices";
 import {AreaState} from "@/components/App/Order/OrderForm/NewPost";
-
 
 
 interface Props {

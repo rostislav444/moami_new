@@ -1,6 +1,4 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-
-import {BASE_URL} from "@/context/api";
 import fetchWithLocale from "@/utils/fetchWrapper";
 
 

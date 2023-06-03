@@ -81,8 +81,11 @@ class VariantImageSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_dimensions(obj):
-        w, h = get_image_dimensions(obj.image.file)
-        return {'width': w, 'height': h}
+        try:
+            w, h = get_image_dimensions(obj.image.file)
+            return {'width': w, 'height': h}
+        except FileNotFoundError:
+            return None
 
 
 class VariantSerializer(serializers.ModelSerializer):

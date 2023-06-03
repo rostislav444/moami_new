@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
-import {useApi} from "@/context/api";
 import {DropdownSelect} from "@/components/Shared/choices";
+import {useLocale} from "@/context/localeFetchWrapper";
 
 
 interface CityState {
@@ -19,7 +19,7 @@ interface Props {
 
 export const Cities = ({selectedArea, selectedCity, setSelectedCity}: Props) => {
     const [cities, setCities] = useState<CityState[]>([])
-    const {apiFetch} = useApi();
+    const apiFetch = useLocale()
 
     useEffect(() => {
         if (selectedArea) {

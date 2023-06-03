@@ -3,10 +3,10 @@ import {Cities} from "@/components/App/Order/OrderForm/NewPost/Cities";
 import {Department} from "@/components/App/Order/OrderForm/NewPost/Department/intex";
 import {Button} from "@/components/Shared/Buttons";
 import {H3} from "@/components/Shared/Typograpy";
-import {Block, Grid} from "@/components/Shared/Blocks";
+import {Grid} from "@/components/Shared/Blocks";
 import {Textarea} from "@/components/App/Order/OrderForm/style";
 import {useEffect, useState} from "react";
-import {useApi} from "@/context/api";
+import {useLocale} from "@/context/localeFetchWrapper";
 
 interface NewPostFormProps {
     selectedArea: string | null
@@ -35,7 +35,7 @@ export const NewPostForm = ({
                                 register
                             }: NewPostFormProps) => {
     const [areas, setAreas] = useState<AreaState[]>([])
-    const {apiFetch} = useApi();
+    const apiFetch = useLocale()
 
     useEffect(() => {
         apiFetch.get('newpost/areas').then((data: any) => {

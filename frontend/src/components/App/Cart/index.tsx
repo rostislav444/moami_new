@@ -7,30 +7,34 @@ import {CartTablePC} from "@/components/App/Cart/CartTable";
 import {Button} from "@/components/Shared/Buttons";
 import {ActionsWrapper, Wrapper} from "@/components/App/Cart/style";
 import Link from "next/link";
-import {useApi} from "@/context/api";
 import store from "@/state/store";
+import {useLocale} from "@/context/localeFetchWrapper";
 
 const CartTableDynamic = dynamic(() => Promise.resolve(CartTablePC), {ssr: false})
 
 
 export const CartPage = () => {
-    const {apiFetch} = useApi()
+    const apiFetch = useLocale()
     const {items} = useAppSelector(selectCart)
 
     useEffect(() => {
-        apiFetch.post('order/check-sizes-availability/', items.map(item => ({id: item.id, quantity: item.quantity})))
-            .then(data => {
-                for (const item of data) {
-                    const cartItem = items.find(cartItem => cartItem.id === item.id)
-                    if (cartItem) {
-                        if (item.quantity < cartItem.quantity) {
-                            store.dispatch(updateItemInCart({id: item.id, quantity: item.quantity}))
-                        } else if (item.quantity === 0) {
+        apiFetch.post('/order/check-sizes-availability/', items.map(item => ({id: item.id, quantity: item.quantity})))
+            .then(({data, ok}) => {
+                if (!ok) {
+                    for (const item of data) {
+                        const cartItem = items.find(cartItem => cartItem.id === item.id)
+                        if (cartItem) {
+                            if (item.quantity < cartItem.quantity) {
+                                store.dispatch(updateItemInCart({id: item.id, quantity: item.quantity}))
+                            } else if (item.quantity === 0) {
+                                store.dispatch(removeItemFromCart(item.id))
+                            }
+                        } else {
                             store.dispatch(removeItemFromCart(item.id))
                         }
-                    } else {
-                        store.dispatch(removeItemFromCart(item.id))
                     }
+                } else {
+                    console.log('Could not check sizes availability')
                 }
             })
     }, [])

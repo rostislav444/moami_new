@@ -1,3 +1,4 @@
+import {API_BASE_URL} from "@/local";
 
 interface FetchOptions extends RequestInit {
   headers: { [key: string]: string };
@@ -17,7 +18,7 @@ export interface FetchWrapper {
 }
 
 const fetchWithLocale = (locale: string|undefined = undefined): FetchWrapper => {
-    const baseUrl = process.env.API_BASE_URL || 'http://moami.com.ua/api';
+    const baseUrl = API_BASE_URL
 
     const request = async (url: string, method: string, body?: any): Promise<FetchResponse> => {
         if (!url.startsWith('/')) {

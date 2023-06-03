@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
-import {useApi} from "@/context/api";
 import {DropdownSelect} from "@/components/Shared/choices";
+import {useLocale} from "@/context/localeFetchWrapper";
 
 
 interface DepartmentState {
@@ -17,7 +17,7 @@ interface Props {
 
 export const Department = ({selectedCity, selectDepartment, setSelectDepartment}: Props) => {
     const [departments, setDepartments] = useState<DepartmentState[]>([])
-    const {apiFetch} = useApi();
+    const apiFetch = useLocale()
 
     useEffect(() => {
         if (selectedCity) {
