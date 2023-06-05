@@ -1,6 +1,6 @@
 from django.contrib import admin
 from apps.sizes.models import SizeGroup, SizeGrid, Size, SizeInterpretation, SizeProperty, SizePropertyValue
-from nested_inline.admin import NestedStackedInline, NestedModelAdmin, NestedTabularInline
+# from nested_inline.admin import NestedStackedInline, NestedModelAdmin, NestedTabularInline
 from django.utils.html import format_html
 
 
@@ -11,13 +11,13 @@ class SizeGridAdmin(admin.ModelAdmin):
     ordering = ('order', 'name')
 
 
-class SizePropertyValueInline(NestedTabularInline):
+class SizePropertyValueInline(admin.StackedInline):
     model = SizePropertyValue
     extra = 0
-    fk_name = 'size'
+    # fk_name = 'size'
 
 
-class SizeInterpretationInline(NestedTabularInline):
+class SizeInterpretationInline(admin.TabularInline):
     model = SizeInterpretation
     extra = 0
     fk_name = 'size'
@@ -25,13 +25,13 @@ class SizeInterpretationInline(NestedTabularInline):
 
 @admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
-    list_display = ('group', 'interpretations')
+    list_display = ('__str__', 'group',)
     search_fields = ('group__name',)
     ordering = ('group__name',)
     inlines = [SizeInterpretationInline, SizePropertyValueInline]
 
 
-class SizeInline(NestedStackedInline):
+class SizeInline(admin.TabularInline):
     model = Size
     extra = 0
     show_change_link = True
@@ -54,17 +54,15 @@ class SizePropertyAdmin(admin.ModelAdmin):
    pass
 
 
-class SizePropertyInline(NestedStackedInline):
+class SizePropertyInline(admin.StackedInline):
     model = SizeProperty
     extra = 0
     show_change_link = True
 
 
-
 @admin.register(SizeGroup)
-class SizeGroupAdmin(NestedModelAdmin):
+class SizeGroupAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
     ordering = ('name',)
-
     inlines = [SizePropertyInline, SizeInline]
