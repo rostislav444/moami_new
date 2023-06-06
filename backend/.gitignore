@@ -27,7 +27,7 @@ log/
 .DS_Store
 
 # PyCharm related files
-.idea/
+.idea/*
 *.iml
 *.ipr
 *.iws
@@ -36,3 +36,4 @@ log/
 .vscode/
 .DS_Store
 static_root/
+data/
