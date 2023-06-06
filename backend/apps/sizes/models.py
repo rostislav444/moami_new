@@ -9,11 +9,18 @@ class SizeGrid(NameSlug):
 
     class Meta:
         ordering = ['order', 'name']
+        verbose_name = 'Размерная сетка'
+        verbose_name_plural = 'Размерные сетки'
 
 
 class SizeGroup(NameSlug):
     base_grid = models.ForeignKey(SizeGrid, on_delete=models.PROTECT, related_name='base_grid', null=True, blank=True)
     grids = models.ManyToManyField(SizeGrid, related_name='groups')
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Группа размеров'
+        verbose_name_plural = 'Группы размеров'
 
 
 class Size(models.Model):
@@ -22,6 +29,8 @@ class Size(models.Model):
 
     class Meta:
         ordering = ['order', 'group__name']
+        verbose_name = 'Размер'
+        verbose_name_plural = 'Размеры'
 
     @property
     def get_size(self):
@@ -55,6 +64,8 @@ class SizeInterpretation(models.Model):
 
     class Meta:
         ordering = ['grid__order']
+        verbose_name = 'Интерпретация размера'
+        verbose_name_plural = 'Интерпретация размеров'
 
 
 class SizeProperty(NameSlug):
@@ -64,6 +75,8 @@ class SizeProperty(NameSlug):
 
     class Meta:
         ordering = ['name']
+        verbose_name = 'Параметр размера'
+        verbose_name_plural = 'Параметры размеров'
 
     def __str__(self):
         return self.name

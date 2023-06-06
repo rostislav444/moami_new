@@ -14,8 +14,11 @@ from adminsortable.models import SortableMixin
 from apps.abstract.fields import DeletableImageField
 from apps.attributes.models import Attribute, AttributeGroup, Composition
 from apps.categories.models import Collections
-from apps.sizes.models import Size
+from apps.sizes.models import Size, SizeGrid
 from apps.translation.models import Translatable
+from django.core.validators import RegexValidator
+
+alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Разрешенные символы 0-9, a-z, A-Z, -')
 
 
 class Brand(Translatable):
@@ -55,6 +58,11 @@ class Color(Translatable):
         return self.name
 
 
+class ProductManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset('category')
+
+
 class Product(Translatable):
     name = models.CharField(max_length=255, verbose_name='Название')
     category = models.ForeignKey('categories.Category', on_delete=models.CASCADE, related_name='products',
@@ -64,7 +72,7 @@ class Product(Translatable):
                                          related_name='products', verbose_name='Категория Rozetka', blank=True,
                                          null=True)
     taxonomy = models.ForeignKey('integrations.GoogleTaxonomy', on_delete=models.CASCADE, related_name='products',
-                                    verbose_name='Категория Google Taxonomy', blank=True, null=True)
+                                 verbose_name='Категория Google Taxonomy', blank=True, null=True)
     collections = models.ManyToManyField(Collections, blank=True, related_name='products', verbose_name='Коллекции')
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='products', verbose_name='Бренд')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='products', verbose_name='Страна')
@@ -74,6 +82,9 @@ class Product(Translatable):
     old_price = models.PositiveIntegerField(default=0, verbose_name='Старая цена')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    product_preferred_size_grid = models.ForeignKey(SizeGrid, null=True, blank=True, on_delete=models.SET_NULL,
+                                                    verbose_name='предпочтительная размерная сетка')
 
     class Meta:
         verbose_name = 'Товар'
@@ -129,11 +140,18 @@ class CustomProperty(models.Model):
         return f'{self.key}: {self.value}'
 
 
+class VariantManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('product')
+
+
 class Variant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
     slug = models.SlugField(max_length=512, unique=True, blank=True)
     color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='variants')
-    code = models.CharField(max_length=255)
+    code = models.CharField(max_length=255, validators=[alphanumeric])
+
+    objects = VariantManager()
 
     class Meta:
         verbose_name = 'Вариант'

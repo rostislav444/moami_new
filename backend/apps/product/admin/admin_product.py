@@ -118,7 +118,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'category', 'brand', 'country', 'collections',)
+            'fields': ('name', 'category', 'brand', 'country', 'collections','product_preferred_size_grid',)
         }),
         ('Интеграции', {
             'fields': ('rozetka_category', 'taxonomy',)

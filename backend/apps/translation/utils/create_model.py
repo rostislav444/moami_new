@@ -23,30 +23,14 @@ def create_translation_model(model):
         setattr(module, model_name, new_model)
         return new_model
 
-
-    # def create_model(model_name, fields, module_name):
-    #     module = sys.modules[module_name]
-    #
-    #     def __str__(self):
-    #         return self.language_code
-    #
-    #     base_model = models.Model
-    #
-    #     fields['__module__'] = module.__name__
-    #     new_model = type(model_name, (base_model,), fields)
-    #     new_model.__str__ = __str__
-    #     setattr(module, model_name, new_model)
-    #     return new_model
-
     def get_translatable_fields(model):
         new_fields = {}
         for field in model._meta.get_fields():
             if isinstance(field, models.CharField) or isinstance(field, models.TextField):
-                # TODO Make one method
                 if field.name not in ['slug']:
-                    new_fields[field.name] = field
-                    new_fields[field.name].blank = True
-                    new_fields[field.name].null = True
+                    new_fields[field.name] = field.__class__(blank=True, null=True)
+                    if isinstance(field, models.CharField):
+                        new_fields[field.name].max_length = field.max_length
         return new_fields
 
     model_name = model.__name__

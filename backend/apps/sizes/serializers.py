@@ -6,3 +6,6 @@ class SizeGridSerializer(serializers.ModelSerializer):
     class Meta:
         model = SizeGrid
         fields = ('id', 'name', 'slug', 'order', 'is_default')
+
+
+

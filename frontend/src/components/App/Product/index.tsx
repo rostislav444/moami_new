@@ -32,10 +32,16 @@ import {ProductDescription} from "@/components/App/Product/Description";
 
 export const ProductPage = ({variant}: VariantPageProps) => {
     const ref = useRef<HTMLDivElement>(null)
-    const {sizeGrids, selected} = useAppSelector<SizeGridProps>(selectSizes)
+
     const initialSize = variant.sizes.find(size => size.stock !== 0)?.id
     const [selectedSize, setSelectedSize] = useState<number | undefined>(initialSize)
     const {push} = useRouter();
+
+    const sizeGrids = variant.product.size_grids
+    const productPreferredSizeGrid = variant.product.product_preferred_size_grid
+    const {selected} = useAppSelector<SizeGridProps>(selectSizes)
+    const [selectedGrid, setSelectedGrid] = useState<string>(sizeGrids.find(grid => grid.slug === selected)?.slug || productPreferredSizeGrid || sizeGrids[0].slug);
+
 
     useEffect(() => {
         if (ref.current) {
@@ -44,6 +50,7 @@ export const ProductPage = ({variant}: VariantPageProps) => {
     }, [ref.current])
 
     const handleGridChange = (slug: string) => {
+        setSelectedGrid(slug)
         store.dispatch(selectGrid(slug))
     }
 
@@ -71,14 +78,14 @@ export const ProductPage = ({variant}: VariantPageProps) => {
             <ImageColumn>
                 {variant.images.map((image, key) =>
                     <ImageWrapper key={key}>
-                        <Image fill src={image.image} alt={'alt' + key}/>
+                        <Image fill src={image.thumbnails[0].image} alt={'alt' + key} unoptimized/>
                     </ImageWrapper>
                 )}
             </ImageColumn>
             <DescriptionColumn ref={ref}>
                 <FlexSpaceBetween mb={2}>
                     <Caption>Код: {variant.code}</Caption>
-                    <DropdownSelect transparent value={selected}
+                    <DropdownSelect transparent value={selectedGrid}
                                     options={sizeGrids.map(grid => ({label: grid.name, value: grid.slug,}))}
                                     onChange={handleGridChange}/>
                 </FlexSpaceBetween>
@@ -91,15 +98,14 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                 <VariantsLinks variants={variant.product.variants} selected={variant.id}/>
                 <SizeList>
                     {variant.sizes.map((size, key) => {
-                        return <SizeItem active={size.stock !== 0} selected={size.id === selectedSize} key={key}
-                                  onClick={() => size.stock !== 0 && setSelectedSize(size.id)}>
-                            {selected && <span>{size.size[selected]}</span>}
-                        </SizeItem>
-                    }
-
+                            return <SizeItem active={size.stock !== 0} selected={size.id === selectedSize} key={key}
+                                             onClick={() => size.stock !== 0 && setSelectedSize(size.id)}>
+                                {selectedGrid && <span>{size.size[selectedGrid]}</span>}
+                            </SizeItem>
+                        }
                     )}
                 </SizeList>
-                 <ProductPreview>
+                <ProductPreview>
                     {variant.product.properties.map((property, key) =>
                         <li key={key}>
                             <Span mr={1}>{property.key}:</Span>

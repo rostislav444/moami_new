@@ -2,6 +2,7 @@ from django.core.files.images import get_image_dimensions
 from rest_framework import serializers
 
 from apps.product.models import Product, Variant, Color, VariantSize, VariantImage, CustomProperty
+from apps.sizes.serializers import SizeGridSerializer
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -51,10 +52,12 @@ class ProductSerializer(serializers.ModelSerializer):
     variants = VariantWithImagesSerializer(many=True)
     breadcrumbs = serializers.SerializerMethodField()
     properties = CustomPropertySerializer(many=True)
+    size_grids = SizeGridSerializer(source='category.size_group.grids', many=True)
 
     class Meta:
         model = Product
-        fields = ('name', 'slug', 'price', 'old_price', 'description', 'properties', 'variants', 'breadcrumbs')
+        fields = ('name', 'slug', 'price', 'old_price', 'description', 'properties', 'variants', 'breadcrumbs',
+                  'size_grids', 'product_preferred_size_grid')
 
     def get_breadcrumbs(self, obj):
         breadcrumbs = []

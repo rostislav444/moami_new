@@ -22,9 +22,10 @@ class VariantViewSet(viewsets.ModelViewSet):
         slug = self.kwargs['slug']
 
         product = slug.split('-c-')[0][2:]
-        print(product)
         code = slug.split('-c-')[1]
-        return Variant.objects.get(code__iexact=code)
+
+        print(Variant.objects.filter(code__iexact=code))
+        return Variant.objects.get(product__slug__iexact=product, code__iexact=code)
 
 
 

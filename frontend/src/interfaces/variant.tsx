@@ -17,7 +17,7 @@ interface VariantImageThumbnail {
     image: string;
 }
 
-interface VariantImage {
+export interface VariantImage {
     image: string;
     dimensions: { width: number; height: number };
     thumbnails: VariantImageThumbnail[];
@@ -34,6 +34,11 @@ interface ProductProperty {
 }
 
 
+interface SizeGrid {
+    slug: string;
+    name: string;
+}
+
 interface Product {
     name: string;
     slug: string;
@@ -43,6 +48,8 @@ interface Product {
     variants: VariantWithImage[];
     properties: ProductProperty[];
     breadcrumbs: { title: string; link: string }[];
+    size_grids: SizeGrid[]
+    product_preferred_size_grid: string
 }
 
 interface VariantState {

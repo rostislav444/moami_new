@@ -1,4 +1,6 @@
 from django.contrib import admin
+
+from apps.sizes.forms import SizeInterpretationForm
 from apps.sizes.models import SizeGroup, SizeGrid, Size, SizeInterpretation, SizeProperty, SizePropertyValue
 # from nested_inline.admin import NestedStackedInline, NestedModelAdmin, NestedTabularInline
 from django.utils.html import format_html
@@ -19,8 +21,20 @@ class SizePropertyValueInline(admin.StackedInline):
 
 class SizeInterpretationInline(admin.TabularInline):
     model = SizeInterpretation
-    extra = 0
+    form = SizeInterpretationForm
+    extra = 1
     fk_name = 'size'
+
+    def get_min_num(self, request, obj=None, **kwargs):
+        return request._obj.group.grids.count()
+
+    def get_max_num(self, request, obj=None, **kwargs):
+        return request._obj.group.grids.count()
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "grid" and request._obj is not None:
+            kwargs["queryset"] = request._obj.group.grids.all()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(Size)
@@ -29,6 +43,10 @@ class SizeAdmin(admin.ModelAdmin):
     search_fields = ('group__name',)
     ordering = ('group__name',)
     inlines = [SizeInterpretationInline, SizePropertyValueInline]
+
+    def get_form(self, request, obj=None, **kwargs):
+        request._obj = obj
+        return super().get_form(request, obj, **kwargs)
 
 
 class SizeInline(admin.TabularInline):
@@ -51,7 +69,7 @@ class SizeInline(admin.TabularInline):
 
 @admin.register(SizeProperty)
 class SizePropertyAdmin(admin.ModelAdmin):
-   pass
+    pass
 
 
 class SizePropertyInline(admin.StackedInline):
