@@ -24,8 +24,11 @@ class VariantViewSet(viewsets.ModelViewSet):
         product = slug.split('-c-')[0][2:]
         code = slug.split('-c-')[1]
 
-        print(Variant.objects.filter(code__iexact=code))
-        return Variant.objects.get(product__slug__iexact=product, code__iexact=code)
+        # return Variant.objects.get(product__slug__iexact=product, code__iexact=code)
+        try:
+            return Variant.objects.get(code__iexact=code)
+        except Variant.DoesNotExist:
+            return None
 
 
 
