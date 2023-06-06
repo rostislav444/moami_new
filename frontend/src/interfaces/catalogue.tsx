@@ -17,6 +17,7 @@ export interface ClorState {
 
 export interface variantImageState {
     image: string,
+    thumbnails: variantImageState[]
     dimensions: {
         width: number,
         height: number
