@@ -19,10 +19,10 @@ class Command(BaseCommand):
     def handle(self,  *args, **options):
         category_slug = options.get('category')
         if category_slug:
-            filename = 'mk_photo{}.zip'.format(category_slug)
+            filename = 'mk_photo_{}'.format(category_slug)
             category = Category.objects.get(slug=category_slug)
         else:
-            filename = 'mk_photo.zip'
+            filename = 'mk_photo'
             category = None
 
         mk_photo_zip_path = os.path.join(settings.MEDIA_ROOT, f'{filename}.zip')

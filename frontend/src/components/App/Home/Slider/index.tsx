@@ -43,7 +43,7 @@ export const HomeSlider = () => {
     }, [])
 
 
-    return slides.length > 0 && (
+    return slides.length > 0 ? (
         <div ref={sliderRef} className="keen-slider">
             {slides.map((slide, key) => (
                 <div key={key} className="keen-slider__slide">
@@ -55,26 +55,5 @@ export const HomeSlider = () => {
                 </div>
             ))}
         </div>
-    );
-
-    //
-    // return slides.length > 0 && <div ref={sliderRef} className="keen-slider">
-    //     {slides.map((slide, key) =>
-    //         <SlideWrapper key={key} className="keen-slider__slide">
-    //             <MiniPostSlide>
-    //                 <div className={'title-description'}>
-    //                     <H1 style={{marginTop: '10%', marginLeft: '5%', maxWidth: '70%'}} mb={4}>{slide.title}</H1>
-    //                     <P style={{marginLeft: '5%'}} mb={2}>{slide.description}</P>
-    //                     <Link href={'/'}>
-    //                         <P color={'primary'} style={{marginLeft: '5%'}} mt={4}>Shop now</P>
-    //                     </Link>
-    //                 </div>
-    //                 <div className={slide.image_2 ? 'image' : 'two-images'}>
-    //                     <img src={slide.image} alt={slide.title}/>
-    //                     {slide.image_2 && <img src={slide.image_2} alt={slide.title}/>}
-    //                 </div>
-    //             </MiniPostSlide>
-    //         </SlideWrapper>)
-    //     }
-    // </div>
+    ) : null;
 }
