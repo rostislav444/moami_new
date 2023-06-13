@@ -33,6 +33,7 @@ export const P = styled(p)`
   line-height: 1.75;
   color: ${props => {
     if (props.color === 'primary') return theme.color.primary
+    if (props.color === 'white') return 'white'
     return null
   }}
 `

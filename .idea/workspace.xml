@@ -6,7 +6,27 @@
   <component name="ChangeListManager">
     <list default="true" id="0aeb8c56-975f-42c2-97d5-8d95cea0dfbb" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/integrations/management/commands/mk_photo.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/integrations/management/commands/mk_photo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/pages/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/pages/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/pages/apps.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/pages/apps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/pages/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/pages/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/product/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/apps/product/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/project/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/project/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/@types/emotion.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/@types/emotion.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/Pagination/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/Pagination/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/VariantsLinks/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/VariantsLinks/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Typograpy.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Typograpy.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/[...params]/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/[...params]/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/styles/Theme.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/Theme.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -167,7 +187,11 @@
       <workItem from="1685963234795" duration="243000" />
       <workItem from="1685963485205" duration="20000" />
       <workItem from="1685963511341" duration="11768000" />
-      <workItem from="1686079605242" duration="2925000" />
+      <workItem from="1686079605242" duration="4201000" />
+      <workItem from="1686413248610" duration="5860000" />
+      <workItem from="1686483386397" duration="4990000" />
+      <workItem from="1686595608900" duration="4497000" />
+      <workItem from="1686652606376" duration="525000" />
     </task>
     <servers />
   </component>

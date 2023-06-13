@@ -14,6 +14,5 @@ export const VariantsLinksContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, 48px);
   grid-gap: 16px;
-  margin-top: 48px;
-  margin-bottom: 48px;
+  margin: 24px 0;
 `;

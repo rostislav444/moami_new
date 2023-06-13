@@ -40,10 +40,16 @@ export default function CatalogueCategory({paginatedVariants, statusCode, params
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const {params} = context.query
+    const page = context.query.page
+
+
     const locale = context.req.headers['accept-language'] || 'uk'
     const apiFetch = fetchWithLocale(locale)
     const paramArray = Array.isArray(params) ? params : []
-    const url = `/catalogue/?category=${paramArray.join(',')}`
+    let url = `/catalogue/?category=${paramArray.join(',')}`
+    if (page) {
+        url += `&page=${page}`
+    }
 
     const props = {
         paginatedVariants: null,

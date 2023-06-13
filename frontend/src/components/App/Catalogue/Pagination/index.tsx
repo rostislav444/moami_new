@@ -40,7 +40,8 @@ export const Pagination = ({page, setPage, totalPages}: paginationProps) => {
                 <s.PaginationButton onClick={() => handlePageChange(page + 2)}>{page + 2}</s.PaginationButton>}
             {page < totalPages - 3 && <s.PaginationButton>...</s.PaginationButton>}
             {page < totalPages - 2 &&  <s.PaginationButton onClick={() => handlePageChange(totalPages)}>{totalPages}</s.PaginationButton>}
-            <s.PaginationButton onClick={handleNextPage}>Next</s.PaginationButton>
+            {page < totalPages && <s.PaginationButton onClick={() => handlePageChange(page + 1)}>Next</s.PaginationButton>}
+
         </s.Pagination>
     )
 }

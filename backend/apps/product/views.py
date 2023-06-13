@@ -5,6 +5,7 @@ from apps.product.models import Variant, Product
 from apps.product.serializers import VariantSerializer, ProductSerializer
 from unidecode import unidecode
 
+
 class ProductList(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -29,6 +30,3 @@ class VariantViewSet(viewsets.ModelViewSet):
             return Variant.objects.get(product__slug__iexact=unidecode(product), code__iexact=code)
         except Variant.DoesNotExist:
             return Variant.objects.none
-
-
-

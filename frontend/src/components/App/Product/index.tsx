@@ -3,8 +3,6 @@ import {
     AddToWishlistWrapper,
     BuyButton,
     DescriptionColumn,
-    ImageColumn,
-    ImageWrapper,
     OldPrice,
     Price,
     PriceBlock,
@@ -28,6 +26,7 @@ import {CartItemState} from "@/interfaces/cart";
 import {addItemToCart} from "@/state/reducers/cart";
 import {VariantsLinks} from "@/components/App/Product/VariantsLinks";
 import {ProductDescription} from "@/components/App/Product/Description";
+import {ProductImageGallery} from "@/components/App/Product/Galery";
 
 
 export const ProductPage = ({variant}: VariantPageProps) => {
@@ -75,13 +74,7 @@ export const ProductPage = ({variant}: VariantPageProps) => {
 
     return (
         <ProductContainer>
-            <ImageColumn>
-                {variant.images.map((image, key) =>
-                    <ImageWrapper key={key}>
-                        <Image fill src={image.thumbnails[0].image} alt={'alt' + key} unoptimized/>
-                    </ImageWrapper>
-                )}
-            </ImageColumn>
+            <ProductImageGallery images={variant.images} />
             <DescriptionColumn ref={ref}>
                 <FlexSpaceBetween mb={2}>
                     <Caption>Код: {variant.code}</Caption>
@@ -95,7 +88,9 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                     {variant.product.old_price > variant.product.price &&
                         <OldPrice>{variant.product.old_price} ₴</OldPrice>}
                 </PriceBlock>
+                 <ProductDescription description={variant.product.description}/>
                 <VariantsLinks variants={variant.product.variants} selected={variant.id}/>
+
                 <SizeList>
                     {variant.sizes.map((size, key) => {
                             return <SizeItem active={size.stock !== 0} selected={size.id === selectedSize} key={key}
@@ -113,6 +108,7 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                         </li>
                     )}
                 </ProductPreview>
+
                 <Actions>
                     <BuyButton onClick={handleAddToCart}>Купить</BuyButton>
                     <AddToWishlistWrapper>
@@ -120,7 +116,7 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                     </AddToWishlistWrapper>
                 </Actions>
 
-                <ProductDescription description={variant.product.description}/>
+
             </DescriptionColumn>
         </ProductContainer>
     )

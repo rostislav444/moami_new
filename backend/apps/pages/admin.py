@@ -20,12 +20,12 @@ class HomeSliderAdmin(admin.ModelAdmin):
         if obj and obj.slide_type == 'mini_post':
             return (
                 (None, {
-                    'fields': ('slide_type', 'title', 'description', 'image', 'image_2', 'is_active')
+                    'fields': ('slide_type', 'link_type', 'link', 'title', 'description', 'image', 'image_2', 'is_active')
                 }),
             )
         return (
             (None, {
-                'fields': ('slide_type', 'image', 'is_active')
+                'fields': ('slide_type', 'link_type', 'link', 'title', 'description', 'image', 'is_active')
             }),
         )
 
