@@ -4,10 +4,12 @@ import cartReducer from '@/state/reducers/cart'
 import userReducer from '@/state/reducers/user'
 import sizeGridsReducer from '@/state/reducers/sizes'
 import collectionsReducer from '@/state/reducers/collections'
+import pagesReducer from "@/state/reducers/pages";
 
 const store = configureStore({
     reducer: {
         user: userReducer,
+        pages: pagesReducer,
         categories: categoriesReducer,
         collections: collectionsReducer,
         cart: cartReducer,

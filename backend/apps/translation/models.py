@@ -21,6 +21,7 @@ class Translatable(models.Model):
         abstract = True
 
     translatable_fields = []
+    exclude_translation = []
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -28,14 +29,15 @@ class Translatable(models.Model):
         self.fields = self._meta.get_fields()
         for field in self.fields:
             if isinstance(field, (models.CharField, models.TextField)) and field.name not in ['slug']:
-                self.translatable_fields.append(field.name)
+                if field.name != 'slug' and field.name not in self.exclude_translation:
+                    self.translatable_fields.append(field.name)
 
     @property
     def get_translatable_fields(self):
         fields = []
         for field in self._meta.get_fields():
             if isinstance(field, models.CharField) or isinstance(field, models.TextField):
-                if field.name not in ['slug']:
+                if field.name != 'slug' and field.name not in self.exclude_translation:
                     fields.append(field.name)
         return fields
 

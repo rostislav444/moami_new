@@ -1,9 +1,9 @@
-from rest_framework import viewsets, mixins, generics
-
-from apps.product.models import Variant, Product
-
-from apps.product.serializers import VariantSerializer, ProductSerializer
+from django.shortcuts import render
+from rest_framework import viewsets
 from unidecode import unidecode
+
+from apps.product.models import Product, Variant
+from apps.product.serializers import ProductSerializer, VariantSerializer
 
 
 class ProductList(viewsets.ModelViewSet):

@@ -53,7 +53,6 @@ interface CounterProps {
 export const Counter = ({value, onChange, maxValue}: CounterProps) => {
     const handleIncrement = () => {
         if (maxValue && value >= maxValue) return;
-        console.log(maxValue, value)
         onChange(value + 1);
     }
 

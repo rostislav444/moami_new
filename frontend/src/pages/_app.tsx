@@ -11,6 +11,7 @@ import {Global} from '@emotion/react';
 import type {AppProps} from 'next/app'
 import {fetchSizeGrids} from "@/state/actions/sizeGrids";
 import {useRouter} from "next/router";
+import {fetchPages} from "@/state/actions/pages";
 
 
 function App({Component, pageProps}: AppProps) {
@@ -27,10 +28,10 @@ function App({Component, pageProps}: AppProps) {
             if (typeof window !== 'undefined') {
                 !store.getState().categories.categories.length && await store.dispatch(fetchCategories());
                 !store.getState().collections.collections.length && await store.dispatch(fetchCollections());
+                !store.getState().pages.pages.length && await store.dispatch(fetchPages());
                 !store.getState().sizes.sizeGrids.length && await store.dispatch(fetchSizeGrids());
             }
         }
-
         load();
     }, [locale]);
 

@@ -5,7 +5,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 from apps.abstract.fields import DeletableImageField
 from apps.abstract.models import NameSlug
 from apps.attributes.models import AttributeGroup
-from apps.sizes.models import SizeGroup
+from apps.sizes.models import SizeGrid, SizeGroup
 from apps.translation.models import Translatable
 
 
@@ -13,6 +13,8 @@ class Category(NameSlug, MPTTModel, Translatable):
     parent = TreeForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
     size_group = models.ForeignKey(SizeGroup, null=True, blank=True, on_delete=models.PROTECT,
                                    related_name='categories')
+    preferred_size_grid = models.ForeignKey(SizeGrid, null=True, blank=True, on_delete=models.SET_NULL,
+                                                    verbose_name='предпочтительная размерная сетка')
 
     class MPTTMeta:
         order_insertion_by = ['name']
@@ -30,10 +32,16 @@ class Category(NameSlug, MPTTModel, Translatable):
         super(Category, self).save(*args, **kwargs)
 
     def _check_attribute_groups(self):
+        # Get all attribute group IDs associated with the current instance
         attribute_groups = self.attribute_groups.all().values_list('id', flat=True)
+
+        # Iterate over all ancestor categories of the current instance
         for ancestor in self.get_ancestors():
+            # Check if any of the attribute groups of the current instance are also present in the ancestor category
             if ancestor.attribute_groups.filter(id__in=attribute_groups).exists():
+                # If a conflict is found, raise a ValidationError
                 raise ValidationError(
+                    # The error message includes the IDs of the conflicting attribute groups and the ancestor category
                     'Attribute group(s) "{}" already exist in ancestor category "{}".'.format(
                         ', '.join(str(ag) for ag in attribute_groups.intersection(ancestor.attribute_groups.all())),
                         ancestor

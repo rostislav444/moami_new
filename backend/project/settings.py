@@ -62,8 +62,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'nested_inline',
     'mptt',
-    'adminsortable'
-
+    'adminsortable',
+    'adminsortable2',
 ]
 
 MIDDLEWARE = [

@@ -18,6 +18,7 @@ from apps.sizes.models import Size, SizeGrid
 from apps.translation.models import Translatable
 from django.core.validators import RegexValidator
 
+
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Разрешенные символы 0-9, a-z, A-Z, -')
 
 
@@ -64,6 +65,7 @@ class ProductManager(models.Manager):
 
 
 class Product(Translatable):
+    index = models.PositiveIntegerField(default=0, verbose_name='Индекс')
     name = models.CharField(max_length=255, verbose_name='Название')
     category = models.ForeignKey('categories.Category', on_delete=models.CASCADE, related_name='products',
                                  verbose_name='Категория')
@@ -89,7 +91,7 @@ class Product(Translatable):
     class Meta:
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
-        ordering = ['name']
+        ordering = ['index']
 
     def save(self, *args, **kwargs):
         self.slug = slugify(unidecode(f'{self.name}-{self.brand.name}'))
@@ -205,10 +207,10 @@ class VariantImageManager(models.Manager):
 
 
 class VariantImage(SortableMixin):
+    index = models.PositiveIntegerField(default=0)
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='images')
     image = DeletableImageField(upload_to='variant_images', get_parent='variant')
     slug = models.SlugField(max_length=255, blank=True)
-    index = models.PositiveIntegerField(default=0, editable=False)
 
     objects = VariantImageManager()
 

@@ -13,9 +13,6 @@ export const FooterWrapper = styled.div`
   margin-top: 48px;
 `
 
-
-
-
 export const MainLine = styled.div`
   display: grid;
   grid-template-columns: auto 1fr;
@@ -54,11 +51,15 @@ export const SocialPhrase = styled(Span)`
 
 export const PagesBlock = styled.div`
   display: grid;
-  grid-template-columns: 160px 320px;
+  grid-template-columns: 160px 240px;
   justify-content: flex-start;
   grid-gap: 16px;
   align-items: flex-start;;
   width: 100%;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `
 
 export const PagesBlockList = styled.ul`

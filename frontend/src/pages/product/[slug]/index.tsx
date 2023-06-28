@@ -5,12 +5,19 @@ import {ProductPage} from "@/components/App/Product";
 import {GetServerSideProps} from "next";
 import {VariantPageProps} from "@/interfaces/variant";
 import fetchWithLocale from "@/utils/fetchWrapper";
+import {useEffect} from "react";
+import {pageView} from "@/lib/FacebookPixel";
+
 
 
 export default function Product({variant}: VariantPageProps) {
     const router = useRouter()
     const {slug} = router.query
     const categoriesBreadcrumbs = variant.product.breadcrumbs
+
+    useEffect(() => {
+        pageView()
+    }, []);
 
     const breadcrumbs = [
         {title: 'Главная', link: '/'},
@@ -28,9 +35,6 @@ export default function Product({variant}: VariantPageProps) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const apiFetch = fetchWithLocale(context.locale || 'uk')
     const {slug} = context.params as { slug: string }
-
-    // const res = await fetch(`${BASE_URL}product/variants/${slug}/`)
-    // const variant = await res.json()
 
     const response = await apiFetch.get(`/product/variants/${slug}/`)
 

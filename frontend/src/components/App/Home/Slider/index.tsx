@@ -5,6 +5,7 @@ import {useKeenSlider} from 'keen-slider/react'
 import {useLocale} from "@/context/localeFetchWrapper";
 import {ImageSlideComponent} from "@/components/App/Home/Slider/Slides/ImageSlide";
 import {MiniPostSlideComponent} from "@/components/App/Home/Slider/Slides/MiniPostSlide";
+import {SlideWrapper, Wrapper} from "@/components/App/Home/Slider/style";
 
 export interface HomeSlideState {
     link_type: 'category' | 'collection' | 'product';
@@ -44,16 +45,19 @@ export const HomeSlider = () => {
 
 
     return slides.length > 0 ? (
-        <div ref={sliderRef} className="keen-slider">
+        <Wrapper ref={sliderRef} className="keen-slider">
             {slides.map((slide, key) => (
                 <div key={key} className="keen-slider__slide">
-                    {slide.image_2 ? (
-                        <MiniPostSlideComponent slide={slide}/>
-                    ) : (
-                        <ImageSlideComponent slide={slide}/>
-                    )}
+                    <SlideWrapper>
+                        {slide.image_2 ? (
+                            <MiniPostSlideComponent slide={slide}/>
+                        ) : (
+                            <ImageSlideComponent slide={slide}/>
+                        )}
+                    </SlideWrapper>
+
                 </div>
             ))}
-        </div>
+        </Wrapper>
     ) : null;
 }

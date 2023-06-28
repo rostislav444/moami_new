@@ -9,7 +9,9 @@ class CategoriesView(generics.GenericAPIView, mixins.ListModelMixin, viewsets.Vi
     serializer_class = CategorySerializer
 
     def get_queryset(self):
-        return Category.objects.filter(parent=None)
+        return Category.objects.filter(
+            parent=None, children__products__isnull=False
+        ).distinct()
 
 
 class CollectionsView(generics.GenericAPIView, mixins.ListModelMixin, viewsets.ViewSet):

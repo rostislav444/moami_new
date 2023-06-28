@@ -6,19 +6,28 @@ import {Pagination} from "@/components/App/Catalogue/Pagination";
 import {Button} from "@/components/Shared/Buttons";
 import {useRouter} from "next/router";
 import fetchWithLocale from "@/utils/fetchWrapper";
+import {ParsedUrlQuery} from 'querystring';
+
+
+const perPage = 24;
+
+function getPageFromQuery(query: ParsedUrlQuery): number {
+    const pageString = query.page as string;
+    const pageNumber = parseInt(pageString);
+    return Number.isNaN(pageNumber) ? 1 : pageNumber;
+}
 
 
 export const Catalogue = ({initialVariants, count, url}: CatalogueProps) => {
-    const perPage = 24;
+    const router = useRouter();
     const apiFetch = fetchWithLocale();
     const [variants, setVariants] = useState(initialVariants);
-    const [page, setPage] = useState<number | null>(null);
+    const [page, setPage] = useState<number>(getPageFromQuery(router.query));
     const [showMore, setShowMore] = useState(false);
     const [loading, setLoading] = useState(false);
     const totalPages = Math.ceil(count / perPage);
     const realPage = page === null ? 1 : page;
 
-    const router = useRouter(); // Get the router instance
 
     useEffect(() => {
         if (page !== null) {
@@ -29,20 +38,29 @@ export const Catalogue = ({initialVariants, count, url}: CatalogueProps) => {
                 setLoading(false);
             });
         }
-
         return () => {
             setLoading(false);
         };
     }, [url, page]);
 
     const handlePageChange = (newPage: number) => {
+        let params = {...router.query};
+        if (newPage > 1) {
+            params.page = newPage.toString();
+        } else {
+            delete params.page;
+        }
+
+        router.push(
+            {pathname: router.pathname, query: params},
+            undefined,
+            {scroll: false}
+        );
+
         setShowMore(false);
         setPage(newPage);
-        router.push({ // Modify the URL's query string
-            pathname: router.pathname,
-            query: { ...router.query, page: newPage },
-        }, undefined, { scroll: false });
     };
+
 
     const handleShowMore = () => {
         setShowMore(true);
@@ -50,8 +68,8 @@ export const Catalogue = ({initialVariants, count, url}: CatalogueProps) => {
         setPage(nextPage);
         router.push({ // Modify the URL's query string
             pathname: router.pathname,
-            query: { ...router.query, page: nextPage },
-        }, undefined, { scroll: false });
+            query: {...router.query, page: nextPage},
+        }, undefined, {scroll: false});
     };
 
     return (

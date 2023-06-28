@@ -27,6 +27,7 @@ import {addItemToCart} from "@/state/reducers/cart";
 import {VariantsLinks} from "@/components/App/Product/VariantsLinks";
 import {ProductDescription} from "@/components/App/Product/Description";
 import {ProductImageGallery} from "@/components/App/Product/Galery";
+import {event} from "@/lib/FacebookPixel";
 
 
 export const ProductPage = ({variant}: VariantPageProps) => {
@@ -68,6 +69,13 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                 old_price: variant.product.price,
             }
             store.dispatch(addItemToCart(data))
+            event('AddToCart', {
+                content_name: variant.name,
+                content_ids: [variant.id],
+                content_type: 'product',
+                value: variant.product.price,
+                currency: 'UAH'
+            })
             push('/cart')
         }
     }

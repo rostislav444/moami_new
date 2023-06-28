@@ -7,7 +7,7 @@ from rest_framework.pagination import PageNumberPagination
 
 
 class CatalogueVariantsPagination(PageNumberPagination):
-    page_size = 12
+    page_size = 24
     page_size_query_param = 'page_size'
     max_page_size = 96
 
@@ -16,28 +16,31 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
     serializer_class = CatalogueVariantSerializer
     pagination_class = CatalogueVariantsPagination
 
-    def filter_by_collection(self, queryset):
-        collection = self.request.GET.get('collection')
-        if collection:
-            return queryset.filter(product__collections__slug=collection)
-        return queryset
+    @staticmethod
+    def filter_by_collection(variants, collection_slug=None):
+        if collection_slug:
+            return variants.filter(product__collections__slug=collection_slug)
+        return variants
 
-    def get_products_by_categories(self):
-        category_name = self.request.GET.get('category')
+    @staticmethod
+    def get_products_by_categories(variants, category_slug):
+        category = None
+        for slug in category_slug.split(','):
+            category = Category.objects.get(slug=slug) if not category else category.children.get(slug=slug)
 
-        if category_name:
-            category = None
-            for name in category_name.split(','):
-                if not category:
-                    category = Category.objects.get(slug=name)
-                else:
-                    category = category.children.get(slug=name)
-            categories = category.get_descendants(include_self=True)
-            return Variant.objects.filter(product__category__in=categories)
-        return Variant.objects.all()
+        # Get all descendants of the final category, including the category itself
+        categories = category.get_descendants(include_self=True)
+
+        # Filter the variants by the categories
+        return Variant.objects.filter(product__category__in=categories)
 
     def get_queryset(self):
-        variants = self.get_products_by_categories()
-        variants = self.filter_by_collection(variants)
-        return variants.filter(sizes__isnull=False).filter(sizes__stock__gt=0).distinct()
+        params = self.request.GET
+        variants = Variant.objects.filter(sizes__isnull=False)
+
+        if 'category' in params:
+            variants = self.get_products_by_categories(variants, params['category'])
+        elif 'collection' in params:
+            variants = self.filter_by_collection(variants, params['collection'])
+        return variants
 

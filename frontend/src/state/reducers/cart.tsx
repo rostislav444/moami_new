@@ -39,7 +39,6 @@ export const cartSlice = createSlice({
         initialState,
         reducers: {
             addItemToCart: (state: Draft<CartState>, action: PayloadAction<CartItemState>) => {
-                console.log(' state.items', state.items)
                 const item = state.items.find((item) => item.id === action.payload.id)
                 if (item) {
                     if (item.quantity < item.stock) {
@@ -52,7 +51,6 @@ export const cartSlice = createSlice({
 
             },
             updateItemInCart: (state, action: PayloadAction<{ id: number, quantity: number }>) => {
-                console.log('updateItemInCart', action.payload)
                 const item = state.items.find((item) => item.id === action.payload.id)
                 if (item) {
                     if (action.payload.quantity <= item.stock) {
@@ -67,13 +65,16 @@ export const cartSlice = createSlice({
                     state.items = state.items.filter((item) => item.id !== action.payload)
                 }
                 return calculateTotal(state)
+            },
+            clearCart: (state) => {
+                state.items = []
+                return calculateTotal(state)
             }
-
         },
     }
 )
 
-export const {addItemToCart, updateItemInCart, removeItemFromCart} = cartSlice.actions
+export const {addItemToCart, updateItemInCart, removeItemFromCart, clearCart} = cartSlice.actions
 
 export const selectCart = (state: RootState) => state.cart
 

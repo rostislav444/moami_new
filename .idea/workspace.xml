@@ -5,10 +5,53 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0aeb8c56-975f-42c2-97d5-8d95cea0dfbb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/integrations/management/commands/mk_photo.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/integrations/management/commands/mk_photo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/catalogue/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/catalogue/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/categories/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/categories/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/categories/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/categories/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/categories/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/categories/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/integrations/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/integrations/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/integrations/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/integrations/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/integrations/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/integrations/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/pages/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/pages/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/pages/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/pages/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/pages/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/pages/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/pages/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/pages/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/pages/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/pages/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/product/admin/admin_product.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/admin/admin_product.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/product/admin/admin_variant.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/admin/admin_variant.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/product/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/product/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/translation/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/translation/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/project/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/project/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/project/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/project/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/@types/emotion.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/Pagination/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/Pagination/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/Slides/MiniPostSlide/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/Slides/MiniPostSlide/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/Slides/MiniPostSlide/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/Slides/MiniPostSlide/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/Slides/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/Slides/style.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Counter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Counter.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Typograpy.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Typograpy.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/product/[slug]/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/product/[slug]/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/categories.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/actions/categories.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/reducers/cart.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/reducers/cart.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/reducers/sizes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/reducers/sizes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/store.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/store.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/styles/Blocks/Content.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/Blocks/Content.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -173,7 +216,13 @@
       <workItem from="1686413248610" duration="5860000" />
       <workItem from="1686483386397" duration="4990000" />
       <workItem from="1686595608900" duration="4497000" />
-      <workItem from="1686652606376" duration="1971000" />
+      <workItem from="1686652606376" duration="3279000" />
+      <workItem from="1686854314186" duration="3043000" />
+      <workItem from="1687013505895" duration="6755000" />
+      <workItem from="1687608411312" duration="2966000" />
+      <workItem from="1687611398014" duration="8415000" />
+      <workItem from="1687887762809" duration="7143000" />
+      <workItem from="1687974764255" duration="3467000" />
     </task>
     <servers />
   </component>

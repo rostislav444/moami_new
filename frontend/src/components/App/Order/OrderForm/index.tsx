@@ -9,6 +9,7 @@ import {useAppSelector} from "@/state/hooks";
 
 import {NewPostForm} from "@/components/App/Order/OrderForm/NewPost"
 import {useLocale} from "@/context/localeFetchWrapper";
+import {useRouter} from "next/navigation";
 
 
 export const OrderForm = () => {
@@ -19,6 +20,8 @@ export const OrderForm = () => {
     const {register, handleSubmit, formState: {errors}} = useForm();
     const apiFetch = useLocale()
     const {items} = useAppSelector(selectCart)
+
+    const {push} = useRouter();
 
 
     const onSubmit = (data: any) => {
@@ -45,7 +48,7 @@ export const OrderForm = () => {
 
 
         apiFetch.post('order/', requestBody).then((data: any) => {
-            console.log(data)
+            push('/order/success')
         })
     }
 

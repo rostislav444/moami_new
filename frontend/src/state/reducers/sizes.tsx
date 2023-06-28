@@ -18,7 +18,6 @@ export const sizesSlice = createSlice({
       state.sizeGrids = action.payload
     },
     selectGrid: (state, action: PayloadAction<string>) => {
-        console.log('payload', action.payload)
         state.selected = action.payload;
     }
   },

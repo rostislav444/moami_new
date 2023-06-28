@@ -4,7 +4,7 @@ from django.utils.safestring import mark_safe
 
 from apps.product.admin.admin_variant_size import VariantSizeInline
 from apps.product.models import Variant, VariantImage, VariantImageThumbnail
-from adminsortable.admin import NonSortableParentAdmin, SortableTabularInline
+from adminsortable2.admin import SortableTabularInline, SortableAdminMixin
 
 
 class VariantInline(admin.TabularInline):
@@ -76,7 +76,7 @@ class VariantImageInline(SortableTabularInline):
 
 
 @admin.register(Variant)
-class VariantAdmin(NonSortableParentAdmin):
+class VariantAdmin(SortableAdminMixin, admin.ModelAdmin):
     def product_link(self, obj):
         style = {
             'display': 'inline-block',

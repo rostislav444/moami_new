@@ -1,9 +1,11 @@
 from django.db import models
 
 from apps.abstract.fields import DeletableImageField
+from apps.abstract.models import NameSlug
+from apps.translation.models import Translatable
 
 
-class HomeSlider(models.Model):
+class HomeSlider(Translatable):
     SLIDE_TYPES = (
         ('image', 'Image'),
         ('mini_post', 'Mini Post'),
@@ -25,6 +27,8 @@ class HomeSlider(models.Model):
     image_2 = DeletableImageField(upload_to='home_slider/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
+    exclude_translation=['link_type', 'link', 'slide_type']
+
     def __str__(self):
         if self.title:
             return self.title
@@ -33,3 +37,11 @@ class HomeSlider(models.Model):
     class Meta:
         verbose_name = 'Баннер домашней страницы'
         verbose_name_plural = 'Баннеры домашней страницы'
+
+
+class Pages(NameSlug, Translatable):
+    description = models.TextField()
+
+    class Meta:
+        verbose_name = 'Текстовая страница'
+        verbose_name_plural = 'Текстовые страницы'

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apps.pages.models import HomeSlider
+from apps.pages.models import HomeSlider, Pages
 
 
 @admin.register(HomeSlider)
@@ -20,7 +20,8 @@ class HomeSliderAdmin(admin.ModelAdmin):
         if obj and obj.slide_type == 'mini_post':
             return (
                 (None, {
-                    'fields': ('slide_type', 'link_type', 'link', 'title', 'description', 'image', 'image_2', 'is_active')
+                    'fields': (
+                    'slide_type', 'link_type', 'link', 'title', 'description', 'image', 'image_2', 'is_active')
                 }),
             )
         return (
@@ -29,3 +30,7 @@ class HomeSliderAdmin(admin.ModelAdmin):
             }),
         )
 
+
+@admin.register(Pages)
+class PagesAdmin(admin.ModelAdmin):
+    pass

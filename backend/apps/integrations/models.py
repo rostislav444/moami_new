@@ -6,13 +6,19 @@ from mptt.models import MPTTModel, TreeForeignKey
 from openpyxl import load_workbook
 
 from apps.abstract.models import NameSlug
+from apps.sizes.models import SizeGrid
 
 
 class RozetkaCategories(NameSlug, MPTTModel):
     parent = TreeForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
+    rozetka_id = models.PositiveIntegerField()
 
     class MPTTMeta:
         order_insertion_by = ['name']
+
+    class Meta:
+        verbose_name = 'Категория Rozetka'
+        verbose_name_plural = 'Категории Rozetka'
 
     def __str__(self):
         categories = self.get_ancestors(include_self=True)

@@ -1,40 +1,35 @@
 import styled from "@emotion/styled";
 
-
-export const SlideWrapper = styled.div`
-    position: relative;
-    display: block;
-    width: 100%;
-    height: auto;
-    padding-bottom: 60%;
+export const Wrapper = styled.div`
+  margin-top: 32px
 `
 
 
-export const MiniPostSlide = styled.div`
-  position: absolute;
-  top: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-
+export const SlideWrapper = styled.div`
+  position: relative;
+  display: block;
   width: 100%;
-  height: 600px;
-
-  .image {
-    position: relative;
-    > img:nth-of-type(1) {
-      position: absolute;
-      top: 0;
-      right: 8%;
-      width: 70%;
-      z-index: 1;
-    }
-    > img:nth-of-type(2) {
-      position: absolute;
-      top: 30%;
-      left: 3%;
-      width: 60%;
-      z-index: 2;
-    }
-
+  height: 0;
+  padding-top: 56.25%;
+  
+  @media(max-width: 768px) {
+      padding-top: 150%;
   }
+
+  > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+`
+
+export const ImageStyled = styled.img`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: 0;
+  object-fit: cover;
 `

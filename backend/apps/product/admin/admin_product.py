@@ -7,6 +7,7 @@ from apps.categories.models import Category, CategoryAttributeGroup
 from apps.product.admin.admin_variant import VariantInline
 from apps.product.forms import ProductAttributeFormSet
 from apps.product.models import Brand, Color, Country, CustomProperty, Product, ProductAttribute, ProductComposition
+from adminsortable2.admin import SortableAdminMixin
 
 
 @admin.register(Brand)
@@ -104,7 +105,7 @@ class CategoryFilter(SimpleListFilter):
 
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display = ('name', 'get_varinats_images', 'category', 'brand', 'price', 'old_price',)
     list_filter = (CategoryFilter,)
     search_fields = ('name', 'category__name', 'brand__name', 'price', 'old_price',)
@@ -118,7 +119,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'category', 'brand', 'country', 'collections','product_preferred_size_grid',)
+            'fields': ('name', 'category', 'brand', 'country', 'collections', 'product_preferred_size_grid',)
         }),
         ('Интеграции', {
             'fields': ('rozetka_category', 'taxonomy',)
