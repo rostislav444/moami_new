@@ -11,11 +11,11 @@ class OrderDeliveryNewPostSerializer(WritableNestedModelSerializer):
 
 
 class OrderDeliverySerializer(WritableNestedModelSerializer):
-    newpost = OrderDeliveryNewPostSerializer(required=False)
+    # newpost = OrderDeliveryNewPostSerializer(required=False)
 
     class Meta:
         model = OrderDelivery
-        fields = ['delivery_type', 'newpost', 'comment']
+        fields = ['delivery_type', 'address', 'comment']
 
 
 class OrderItemSerializer(serializers.ModelSerializer):

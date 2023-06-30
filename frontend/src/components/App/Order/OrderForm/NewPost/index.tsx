@@ -29,34 +29,27 @@ export const NewPostForm = ({
                                 selectedArea, setSelectedArea, selectedCity, setSelectedCity, selectDepartment,
                                 setSelectDepartment, register
                             }: NewPostFormProps) => {
-    const [areas, setAreas] = useState<AreaState[]>([])
-    const apiFetch = useLocale()
 
-    useEffect(() => {
-        apiFetch.get('newpost/areas').then((data: any) => {
-            setAreas([...data.data]);
-        })
-    }, [])
 
 
     return <div>
         <H3 mt={3} mb={3}>Выберите город и отделение Новой Почты</H3>
         <Grid gap={16}>
-            {areas.length > 0 && <Areas {...{selectedArea, setSelectedArea, areas}} />}
-            {selectedArea && <Cities {...{selectedArea, selectedCity, setSelectedCity}} />}
-            {selectedCity && <Department {...{selectedCity, selectDepartment, setSelectDepartment}} />}
-            {areas.length === 0 && <InputWrapper>
-                <Input placeholder='Адрес / отделение доставки' type="text"
-                       {...register('delivery.adress',
-                           {required: false, pattern: /^\S+@\S+$/i}
-                       )}
-                />
-            </InputWrapper>}
-            <Textarea
-                placeholder={'Комментарии к доставке'}
-                {...register('delivery.comment')}
-            />
-            <Button>Подтвердить заказ</Button>
+            {/*{areas.length > 0 && <Areas {...{selectedArea, setSelectedArea, areas}} />}*/}
+            {/*{selectedArea && <Cities {...{selectedArea, selectedCity, setSelectedCity}} />}*/}
+            {/*{selectedCity && <Department {...{selectedCity, selectDepartment, setSelectDepartment}} />}*/}
+            {/*{areas.length === 0 && <InputWrapper>*/}
+            {/*    <Input placeholder='Адрес / отделение доставки' type="text"*/}
+            {/*           {...register('delivery.adress',*/}
+            {/*               {required: false, pattern: /^\S+@\S+$/i}*/}
+            {/*           )}*/}
+            {/*    />*/}
+            {/*</InputWrapper>}*/}
+            {/*<Textarea*/}
+            {/*    placeholder={'Комментарии к доставке'}*/}
+            {/*    {...register('delivery.comment')}*/}
+            {/*/>*/}
+
         </Grid>
 
     </div>

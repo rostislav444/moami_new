@@ -65,7 +65,7 @@ class ProductManager(models.Manager):
 
 
 class Product(Translatable):
-    index = models.PositiveIntegerField(default=0, verbose_name='Индекс')
+    index = models.PositiveIntegerField(default=0, blank=False, null=False, verbose_name='Индекс')
     name = models.CharField(max_length=255, verbose_name='Название')
     category = models.ForeignKey('categories.Category', on_delete=models.CASCADE, related_name='products',
                                  verbose_name='Категория')

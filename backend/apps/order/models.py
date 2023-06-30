@@ -13,7 +13,8 @@ class Order(models.Model):
         ('canceled', 'Заказ отменен'),
     )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь', related_name='orders', blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь', related_name='orders',
+                             blank=True, null=True)
     first_name = models.CharField(max_length=100, verbose_name='Имя')
     last_name = models.CharField(max_length=100, verbose_name='Фамилия')
     father_name = models.CharField(max_length=100, verbose_name='Отчество')
@@ -95,10 +96,12 @@ class OrderDelivery(models.Model):
     DELIVERY_TYPES = (
         ('courier', 'Курьером по Киеву'),
         ('newpost', 'Новая почта'),
+        ('other', 'Другое'),
     )
 
     delivery_type = models.CharField(max_length=100, choices=DELIVERY_TYPES, verbose_name='Тип доставки')
     order = models.OneToOneField(Order, on_delete=models.CASCADE, verbose_name='Заказ', related_name='delivery')
+    address = models.CharField(max_length=100, verbose_name='Адрес', blank=True, null=True)
     comment = models.TextField(verbose_name='Комментарий', blank=True, null=True)
 
     # def __str__(self):
@@ -111,7 +114,8 @@ class OrderDelivery(models.Model):
 
 
 class OrderDeliveryAddress(models.Model):
-    delivery = models.OneToOneField(OrderDelivery, on_delete=models.CASCADE, verbose_name='Доставка', related_name='address')
+    delivery = models.OneToOneField(OrderDelivery, on_delete=models.CASCADE, verbose_name='Доставка',
+                                    related_name='address_delivery')
     city = models.CharField(max_length=100, verbose_name='Город')
     address = models.CharField(max_length=100, verbose_name='Адрес')
 
@@ -125,7 +129,8 @@ class OrderDeliveryAddress(models.Model):
 
 
 class OrderDeliveryNewPost(models.Model):
-    delivery = models.OneToOneField(OrderDelivery, on_delete=models.CASCADE, verbose_name='Доставка', related_name='newpost')
+    delivery = models.OneToOneField(OrderDelivery, on_delete=models.CASCADE, verbose_name='Доставка',
+                                    related_name='newpost_delivery')
     region = models.ForeignKey(NewPostRegion, on_delete=models.CASCADE, verbose_name='Регион', blank=True, null=True)
     city = models.ForeignKey(NewPostCities, on_delete=models.CASCADE, verbose_name='Город')
     department = models.ForeignKey(NewPostDepartments, on_delete=models.CASCADE, verbose_name='Отделение')

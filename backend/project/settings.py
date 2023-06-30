@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     # Libs that need to be on top
     'colorfield',
+    'adminsortable2',
     # Django
     'django.contrib.admin',
     'django.contrib.auth',
@@ -62,8 +63,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'nested_inline',
     'mptt',
-    'adminsortable',
-    'adminsortable2',
+
 ]
 
 MIDDLEWARE = [
