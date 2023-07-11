@@ -6,14 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0aeb8c56-975f-42c2-97d5-8d95cea0dfbb" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/order/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/order/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/order/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/order/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/product/admin/admin_product.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/admin/admin_product.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/product/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/project/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/project/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/next.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/next.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/VarinatList/Variant/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/VarinatList/Variant/style.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -186,7 +179,9 @@
       <workItem from="1687887762809" duration="7143000" />
       <workItem from="1687974764255" duration="5863000" />
       <workItem from="1688064334648" duration="2540000" />
-      <workItem from="1688154272880" duration="2100000" />
+      <workItem from="1688154272880" duration="2395000" />
+      <workItem from="1688385414135" duration="49000" />
+      <workItem from="1689066481735" duration="161000" />
     </task>
     <servers />
   </component>

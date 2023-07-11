@@ -6,7 +6,7 @@ export const ImageWrapper = styled.div`
   display: block;
   width: 100%;
   height: auto; 
-  padding-top: 133%
+  padding-top: 150%
 `
 
 export const imageStyle = css`
