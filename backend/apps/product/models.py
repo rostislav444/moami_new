@@ -172,7 +172,7 @@ class Variant(models.Model):
 
     @property
     def get_slug(self):
-        return slugify(unidecode(f'p-{self.product.slug}-c-{self.code}'))
+        return slugify(unidecode(f'{self.product.slug}-code-{self.code}'))
 
     def save(self, *args, **kwargs):
         self.code = self.code.replace(' ', '-').upper()

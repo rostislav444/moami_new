@@ -1,8 +1,9 @@
 from rest_framework import generics, viewsets, mixins
 from apps.catalogue.serializers import CatalogueVariantSerializer
+from apps.categories.serializers import CategoriesWithProductsCountSerializer
 from apps.product.models import Variant
 from apps.categories.models import Category
-
+from django.db.models.expressions import RawSQL
 from rest_framework.pagination import PageNumberPagination
 
 
@@ -19,7 +20,7 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
     @staticmethod
     def filter_by_collection(variants, collection_slug=None):
         if collection_slug:
-            return variants.filter(product__collections__slug=collection_slug)
+            return variants.filter(product__collections__slug=collection_slug).distinct()
         return variants
 
     @staticmethod
@@ -32,10 +33,11 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
         categories = category.get_descendants(include_self=True)
 
         # Filter the variants by the categories
-        return Variant.objects.filter(product__category__in=categories)
+        return Variant.objects.filter(product__category__in=categories).distinct()
 
     def get_queryset(self):
         params = self.request.GET
+        print(params)
         variants = Variant.objects.filter(sizes__isnull=False)
 
         if 'category' in params:
@@ -43,4 +45,3 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
         elif 'collection' in params:
             variants = self.filter_by_collection(variants, params['collection'])
         return variants
-

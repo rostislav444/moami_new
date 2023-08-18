@@ -109,6 +109,7 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display = ('index', 'name', 'get_varinats_images', 'category', 'brand', 'price', 'old_price',)
     list_filter = (CategoryFilter,)
     search_fields = ('name', 'category__name', 'brand__name', 'price', 'old_price',)
+    readonly_fields = ('slug',)
     ordering = ['index']
 
     def get_list_filter(self, request):
@@ -120,7 +121,7 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'category', 'brand', 'country', 'collections', 'product_preferred_size_grid',)
+            'fields': ('name', 'slug', 'category', 'brand', 'country', 'collections', 'product_preferred_size_grid',)
         }),
         ('Интеграции', {
             'fields': ('rozetka_category', 'taxonomy',)

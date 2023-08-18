@@ -7,6 +7,7 @@ from apps.abstract.models import NameSlug
 from apps.attributes.models import AttributeGroup
 from apps.sizes.models import SizeGrid, SizeGroup
 from apps.translation.models import Translatable
+from django.db.models import Count, Sum
 
 
 class Category(NameSlug, MPTTModel, Translatable):
@@ -14,7 +15,7 @@ class Category(NameSlug, MPTTModel, Translatable):
     size_group = models.ForeignKey(SizeGroup, null=True, blank=True, on_delete=models.PROTECT,
                                    related_name='categories')
     preferred_size_grid = models.ForeignKey(SizeGrid, null=True, blank=True, on_delete=models.SET_NULL,
-                                                    verbose_name='предпочтительная размерная сетка')
+                                            verbose_name='предпочтительная размерная сетка')
 
     class MPTTMeta:
         order_insertion_by = ['name']
@@ -30,6 +31,17 @@ class Category(NameSlug, MPTTModel, Translatable):
         if self.parent and not self.size_group and self.parent.size_group:
             self.size_group = self.parent.size_group
         super(Category, self).save(*args, **kwargs)
+
+    def get_products_count(self):
+        # count variants in current category
+        count = self.products.annotate(num_variants=Count('variants')).aggregate(total=Sum('num_variants'))[
+                    'total'] or 0
+
+        # recursively add counts from child categories
+        for child in self.get_children():
+            count += child.get_products_count()
+
+        return count
 
     def _check_attribute_groups(self):
         # Get all attribute group IDs associated with the current instance
@@ -79,3 +91,7 @@ class Collections(NameSlug):
 
     def __str__(self):
         return self.name
+
+    def get_products_count(self):
+        return self.products.annotate(num_variants=Count('variants')).aggregate(total=Sum('num_variants'))['total'] or 0
+

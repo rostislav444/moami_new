@@ -21,7 +21,7 @@ class CatalogueVariantSerializer(serializers.ModelSerializer):
     color = ColorSerializer()
     images = VariantImageSerializer(many=True)
     sizes = VariantSizeSerializer(many=True)
-    slug = serializers.SlugField(source='get_slug', read_only=True)
+    slug = serializers.CharField(source='get_slug', read_only=True)
 
     class Meta:
         model = Variant

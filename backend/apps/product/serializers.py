@@ -97,6 +97,7 @@ class VariantSerializer(serializers.ModelSerializer):
     images = VariantImageSerializer(many=True)
     sizes = VariantSizeSerializer(many=True)
     color = serializers.CharField(source='color.name')
+    slug = serializers.CharField(source='get_slug')
 
     class Meta:
         model = Variant

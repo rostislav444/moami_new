@@ -20,13 +20,11 @@ class VariantViewSet(viewsets.ModelViewSet):
         return Variant.objects.all()
 
     def get_object(self):
-        slug = self.kwargs['slug']
+        split_slug = self.kwargs['slug'].split('-code-')
+        product_slug = split_slug[0]
+        code = split_slug[1]
 
-        product = slug.split('-c-')[0][2:]
-        code = slug.split('-c-')[1]
-
-        # return Variant.objects.get(product__slug__iexact=product, code__iexact=code)
         try:
-            return Variant.objects.get(product__slug__iexact=unidecode(product), code__iexact=code)
+            return Variant.objects.get(product__slug__iexact=product_slug, code__iexact=code)
         except Variant.DoesNotExist:
-            return Variant.objects.none
+            return Variant.objects.none()
