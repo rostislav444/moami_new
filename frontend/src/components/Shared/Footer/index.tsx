@@ -2,12 +2,9 @@ import {FooterWrapper, MainLine, PagesBlock, PagesBlockList, SloganBlock,} from 
 import {Content} from "@/styles/Blocks/Content";
 import {H3, P} from "@/components/Shared/Typograpy";
 import React from "react";
-import {useAppSelector} from "@/state/hooks";
-import {selectPages} from "@/state/reducers/pages";
 
 
 export const Footer = () => {
-    const {pages} = useAppSelector(selectPages)
 
     return <FooterWrapper>
         <Content>
@@ -23,9 +20,9 @@ export const Footer = () => {
                     <div>
                         <H3 mb={2}>Покупателю</H3>
                         <PagesBlockList>
-                            {pages.map((page, index) => <li key={index}>
-                                <a color='white'>{page.name}</a>
-                            </li>)}
+                            {/*{pages.map((page, index) => <li key={index}>*/}
+                            {/*    <a color='white'>{page.name}</a>*/}
+                            {/*</li>)}*/}
 
                             <li>
                                 <a color='white'>Коллекции</a>

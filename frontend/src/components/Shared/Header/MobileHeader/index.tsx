@@ -7,6 +7,10 @@ import {CartIcon} from "@/components/Shared/Header/DesktopHeader/CartIcon";
 import Link from "next/link";
 
 
+interface MobileHeaderProps {
+    data: any
+}
+
 export const MobileHeader = () => {
     const [isOpen, setIsOpen] = useState(false);
 

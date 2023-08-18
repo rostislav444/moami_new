@@ -36,6 +36,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const apiFetch = fetchWithLocale(context.locale || 'uk')
     const {slug} = context.params as { slug: string }
 
+    console.log('getServerSideProps', slug)
+
     const response = await apiFetch.get(`/product/variants/${slug}/`)
 
     if (!response.ok) {

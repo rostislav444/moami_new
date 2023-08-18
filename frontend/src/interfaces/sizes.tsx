@@ -6,7 +6,7 @@ export interface SizeGridState {
     is_default: boolean;
 }
 
-export interface SizeGridProps {
+export interface SizesState {
     sizeGrids: SizeGridState[];
     selected: null | string;
 }

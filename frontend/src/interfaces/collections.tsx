@@ -3,6 +3,7 @@ export interface CollectionsState {
     name: string;
     slug: string;
     image: string;
+    products_count: number;
 }
 
 export interface CollectionsProps {

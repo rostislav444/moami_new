@@ -43,7 +43,8 @@ export interface paginatedVariantsState {
 export interface CatalogueProps {
     initialVariants: variantState[],
     count: number,
-    url: string
+    url: string,
+    page: number
 }
 
 export interface variantListProps {

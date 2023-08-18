@@ -3,3 +3,7 @@ export interface PageState {
     slug: string,
     description: string
 }
+
+export interface PagesProps {
+    pages: PageState[]
+}

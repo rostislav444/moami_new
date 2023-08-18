@@ -7,18 +7,23 @@ import React from "react";
 import {CartIcon} from "./CartIcon";
 import {useRouter} from 'next/router';
 import {DropdownSelect} from "@/components/Shared/choices";
-
-import {useAppSelector} from "@/state/hooks";
-import {selectCategories} from "@/state/reducers/categories";
-import {selectCollections} from "@/state/reducers/collections";
-import {DesktopNavMenu} from "@/components/Shared/Header/DesktopHeader/NavMenu";
 import {Logo} from "@/components/Shared/Header/components/Logo";
+import {DesktopNavMenu} from "@/components/Shared/Header/DesktopHeader/NavMenu";
 
-export const DesktopHeader = () => {
+
+interface DesktopHeaderProps {
+    data: any
+}
+
+
+export const DesktopHeader = ({data}: DesktopHeaderProps) => {
     const router = useRouter();
     const {locale, asPath} = router;
-    const {categories} = useAppSelector(selectCategories)
-    const {collections} = useAppSelector(selectCollections)
+
+    if (!data) return null
+
+    const {categories, collections} = data
+
 
     const localeOptions = [
         {value: 'uk', label: 'Укр'},

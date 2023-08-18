@@ -2,7 +2,6 @@ import {CategoryState} from "@/interfaces/categories";
 
 
 export const categoriesBySlugList = (categories: CategoryState[], slugs: string[], result: any) => {
-
     for (let i = 0; i < categories.length; i++) {
         if (categories[i].slug === slugs[0]) {
             const link = result.length > 0 ? result[result.length - 1].link + '/' + categories[i].slug : '/' + categories[i].slug
@@ -13,4 +12,14 @@ export const categoriesBySlugList = (categories: CategoryState[], slugs: string[
         }
     }
     return result
+}
+
+
+export const getCategoriesAndPage = (params: string[]) => {
+    let page = 1
+    if (params.includes('page')) {
+        page = parseInt(params[params.length - 1])
+        params = params.slice(0, params.length - 2)
+    }
+    return {page, categories: params}
 }

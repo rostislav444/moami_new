@@ -1,35 +1,24 @@
-import type {PayloadAction} from '@reduxjs/toolkit'
-import {createSlice} from '@reduxjs/toolkit'
-import type {RootState} from '../store'
-import {CategoryProps, CategoryState} from '@/interfaces/categories'
-import {fetchCategories} from "@/state/actions/categories";
+import {createSlice} from "@reduxjs/toolkit";
+import {CategoryProps} from "@/interfaces/categories";
 
 
 const initialState: CategoryProps = {
-  categories: [],
+    categories: [],
 }
 
+
 export const categoriesSlice = createSlice({
-  name: 'categories',
-  initialState,
-  reducers: {
-    update: (state, action: PayloadAction<CategoryState[]>) => {
-      state.categories = action.payload
+    name: 'categories',
+    initialState,
+    reducers: {
+        setCategories: (state, action) => {
+            state.categories = action.payload
+        },
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchCategories.pending, (state) => {
-        state.categories = []; // clear categories when the request starts
-      })
-      .addCase(fetchCategories.fulfilled, (state, action) => {
-        state.categories = action.payload;
-      });
-  },
 })
 
-export const { update } = categoriesSlice.actions
+export const {setCategories} = categoriesSlice.actions
 
-export const selectCategories = (state: RootState) => state.categories
+export const selectCategories = (state: any) => state.categories.categories
 
 export default categoriesSlice.reducer

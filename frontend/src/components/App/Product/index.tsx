@@ -1,37 +1,27 @@
-import {
-    Actions,
-    AddToWishlistWrapper,
-    BuyButton,
-    DescriptionColumn,
-    OldPrice,
-    Price,
-    PriceBlock,
-    ProductContainer, ProductPreview,
-    SizeItem,
-    SizeList
-} from "@/components/App/Product/style";
-import {useEffect, useRef, useState} from "react";
-import Image from "next/image";
-import {VariantPageProps} from "@/interfaces/variant";
-import {Caption, H2, Span} from "@/components/Shared/Typograpy";
-import {FlexSpaceBetween} from "@/components/Shared/Blocks";
-import {Icon} from "@/components/Shared/Icons";
-import {useAppSelector} from "@/state/hooks";
-import {selectGrid, selectSizes} from "@/state/reducers/sizes";
-import {DropdownSelect} from "@/components/Shared/choices";
-import {useRouter} from 'next/navigation';
-import store from "@/state/store";
-import {SizeGridProps} from "@/interfaces/sizes";
-import {CartItemState} from "@/interfaces/cart";
-import {addItemToCart} from "@/state/reducers/cart";
-import {VariantsLinks} from "@/components/App/Product/VariantsLinks";
-import {ProductDescription} from "@/components/App/Product/Description";
-import {ProductImageGallery} from "@/components/App/Product/Galery";
-import {event} from "@/lib/FacebookPixel";
+import {Actions, AddToWishlistWrapper, BuyButton, DescriptionColumn, OldPrice, Price, PriceBlock, ProductContainer, ProductPreview, SizeItem, SizeList} from "@/components/App/Product/style";
+import {useEffect, useRef, useState}                                                                                                                    from "react";
+import {VariantPageProps}                                                                                                                               from "@/interfaces/variant";
+import {Caption, H2, Span}                                                                                                                              from "@/components/Shared/Typograpy";
+import {FlexSpaceBetween}                                                                                                                               from "@/components/Shared/Blocks";
+import {Icon}                                                                                                                                           from "@/components/Shared/Icons";
+import {useAppSelector}                                                                                                                                 from "@/state/hooks";
+import {selectGrid, selectSizes}                                                                                                                        from "@/state/reducers/sizes";
+import {DropdownSelect}                                                                                                                                 from "@/components/Shared/choices";
+import {useRouter}                                                                                                                                      from 'next/navigation';
+import {SizeGridState}                                                                                                                                  from "@/interfaces/sizes";
+import {CartItemState}                                                                                                                                  from "@/interfaces/cart";
+import {addItemToCart}                                                                                                                                  from "@/state/reducers/cart";
+import {VariantsLinks}                                                                                                                                  from "@/components/App/Product/VariantsLinks";
+import {ProductDescription}                                                                                                                             from "@/components/App/Product/Description";
+import {ProductImageGallery}                                                                                                                            from "@/components/App/Product/Galery";
+import {event}                                                                                                                                          from "@/lib/FacebookPixel";
+import {useStore}                                                                                                                                       from "react-redux";
 
 
 export const ProductPage = ({variant}: VariantPageProps) => {
-    const ref = useRef<HTMLDivElement>(null)
+    const store = useStore()
+
+    const descriptionColumnRef = useRef<HTMLDivElement>(null)
 
     const initialSize = variant.sizes.find(size => size.stock !== 0)?.id
     const [selectedSize, setSelectedSize] = useState<number | undefined>(initialSize)
@@ -39,15 +29,15 @@ export const ProductPage = ({variant}: VariantPageProps) => {
 
     const sizeGrids = variant.product.size_grids
     const productPreferredSizeGrid = variant.product.product_preferred_size_grid
-    const {selected} = useAppSelector<SizeGridProps>(selectSizes)
+    const {selected} = useAppSelector<SizeGridState>(selectSizes)
     const [selectedGrid, setSelectedGrid] = useState<string>(sizeGrids.find(grid => grid.slug === selected)?.slug || productPreferredSizeGrid || sizeGrids[0].slug);
 
 
     useEffect(() => {
-        if (ref.current) {
-            ref.current.style.height = `${ref.current.scrollHeight + 8}px`
+        if (descriptionColumnRef.current) {
+            descriptionColumnRef.current.style.height = `${descriptionColumnRef.current.scrollHeight + 8}px`
         }
-    }, [ref.current])
+    }, [descriptionColumnRef.current])
 
     const handleGridChange = (slug: string) => {
         setSelectedGrid(slug)
@@ -82,8 +72,8 @@ export const ProductPage = ({variant}: VariantPageProps) => {
 
     return (
         <ProductContainer>
-            <ProductImageGallery images={variant.images} />
-            <DescriptionColumn ref={ref}>
+            <ProductImageGallery images={variant.images}/>
+            <DescriptionColumn ref={descriptionColumnRef}>
                 <FlexSpaceBetween mb={2}>
                     <Caption>Код: {variant.code}</Caption>
                     <DropdownSelect transparent value={selectedGrid}
@@ -96,7 +86,7 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                     {variant.product.old_price > variant.product.price &&
                         <OldPrice>{variant.product.old_price} ₴</OldPrice>}
                 </PriceBlock>
-                 <ProductDescription description={variant.product.description}/>
+                <ProductDescription description={variant.product.description} parent={descriptionColumnRef}/>
                 <VariantsLinks variants={variant.product.variants} selected={variant.id}/>
 
                 <SizeList>

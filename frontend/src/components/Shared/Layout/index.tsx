@@ -1,12 +1,14 @@
-import React from "react";
-import Head from 'next/head'
-import {Header} from "@/components/Shared/Header";
+import React                        from "react";
+import Head                         from 'next/head'
+import {Header}                     from "@/components/Shared/Header";
 import {Content, Main, MainContent} from "@/styles/Blocks/Content";
-import CustomThemeProvider from "@/styles/ThemeProvider";
-import {Breadcrumbs} from './Breadcrumbs'
-import {Footer} from "@/components/Shared/Footer";
-import {usePathname} from 'next/navigation';
-import Script from 'next/script'
+import CustomThemeProvider          from "@/styles/ThemeProvider";
+import {Breadcrumbs}                from './Breadcrumbs'
+import {Footer}                     from "@/components/Shared/Footer";
+import {usePathname}                from 'next/navigation';
+import Script                       from 'next/script'
+import {useStore}                   from "react-redux";
+import {selectRoute}                from "@/state/reducers/routing";
 
 export interface BreadcrumbsState {
     title: string,
@@ -15,7 +17,8 @@ export interface BreadcrumbsState {
 
 interface LayoutProps {
     children: React.ReactNode;
-    breadcrumbs?: BreadcrumbsState[]
+    breadcrumbs?: BreadcrumbsState[],
+    data?: any
 }
 
 export default function Layout({children, breadcrumbs}: LayoutProps) {

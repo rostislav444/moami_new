@@ -1,10 +1,12 @@
-import Layout from "@/components/Shared/Layout";
-import {useAppSelector} from "@/state/hooks";
-import {selectCollections} from "@/state/reducers/collections";
+import Layout                from "@/components/Shared/Layout";
+import {useAppSelector}      from "@/state/hooks";
+import {selectCollections}   from "@/state/reducers/collections";
 import {CollectionComponent} from "@/components/App/Collections";
+import {useStore}            from "react-redux";
 
 export default function Collections() {
-    const {collections} = useAppSelector(selectCollections)
+    const store = useStore()
+    const collections = selectCollections(store.getState())
 
     const breadcrumbs = [
         {title: 'Главная', link: '/'},

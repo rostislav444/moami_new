@@ -15,9 +15,9 @@ export const DescriptionText = styled.div<{ showMore: boolean }>`
   position: relative;
   width: 100%;
   height: auto;
-  overflow: hidden;
   line-height: 1.75;
   max-height: ${props => props.showMore ? 'none' : '144px'};
+  overflow: hidden;
 `;
 
 export const ShowMoreButton = styled.button`

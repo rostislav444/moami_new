@@ -1,24 +1,31 @@
-import Layout from '@/components/Shared/Layout'
-import {GetServerSideProps} from 'next'
-import {useAppSelector} from "@/state/hooks";
-import {selectCategories} from "@/state/reducers/categories";
-import {Catalogue} from "@/components/App/Catalogue";
-import Error from 'next/error';
-import {categoriesBySlugList} from "@/utils/categories";
-import {PaginatedVariants} from "@/interfaces/variant";
-import fetchWithLocale from "@/utils/fetchWrapper";
+import Layout                 from '@/components/Shared/Layout'
+import {GetStaticProps}       from 'next'
+import {Catalogue}            from "@/components/App/Catalogue";
+import Error                  from 'next/error';
+import {PaginatedVariants}    from "@/interfaces/variant";
+import fetchWithLocale        from "@/utils/fetchWrapper";
+import {BaseProps}            from "@/interfaces/_base";
+import {useStore}             from "react-redux";
+import {selectCategories}                           from "@/state/reducers/categories";
+import {categoriesBySlugList, getCategoriesAndPage} from "@/utils/categories";
+import {baseUrl}                                    from "@/pages/_app";
+import {CategoryState}        from "@/interfaces/categories";
 
 
-interface CatalogueCategoryProps {
+export interface CatalogueCategoryProps extends BaseProps {
     paginatedVariants: PaginatedVariants,
     statusCode?: number,
     params: string[],
-    url: string
+    context: any,
+    page: number,
 }
 
+export const perPage = 24;
 
-export default function CatalogueCategory({paginatedVariants, statusCode, params, url}: CatalogueCategoryProps) {
-    const {categories} = useAppSelector(selectCategories)
+export default function CatalogueCategory({paginatedVariants, statusCode, params, page}: CatalogueCategoryProps) {
+    const store = useStore();
+    const categories = selectCategories(store.getState())
+    const path = params.join('/') + (page > 1 ? `/page/${page}` : '')
 
     if (statusCode) {
         return <Error statusCode={statusCode}/>
@@ -29,46 +36,79 @@ export default function CatalogueCategory({paginatedVariants, statusCode, params
 
     return (
         <Layout
-            key={JSON.stringify(params)}
-            breadcrumbs={[{title: 'Главная', link: '/'}, ...breadcrumbsCategories]
-            }>
-            <Catalogue initialVariants={results} count={count} url={url}/>
+            breadcrumbs={[{title: 'Главная', link: '/'}, ...breadcrumbsCategories]}
+            key={path}
+        >
+            <Catalogue initialVariants={results} count={count} url={params.join('/')} page={page}/>
         </Layout>
     )
 }
 
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    const {params} = context.query
-    const page = context.query.page
+export let cache: { [key: string]: Array<object> } = {};
 
 
-    const locale = context.req.headers['accept-language'] || 'uk'
-    const apiFetch = fetchWithLocale(locale)
-    const paramArray = Array.isArray(params) ? params : []
-    let url = `/catalogue/?category=${paramArray.join(',')}`
-    if (page) {
-        url += `&page=${page}`
+export const getStaticProps: GetStaticProps = async ({params, locale}) => {
+    if (!params) {return {props: {statusCode: 404}}}
+
+    const paramsArray = Array.isArray(params.params) ? params.params : params.params ? [params.params] : [];
+    const {page, categories} = getCategoriesAndPage(paramsArray);
+
+    if (!categories.length || !categories[0]) {
+        return {props: {statusCode: 404}};
     }
 
-    const props = {
-        paginatedVariants: null,
-        statusCode: null,
-        params: paramArray,
-        url: url
-    }
+    const url = `/catalogue/?category=${categories.join(',')}&page=${page}`;
+    const apiFetch = fetchWithLocale(locale);
+    const response = await apiFetch.get(url);
 
-    const response = await apiFetch.get(url)
-
-    if (!response.ok) {
+    if (response.ok) {
         return {
             props: {
-                statusCode: 404,
+                paginatedVariants: response.data,
+                params: categories,
+                page,
             },
+            revalidate: 60 * 5
         }
     }
 
-    props.paginatedVariants = response.data
-
-    return {props}
+    return {props: {statusCode: 404}};
 }
+
+
+export const getStaticPaths = async () => {
+    const categoriesListUrl = baseUrl + '/api/category/categories/'
+    const response = await fetch(categoriesListUrl)
+    const categories: CategoryState[] = await response.json()
+
+    const recursiveCategories = (categories: CategoryState[], parentPath: string = ''): Array<string> => {
+        let paths: Array<string> = [];
+        categories.forEach(category => {
+            const pages = Math.ceil(category.products_count / perPage)
+
+            for (let i = 0; i < pages; i++) {
+                let newPath;
+                if (i === 0) {
+                    newPath = `${parentPath}/${category.slug}`;
+                } else {
+                    newPath = `${parentPath}/${category.slug}/page/${i + 1}`;
+                }
+                paths.push(newPath);
+            }
+            const newPath = `${parentPath}/${category.slug}`;
+            if (category.children.length) {
+                paths = [...paths, ...recursiveCategories(category.children, newPath)];
+            }
+        });
+        return paths;
+    }
+
+    const paths = recursiveCategories(categories)
+    return {
+        paths: paths.map(path => ({params: {params: path.split('/')}})),
+        fallback: 'blocking'
+    }
+}
+
+
