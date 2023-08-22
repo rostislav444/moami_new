@@ -11,6 +11,7 @@ import {setCollections}            from "@/state/reducers/collections";
 import {initializeStore}           from "@/state/store";
 import {setSizeGrids}              from "@/state/reducers/sizes";
 import {setPages}                  from "@/state/reducers/pages";
+import {API_BASE_URL}              from "@/local";
 
 
 const useStore = (initialState: any) => {
@@ -18,7 +19,7 @@ const useStore = (initialState: any) => {
     return store;
 }
 
-export const baseUrl = 'http://0.0.0.0:8000'
+export const baseUrl = API_BASE_URL
 
 interface MyAppProps extends AppProps {
     initialReduxState: any
@@ -60,10 +61,10 @@ MyApp.getInitialProps = async (context: AppContext) => {
         const headers = getHeaders(context);
 
         const urls = [
-            '/api/category/categories/',
-            '/api/category/collections/',
-            '/api/sizes/size-grids/',
-            '/api/pages/pages/'
+            '/category/categories/',
+            '/category/collections/',
+            '/sizes/size-grids/',
+            '/pages/pages/'
         ];
 
         const [categories, collections, sizeGrids, pages] = await Promise.all(

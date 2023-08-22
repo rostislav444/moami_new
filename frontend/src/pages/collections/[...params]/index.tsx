@@ -6,10 +6,11 @@ import {Catalogue}                       from "@/components/App/Catalogue";
 import fetchWithLocale                   from "@/utils/fetchWrapper";
 import {useStore}                        from "react-redux";
 import {CollectionsState}                from "@/interfaces/collections";
-import {baseUrl}                         from "@/pages/_app";
 import {CatalogueCategoryProps, perPage} from "@/pages/[...params]";
 import {getCategoriesAndPage}            from "@/utils/categories";
+import {API_BASE_URL}                    from "@/local";
 
+export const baseUrl = API_BASE_URL
 
 export default function Collection({paginatedVariants, statusCode, params, page}: CatalogueCategoryProps) {
     const store = useStore()
@@ -70,7 +71,7 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
 
 
 export const getStaticPaths = async () => {
-    const collectionsListUrl = baseUrl + '/api/category/collections/'
+    const collectionsListUrl = baseUrl + '/category/collections/'
     const response = await fetch(collectionsListUrl)
     const collections: CollectionsState[] = await response.json()
 

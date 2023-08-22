@@ -8,9 +8,10 @@ import {BaseProps}                                  from "@/interfaces/_base";
 import {useStore}                                   from "react-redux";
 import {selectCategories}                           from "@/state/reducers/categories";
 import {categoriesBySlugList, getCategoriesAndPage} from "@/utils/categories";
-import {baseUrl}                                    from "@/pages/_app";
 import {CategoryState}                              from "@/interfaces/categories";
+import {API_BASE_URL}                               from "@/local";
 
+const baseUrl = API_BASE_URL
 
 export interface CatalogueCategoryProps extends BaseProps {
     paginatedVariants: PaginatedVariants,
@@ -80,7 +81,7 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
 
 
 export const getStaticPaths = async () => {
-    const categoriesListUrl = baseUrl + '/api/category/categories/'
+    const categoriesListUrl = baseUrl + '/category/categories/'
     const response = await fetch(categoriesListUrl)
     const categories: CategoryState[] = await response.json()
 
