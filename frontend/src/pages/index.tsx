@@ -1,9 +1,10 @@
-import Layout                       from '@/components/Shared/Layout'
-import {HomeSlider, HomeSlideState} from "@/components/App/Home/Slider";
+import Layout           from '@/components/Shared/Layout'
+import {HomeSlider}     from "@/components/App/Home/Slider";
 import 'keen-slider/keen-slider.min.css'
 import {BaseProps}      from "@/interfaces/_base";
 import {GetStaticProps} from "next";
 import fetchWithLocale  from "@/utils/fetchWrapper";
+import {HomeSlideState} from "@/interfaces/home/silder";
 
 interface HomeProps extends BaseProps {
     slides: HomeSlideState[];

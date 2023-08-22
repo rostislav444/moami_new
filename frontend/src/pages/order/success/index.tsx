@@ -1,25 +1,17 @@
-import Layout from "@/components/Shared/Layout";
-import {Wrapper} from "@/components/App/Order/style";
-import {H1, P} from "@/components/Shared/Typograpy";
+import Layout      from "@/components/Shared/Layout";
+import {H1, P}     from "@/components/Shared/Typograpy";
 import {useEffect} from "react";
-import store from "@/state/store";
 import {clearCart} from "@/state/reducers/cart";
+import {useStore}  from "react-redux";
 
 
 export default function OrderSuccessPage() {
+    const store = useStore()
+
     const breadcrumbs = [
-        {
-            title: 'Главная',
-            url: '/'
-        },
-        {
-            title: 'Оформление заказа',
-            url: '/order'
-        },
-        {
-            title: 'Заказ оформлен',
-            url: '/order/success'
-        }
+        {title: 'Главная', url: '/'},
+        {title: 'Оформление заказа', url: '/order'},
+        {title: 'Заказ оформлен', url: '/order/success'}
     ]
 
     useEffect(() => {

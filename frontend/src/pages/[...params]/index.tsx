@@ -1,15 +1,15 @@
-import Layout                 from '@/components/Shared/Layout'
-import {GetStaticProps}       from 'next'
-import {Catalogue}            from "@/components/App/Catalogue";
-import Error                  from 'next/error';
-import {PaginatedVariants}    from "@/interfaces/variant";
-import fetchWithLocale        from "@/utils/fetchWrapper";
-import {BaseProps}            from "@/interfaces/_base";
-import {useStore}             from "react-redux";
+import Layout                                       from '@/components/Shared/Layout'
+import {GetStaticProps}                             from 'next'
+import {Catalogue}                                  from "@/components/App/Catalogue";
+import Error                                        from 'next/error';
+import {PaginatedVariants}                          from "@/interfaces/variant";
+import fetchWithLocale                              from "@/utils/fetchWrapper";
+import {BaseProps}                                  from "@/interfaces/_base";
+import {useStore}                                   from "react-redux";
 import {selectCategories}                           from "@/state/reducers/categories";
 import {categoriesBySlugList, getCategoriesAndPage} from "@/utils/categories";
 import {baseUrl}                                    from "@/pages/_app";
-import {CategoryState}        from "@/interfaces/categories";
+import {CategoryState}                              from "@/interfaces/categories";
 
 
 export interface CatalogueCategoryProps extends BaseProps {
@@ -49,7 +49,9 @@ export let cache: { [key: string]: Array<object> } = {};
 
 
 export const getStaticProps: GetStaticProps = async ({params, locale}) => {
-    if (!params) {return {props: {statusCode: 404}}}
+    if (!params) {
+        return {props: {statusCode: 404}}
+    }
 
     const paramsArray = Array.isArray(params.params) ? params.params : params.params ? [params.params] : [];
     const {page, categories} = getCategoriesAndPage(paramsArray);
@@ -82,29 +84,27 @@ export const getStaticPaths = async () => {
     const response = await fetch(categoriesListUrl)
     const categories: CategoryState[] = await response.json()
 
-    const recursiveCategories = (categories: CategoryState[], parentPath: string = ''): Array<string> => {
+    const generateCategoriesPaths = (categories: CategoryState[], parentPath: string = ''): Array<string> => {
         let paths: Array<string> = [];
         categories.forEach(category => {
             const pages = Math.ceil(category.products_count / perPage)
 
+            let newPath;
             for (let i = 0; i < pages; i++) {
-                let newPath;
                 if (i === 0) {
-                    newPath = `${parentPath}/${category.slug}`;
+                    newPath = category.slug;
                 } else {
-                    newPath = `${parentPath}/${category.slug}/page/${i + 1}`;
+                    newPath = `${category.slug}/page/${i + 1}`;
                 }
                 paths.push(newPath);
-            }
-            const newPath = `${parentPath}/${category.slug}`;
-            if (category.children.length) {
-                paths = [...paths, ...recursiveCategories(category.children, newPath)];
             }
         });
         return paths;
     }
 
-    const paths = recursiveCategories(categories)
+
+    const paths = generateCategoriesPaths(categories)
+
     return {
         paths: paths.map(path => ({params: {params: path.split('/')}})),
         fallback: 'blocking'

@@ -8,10 +8,11 @@ import {selectCart} from "@/state/reducers/cart";
 import {useAppSelector} from "@/state/hooks";
 
 import {AreaState, NewPostForm} from "@/components/App/Order/OrderForm/NewPost"
-import {useLocale} from "@/context/localeFetchWrapper";
-import {useRouter} from "next/navigation";
-import {Button} from "@/components/Shared/Buttons";
-import {Grid} from "@/components/Shared/Blocks";
+
+import {useRouter}     from "next/navigation";
+import {Button}        from "@/components/Shared/Buttons";
+import {Grid}          from "@/components/Shared/Blocks";
+import fetchWithLocale from "@/utils/fetchWrapper";
 
 
 export const OrderForm = () => {
@@ -20,7 +21,7 @@ export const OrderForm = () => {
     const [selectDepartment, setSelectDepartment] = useState<string | null>(null)
 
     const {register, handleSubmit, formState: {errors}, watch} = useForm();
-    const apiFetch = useLocale()
+    const api = fetchWithLocale()
     const {items} = useAppSelector(selectCart)
 
     const {push} = useRouter();
@@ -30,7 +31,7 @@ export const OrderForm = () => {
 
 
     useEffect(() => {
-        apiFetch.get('newpost/areas').then((data: any) => {
+        api.get('newpost/areas').then((data: any) => {
             setAreas([...data.data]);
         })
     }, [])
@@ -74,7 +75,7 @@ export const OrderForm = () => {
         console.log(requestBody)
 
 
-        apiFetch.post('order/', requestBody).then((data: any) => {
+        api.post('order/', requestBody).then((data: any) => {
             push('/order/success')
         })
     }

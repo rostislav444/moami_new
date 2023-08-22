@@ -4,7 +4,7 @@ import React, {useEffect, useRef, useState}                    from "react";
 
 interface DescriptionProps {
     description: string,
-    parent: React.MutableRefObject<HTMLDivElement>
+    parent: any
 }
 
 

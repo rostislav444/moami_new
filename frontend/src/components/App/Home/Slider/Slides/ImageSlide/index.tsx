@@ -1,7 +1,8 @@
-import {ImageWrapper} from "@/components/App/Home/Slider/Slides/ImageSlide/style";
-import Image from "next/image";
+import {ImageWrapper}              from "@/components/App/Home/Slider/Slides/ImageSlide/style";
+import Image                       from "next/image";
 import {TitleDescriptionComponent} from "@/components/App/Home/Slider/Slides/style";
-import {HomeSlideState} from "@/components/App/Home/Slider";
+import {HomeSlideState}            from "@/interfaces/home/silder";
+
 
 
 interface ImageSlideComponentProps {

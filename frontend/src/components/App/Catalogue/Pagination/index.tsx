@@ -1,37 +1,73 @@
 import React                                 from 'react';
 import {useRouter}                           from "next/router";
-import Link                                  from 'next/link'
-import {PaginationButton, PaginationWrapper} from "@/components/App/Catalogue/Pagination/style";
+import Link                                                      from 'next/link'
+import {PaginationButton, PaginationEllipsis, PaginationWrapper} from "@/components/App/Catalogue/Pagination/style";
 
-
-interface paginationProps {
+type PaginationProps = {
     page: number;
     totalPages: number;
     url: string;
 }
 
-export const Pagination = ({page, totalPages, url}: paginationProps) => {
-    const getPageLink = (pageNum: number) => {
-        return `/${url}/page/${pageNum}`;
-    };
+type PaginationItem = {
+    type: 'page' | 'ellipsis';
+    pageNum?: number;
+    label?: string;
+}
+
+const getPaginationState = (page: number, totalPages: number, groupLength: number): PaginationItem[] => {
+    const nearCurrentPage = (i: number): boolean => {
+        const startGroup = page - Math.floor((groupLength - 1) / 2);
+        const endGroup = page + Math.floor(groupLength / 2);
+        return i >= startGroup && i <= endGroup;
+    }
+
+    const generatePaginationItems = (): PaginationItem[] => {
+        const items: PaginationItem[] = [];
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || nearCurrentPage(i)) {
+                items.push({type: 'page', pageNum: i});
+            } else if (i - 1 === 1 || i === page - Math.floor((groupLength - 1) / 2) || i === page + Math.floor(groupLength / 2) + 1) {
+                items.push({type: 'ellipsis'});
+                continue;
+            }
+        }
+
+        if (page > 1) items.unshift({type: 'page', pageNum: page - 1, label: '<'});
+        if (page < totalPages) items.push({type: 'page', pageNum: page + 1, label: '>'});
+
+        return items;
+    }
+
+    return generatePaginationItems();
+}
+
+
+export const Pagination = ({page, totalPages, url}: PaginationProps) => {
+    const router = useRouter();
+    const locale = router.locale;
+
+    const getPageLink = (pageNum: number) => `${url}/page/${pageNum}`;
+    const groupLength = 3;
+
+    const paginationState: PaginationItem[] = getPaginationState(page, totalPages, groupLength);
 
     return (
         <PaginationWrapper>
-            {page > 1 && <Link href={getPageLink(page - 1)}><PaginationButton>Prev</PaginationButton></Link>}
-            {page > 3 && <Link href={getPageLink(1)}><PaginationButton>1</PaginationButton></Link>}
-            {page > 4 && <PaginationButton>...</PaginationButton>}
-            {page > 2 && <Link href={getPageLink(page - 2)}><PaginationButton>{page - 2}</PaginationButton></Link>}
-            {page > 1 && <Link href={getPageLink(page - 1)}><PaginationButton>{page - 1}</PaginationButton></Link>}
-            <PaginationButton active>{page}</PaginationButton>
-            {page < totalPages &&
-                <Link href={getPageLink(page + 1)}><PaginationButton>{page + 1}</PaginationButton></Link>}
-            {page < totalPages - 1 &&
-                <Link href={getPageLink(page + 2)}><PaginationButton>{page + 2}</PaginationButton></Link>}
-            {page < totalPages - 3 && <PaginationButton>...</PaginationButton>}
-            {page < totalPages - 2 &&
-                <Link href={getPageLink(totalPages)}><PaginationButton>{totalPages}</PaginationButton></Link>}
-            {page < totalPages - 1 &&
-                <Link href={getPageLink(page + 1)}><PaginationButton>Next</PaginationButton></Link>}
+            {paginationState.map((item, index) => {
+                if (item.type === 'ellipsis') {
+                    return <PaginationEllipsis key={index}>...</PaginationEllipsis>;
+                }
+                const isCurrent = page === item.pageNum;
+                return (
+                    <Link key={index} locale={locale} href={getPageLink(item.pageNum!)}>
+                        <PaginationButton active={isCurrent}>
+                            {item.label || item.pageNum}
+                        </PaginationButton>
+                    </Link>
+                );
+            })}
         </PaginationWrapper>
-    )
+    );
 }

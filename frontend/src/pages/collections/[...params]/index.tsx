@@ -34,7 +34,7 @@ export default function Collection({paginatedVariants, statusCode, params, page}
             key={page}
             breadcrumbs={breadcrumbs}
         >
-            <Catalogue initialVariants={results} count={count} url={'collections/' + params.join('/')} page={page} />
+            <Catalogue initialVariants={results} count={count} url={params.join('/')} page={page} />
         </Layout>
     )
 }
@@ -83,9 +83,9 @@ export const getStaticPaths = async () => {
             for (let i = 0; i < pages; i++) {
                 let newPath;
                 if (i === 0) {
-                    newPath = `collections/${collection.slug}`;
+                    newPath = `${collection.slug}`;
                 } else {
-                    newPath = `collections/${collection.slug}/page/${i + 1}`;
+                    newPath = `${collection.slug}/page/${i + 1}`;
                 }
                 paths.push(newPath);
             }

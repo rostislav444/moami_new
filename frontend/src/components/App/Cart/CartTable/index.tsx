@@ -1,17 +1,18 @@
-import {CartTable, RemoveButton} from "./style";
-import Link from "next/link";
-import {CartTableProps} from "@/interfaces/cart";
-import store from "@/state/store";
-import {H4} from "@/components/Shared/Typograpy";
-import {Counter} from "@/components/Shared/Counter";
+import {CartTable, RemoveButton}      from "./style";
+import Link                           from "next/link";
+import {CartTableProps}               from "@/interfaces/cart";
+import {H4}                           from "@/components/Shared/Typograpy";
+import {Counter}                      from "@/components/Shared/Counter";
 import {selectCart, updateItemInCart} from "@/state/reducers/cart";
-import {useRouter} from "next/navigation";
-import {useAppSelector} from "@/state/hooks";
-import {useEffect} from "react";
+import {useRouter}                    from "next/navigation";
+import {useAppSelector}               from "@/state/hooks";
+import {useEffect}                    from "react";
+import {useStore}                     from "react-redux";
 
 
 export const CartTablePC = () => {
     const {push} = useRouter();
+    const store = useStore()
     const {items, quantity, total} = useAppSelector(selectCart)
     const {selected} = useAppSelector(state => state.sizes)
 
@@ -30,22 +31,22 @@ export const CartTablePC = () => {
     return <CartTable>
         <div className="cart-row cart-header">
             <div className="cart-cell">
-                <H4>Image</H4>
+                <H4>Фото</H4>
             </div>
             <div className="cart-cell">
-                <H4>Detail</H4>
+                <H4>Детали</H4>
             </div>
             <div className="cart-cell">
-                <H4>Price</H4>
+                <H4>Цена</H4>
             </div>
             <div className="cart-cell">
-                <H4>Quantity</H4>
+                <H4>Кол-во</H4>
             </div>
             <div className="cart-cell">
                 <H4></H4>
             </div>
             <div className="cart-cell">
-                <H4>Total</H4>
+                <H4>Всего</H4>
             </div>
         </div>
 
@@ -84,7 +85,7 @@ export const CartTablePC = () => {
             <div className="cart-cell"></div>
             <div className="cart-cell"></div>
             <div className="cart-cell cart-total-label">
-                <span>Total:</span>
+                <span>Сума:</span>
             </div>
             <div className="cart-cell cart-total-value">
                 <span>{total} ₴</span>

@@ -1,27 +1,21 @@
-import dynamic from "next/dynamic";
-import {useAppSelector} from "@/state/hooks";
-import {selectCart} from "@/state/reducers/cart";
-import {
-    OrderItem,
-    OrderItemDescription,
-    OrderItemDescriptionRight,
-    OrderItemsList, OrderTotalWrapper,
-    Wrapper
-} from "@/components/App/Order/OrderProductsList/style";
-import {Caption, H2, H3, H4, P, PL} from "@/components/Shared/Typograpy";
-import {CartItemState} from "@/interfaces/cart";
+import dynamic                                                                                                  from "next/dynamic";
+import {useAppSelector}                                                                                         from "@/state/hooks";
+import {selectCart}                                                                                             from "@/state/reducers/cart";
+import {OrderItem, OrderItemDescription, OrderItemDescriptionRight, OrderItemsList, OrderTotalWrapper, Wrapper} from "@/components/App/Order/OrderProductsList/style";
+import {Caption, H3, H4, P, PL}                                                                                 from "@/components/Shared/Typograpy";
+import {CartItemState}                                                                                          from "@/interfaces/cart";
 
 
-import Image from 'next/image'
-import {selectSizes} from "@/state/reducers/sizes";
-import {useEffect} from "react";
-import {useRouter} from "next/navigation";
+import Image                from 'next/image'
+import {selectSelectedGrid} from "@/state/reducers/sizes";
+import {useEffect}          from "react";
+import {useRouter}          from "next/navigation";
 
 
 const OrderProductsListComponent = () => {
     const {push} = useRouter();
     const {items, quantity, total} = useAppSelector(selectCart);
-    const {selected} = useAppSelector(selectSizes)
+    const selected = useAppSelector(selectSelectedGrid)
 
     useEffect(() => {quantity === 0 && push('/')}, [quantity]);
 

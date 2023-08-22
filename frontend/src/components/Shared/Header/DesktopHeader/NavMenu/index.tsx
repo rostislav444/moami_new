@@ -1,9 +1,10 @@
-import * as s from "./style"
-import Link from "next/link";
-import {Span} from "@/components/Shared/Typograpy";
-import React from "react";
-import {CategoryState} from "@/interfaces/categories";
+import * as s             from "./style"
+import Link               from "next/link";
+import {Span}             from "@/components/Shared/Typograpy";
+import React              from "react";
+import {CategoryState}    from "@/interfaces/categories";
 import {CollectionsState} from "@/interfaces/collections";
+import {useRouter}        from "next/router";
 
 
 interface Props {
@@ -12,17 +13,20 @@ interface Props {
 }
 
 export const DesktopNavMenu = ({categories, collections}: Props) => {
+    const router = useRouter();
+    const {locale} = router;
+
     return <s.NavWrapper>
         <s.NavUl>
             {categories.map((category) =>
                 <s.NavMenuItem key={category.id}>
-                    <Link href={`/${category.slug}`}>
+                    <Link locale={locale} href={`/${category.slug}`}>
                         <Span>{category.name}</Span>
                     </Link>
                     <s.SubMenuWrapper className={'sub-menu'}>
                         <s.SubMenu>
                             {category.children.map((subcategory) =>
-                                <Link key={subcategory.id} href={`/${category.slug}/${subcategory.slug}`}>
+                                <Link locale={locale} key={subcategory.id} href={`/${category.slug}/${subcategory.slug}`}>
                                     <s.SubMenuItem>
                                         <Span>{subcategory.name}</Span>
                                     </s.SubMenuItem>
@@ -33,7 +37,7 @@ export const DesktopNavMenu = ({categories, collections}: Props) => {
                 </s.NavMenuItem>
             )}
             <s.NavMenuItem>
-                <Link href={`/collections`}><span>Коллекции</span></Link>
+                <Link locale={locale} href={`/collections`}><span>Коллекции</span></Link>
                 <s.SubMenuWrapper className={'sub-menu'}>
                     <s.SubMenu>
                         {collections.map((collection) =>

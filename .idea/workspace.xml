@@ -5,57 +5,44 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0aeb8c56-975f-42c2-97d5-8d95cea0dfbb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/collections/[...params]/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/catalogue/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/catalogue/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/catalogue/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/catalogue/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/categories/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/categories/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/categories/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/categories/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/categories/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/categories/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/integrations/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/integrations/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/newpost/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/newpost/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/newpost/apps.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/newpost/apps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/newpost/management/commands/load_newpost.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/newpost/management/commands/load_newpost.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/newpost/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/newpost/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/newpost/serializer.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/newpost/serializer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/apps/order/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/order/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/apps/product/admin/admin_product.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/admin/admin_product.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/apps/product/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/apps/product/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/apps/product/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/apps/product/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/project/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/project/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/data/dumps/dump.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/templates/feed/rozetka.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/templates/feed/rozetka.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Cart/CartTable/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Cart/CartTable/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Cart/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Cart/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/Pagination/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/Pagination/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/Pagination/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/Pagination/style.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Catalogue/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/Slides/ImageSlide/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/Slides/ImageSlide/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/Slides/MiniPostSlide/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Home/Slider/Slides/MiniPostSlide/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/Cities/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/Cities/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/Department/intex.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/Department/intex.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/NewPost/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderForm/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderProductsList/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/OrderProductsList/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Order/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Order/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/style.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/Description/style.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/VariantsLinks/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/VariantsLinks/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/App/Product/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/App/Product/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Footer/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/NavMenu/Categories/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/NavMenu/Categories/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/MobileHeader/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/context/localeFetchWrapper.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/interfaces/catalogue.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/interfaces/catalogue.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/interfaces/categories.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/interfaces/categories.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/interfaces/collections.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/interfaces/collections.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/interfaces/pages.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/interfaces/pages.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/interfaces/sizes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/interfaces/sizes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/NavMenu/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Header/DesktopHeader/NavMenu/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/Breadcrumbs/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/Shared/Layout/Breadcrumbs/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/[...params]/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/[...params]/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/_app.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/collections/[slug]/index.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/collections/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/collections/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/cart/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/cart/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/collections/[...params]/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/collections/[...params]/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/order/success/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/order/success/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/product/[slug]/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/product/[slug]/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/categories.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/collections.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/pages.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions/sizeGrids.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/reducers/categories.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/reducers/collections.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/reducers/pages.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/reducers/sizes.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/state/store.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/state/store.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/utils/categories.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/utils/categories.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/state/actions.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/styles/Theme.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/Theme.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -241,7 +228,10 @@
       <workItem from="1691426800904" duration="109000" />
       <workItem from="1691660374742" duration="1189000" />
       <workItem from="1691669295297" duration="3460000" />
-      <workItem from="1692351266687" duration="1545000" />
+      <workItem from="1692351266687" duration="8797000" />
+      <workItem from="1692395766875" duration="688000" />
+      <workItem from="1692630288357" duration="9027000" />
+      <workItem from="1692723448573" duration="6667000" />
     </task>
     <servers />
   </component>
@@ -258,15 +248,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/frontend/src/components/App/Order/index.tsx</url>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

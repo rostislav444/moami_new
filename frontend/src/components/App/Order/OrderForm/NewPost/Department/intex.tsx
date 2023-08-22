@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {DropdownSelect} from "@/components/Shared/choices";
-import {useLocale} from "@/context/localeFetchWrapper";
+import fetchWithLocale       from "@/utils/fetchWrapper";
 
 
 interface DepartmentState {
@@ -17,11 +17,11 @@ interface Props {
 
 export const Department = ({selectedCity, selectDepartment, setSelectDepartment}: Props) => {
     const [departments, setDepartments] = useState<DepartmentState[]>([])
-    const apiFetch = useLocale()
+    const api = fetchWithLocale()
 
     useEffect(() => {
         if (selectedCity) {
-            apiFetch.get(`newpost/departments?city=${selectedCity}`).then((data: any) => {
+            api.get(`newpost/departments?city=${selectedCity}`).then((data: any) => {
                 setDepartments([...data]);
             })
         }

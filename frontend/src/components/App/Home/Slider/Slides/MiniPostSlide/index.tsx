@@ -1,11 +1,7 @@
-import {
-    FirstImageWrapper,
-    ImagesWrapper,
-    MiniPostWrapper, SecondImageWrapper
-} from "@/components/App/Home/Slider/Slides/MiniPostSlide/style";
-import {TitleDescriptionComponent} from "@/components/App/Home/Slider/Slides/style";
-import {HomeSlideState} from "@/components/App/Home/Slider";
-import {ImageStyled} from "@/components/App/Home/Slider/style";
+import {FirstImageWrapper, ImagesWrapper, MiniPostWrapper, SecondImageWrapper} from "@/components/App/Home/Slider/Slides/MiniPostSlide/style";
+import {TitleDescriptionComponent}                                             from "@/components/App/Home/Slider/Slides/style";
+import {ImageStyled}                                                           from "@/components/App/Home/Slider/style";
+import {HomeSlideState}                                                        from "@/interfaces/home/silder";
 
 
 interface MiniPostSlideComponentProps {
@@ -22,7 +18,7 @@ export const MiniPostSlideComponent = ({slide}: MiniPostSlideComponentProps) => 
             </FirstImageWrapper>
             {slide.image_2 &&
                 <SecondImageWrapper>
-                     <ImageStyled src={slide.image_2} alt={slide.title}/>
+                    <ImageStyled src={slide.image_2} alt={slide.title}/>
                 </SecondImageWrapper>
             }
         </ImagesWrapper>
