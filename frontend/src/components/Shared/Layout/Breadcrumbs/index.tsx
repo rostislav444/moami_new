@@ -11,16 +11,16 @@ export const Breadcrumbs = ({breadcrumbs}: BreadcrumbsProps) => {
 
     return (
         <BreadcrumbsWrapper>
-            {/*{breadcrumbs?.map((breadcrumb, index) =>*/}
-            {/*    <li key={index}>*/}
-            {/*        {!breadcrumb.link || index === breadcrumbs.length - 1 ?*/}
-            {/*            <span>{breadcrumb.title}</span>*/}
-            {/*            : <Link href={breadcrumb.link}>{breadcrumb.title}</Link>*/}
-            {/*        }*/}
-            {/*        {len && index < len - 1 && <BreadcrumbsSeparator>/</BreadcrumbsSeparator>}*/}
-            {/*    </li>*/}
+            {breadcrumbs?.map((breadcrumb, index) =>
+                <li key={index}>
+                    {!breadcrumb.link || index === breadcrumbs.length - 1 ?
+                        <span>{breadcrumb.title}</span>
+                        : <Link href={breadcrumb.link}>{breadcrumb.title}</Link>
+                    }
+                    {len && index < len - 1 && <BreadcrumbsSeparator>/</BreadcrumbsSeparator>}
+                </li>
 
-            {/*)}*/}
+            )}
         </BreadcrumbsWrapper>
     )
 }

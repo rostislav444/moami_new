@@ -9,6 +9,9 @@ interface VariantsLinksProps {
 }
 
 export const VariantsLinks = ({variants, selected}: VariantsLinksProps) => {
+    if (variants.length === 1) {
+        return null;
+    }
     return (
         <VariantsLinksContainer>
             {variants.map(variant =>

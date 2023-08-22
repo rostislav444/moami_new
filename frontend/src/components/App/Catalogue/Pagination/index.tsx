@@ -1,5 +1,5 @@
-import React                                 from 'react';
-import {useRouter}                           from "next/router";
+import React                                                     from 'react';
+import {useRouter}                                               from "next/router";
 import Link                                                      from 'next/link'
 import {PaginationButton, PaginationEllipsis, PaginationWrapper} from "@/components/App/Catalogue/Pagination/style";
 
@@ -15,7 +15,15 @@ type PaginationItem = {
     label?: string;
 }
 
-const getPaginationState = (page: number, totalPages: number, groupLength: number): PaginationItem[] => {
+
+
+export const Pagination = ({page, totalPages, url}: PaginationProps) => {
+    const router = useRouter();
+    const locale = router.locale;
+
+    const getPageLink = (pageNum: number) => `${url}/page/${pageNum}`;
+    const groupLength = 3;
+
     const nearCurrentPage = (i: number): boolean => {
         const startGroup = page - Math.floor((groupLength - 1) / 2);
         const endGroup = page + Math.floor(groupLength / 2);
@@ -40,18 +48,7 @@ const getPaginationState = (page: number, totalPages: number, groupLength: numbe
         return items;
     }
 
-    return generatePaginationItems();
-}
-
-
-export const Pagination = ({page, totalPages, url}: PaginationProps) => {
-    const router = useRouter();
-    const locale = router.locale;
-
-    const getPageLink = (pageNum: number) => `${url}/page/${pageNum}`;
-    const groupLength = 3;
-
-    const paginationState: PaginationItem[] = getPaginationState(page, totalPages, groupLength);
+    const paginationState: PaginationItem[] = generatePaginationItems()
 
     return (
         <PaginationWrapper>

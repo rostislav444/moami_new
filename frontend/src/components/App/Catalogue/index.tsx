@@ -29,7 +29,7 @@ export const Catalogue = ({initialVariants, count, url, page}: CatalogueProps) =
     const totalPages = Math.ceil(count / perPage);
 
     useEffect(() => {
-        console.log(page)
+        // console.log(page)
         // if (page !== null) {
         //     setLoading(true);
         //     const pageUrl = page === 1 ? url : `${url}&page=${page}`;
