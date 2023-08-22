@@ -85,9 +85,6 @@ class Product(Translatable):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    product_preferred_size_grid = models.ForeignKey(SizeGrid, null=True, blank=True, on_delete=models.SET_NULL,
-                                                    verbose_name='предпочтительная размерная сетка')
-
     class Meta:
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
@@ -99,6 +96,10 @@ class Product(Translatable):
 
     def __str__(self):
         return f'{self.name} id: {str(self.id)}'
+
+    @property
+    def get_preferred_size_grid(self):
+        return self.category.preferred_size_grid.name if self.category.preferred_size_grid else 'ua'
 
 
 class ProductComposition(models.Model):
@@ -197,8 +198,19 @@ class VariantSize(models.Model):
             return interpretation.value
         return self.size.__str__()
 
+    @property
+    def get_size(self):
+        sizes = self.size.get_interpretations_dict()
+        preferred_size_grid = self.variant.product.get_preferred_size_grid
+
+        if preferred_size_grid in sizes.keys():
+            return sizes[preferred_size_grid]
+        else:
+            key = list(sizes.keys())[0]
+            return sizes[key]
+
     def __str__(self):
-        return f'{self.variant} ({self.get_size_name})'
+        return f'{self.variant} ({self.get_size})'
 
 
 class VariantImageManager(models.Manager):

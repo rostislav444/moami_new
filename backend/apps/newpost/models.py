@@ -1,11 +1,40 @@
+import json
+
 from django.db import models
+from django.core.exceptions import ValidationError
+import requests
 
 
 class NewPostApiKey(models.Model):
-    value = models.CharField(max_length=255)
+    value = models.CharField(max_length=255, verbose_name='Ключ')
+
+    class Meta:
+        verbose_name = 'Ключ Новой почты'
+        verbose_name_plural = '1. Ключ Новой почты'
+
+    @staticmethod
+    def test_data(key):
+        return {
+            "apiKey": key,
+            "modelName": "Address",
+            "calledMethod": "searchSettlements",
+            "methodProperties": {
+                "CityName": "київ",
+                "Limit": "1",
+                "Page": "1"
+            }
+        }
+
+    def clean(self):
+        endpoint = 'https://api.novaposhta.ua/v2.0/json/'
+        data = json.dumps(self.test_data(self.value))
+        response = requests.post(endpoint, data)
+        response = response.json()
+        if not response['success']:
+            raise ValidationError('Ключ не валидный')
 
     def __str__(self):
-        return self.value
+        return 'Ключ Новой почты'
 
 
 class NewPostAreas(models.Model):
@@ -16,6 +45,8 @@ class NewPostAreas(models.Model):
 
     class Meta:
         ordering = ('description', 'description_ru',)
+        verbose_name = 'Область'
+        verbose_name_plural = '2. Области'
 
     def __str__(self):
         return f'{self.description} ({self.description_ru}) область'
@@ -30,6 +61,8 @@ class NewPostRegion(models.Model):
 
     class Meta:
         ordering = ('description', 'description_ru',)
+        verbose_name = 'Район'
+        verbose_name_plural = '3. Районы'
 
     def __str__(self):
         return f'{self.description}, {self.area.description} район'
@@ -52,6 +85,8 @@ class NewPostCities(models.Model):
 
     class Meta:
         ordering = ('description', 'description_ru',)
+        verbose_name = 'Город'
+        verbose_name_plural = '4. Города'
 
     def __str__(self):
         if self.region:
@@ -79,6 +114,8 @@ class NewPostDepartments(models.Model):
 
     class Meta:
         ordering = ('number', 'description', 'description_ru',)
+        verbose_name = 'Отделение'
+        verbose_name_plural = '5. Отделения'
 
     def __str__(self):
         return f'{str(self.site_key)}, {self.description}'

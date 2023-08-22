@@ -20,3 +20,17 @@ class NewPostDepartmentsSerializer(serializers.ModelSerializer):
         fields = ['ref', 'number', 'description', 'description_ru', 'short_address', 'short_address_ru', 'latitude',
                   'longitude', 'schedule']
 
+
+# Uses for nested serializers
+class NewPostCitiesRel(NewPostCitiesSerializer):
+    departments = NewPostDepartmentsSerializer(many=True, read_only=True)
+
+    class Meta(NewPostCitiesSerializer.Meta):
+        fields = NewPostCitiesSerializer.Meta.fields + ['departments']
+
+
+class NewPostAreasRel(NewPostAreasSerializer):
+    cities = NewPostCitiesRel(many=True, read_only=True)
+
+    class Meta(NewPostAreasSerializer.Meta):
+        fields = NewPostAreasSerializer.Meta.fields + ['cities']

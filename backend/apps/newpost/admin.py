@@ -34,5 +34,5 @@ class NewPostCitiesAdmin(admin.ModelAdmin):
 @admin.register(NewPostDepartments)
 class NewPostDepartmentsAdmin(admin.ModelAdmin):
     list_display = ['site_key', 'description', 'city']
-    search_fields = ['site_key', 'description', 'city__description']
+    search_fields = ['description', 'description_ru']
     list_filter = ['city__region__area__description']

@@ -21,29 +21,17 @@ class ProductCompositionSerializer(serializers.ModelSerializer):
 
 
 class FeedVariantSizeSerializer(serializers.ModelSerializer):
-    size = serializers.SerializerMethodField()
+    size = serializers.CharField(source='get_size')
+    full_id = serializers.SerializerMethodField()
 
     class Meta:
         model = VariantSize
-        fields = ('id', 'size', 'stock')
+        fields = ('id', 'full_id', 'size', 'stock')
 
-    def get_size(self, obj):
-        sizes = obj.size.get_interpretations_dict()
-        category_preferred_size_grid = obj.variant.product.category.preferred_size_grid
-        product_preferred_size_grid = obj.variant.product.product_preferred_size_grid
-        if product_preferred_size_grid:
-            return sizes[product_preferred_size_grid.name]
-        elif category_preferred_size_grid:
-            return sizes[category_preferred_size_grid.name]
-        elif 'ua' in sizes.keys():
-            return sizes['ua']
-        elif 'eu' in sizes.keys():
-            return sizes['eu']
-        elif 'int' in sizes.keys():
-            return sizes['int']
-        else:
-            key = list(sizes.keys())[0]
-            return sizes[key]
+    @staticmethod
+    def get_full_id(obj):
+        full_id = obj.variant.code + ' ' + obj.get_size
+        return full_id.upper()
 
 
 class FeedVariantImageSerializer(serializers.ModelSerializer):
@@ -90,11 +78,12 @@ class FeedProductSerializer(serializers.ModelSerializer):
     description_uk = serializers.SerializerMethodField()
     compositions = ProductCompositionSerializer(many=True)
     attributes = FeedProductAttributeSerializer(many=True)
+    preferred_size_grid = serializers.CharField(source='get_preferred_size_grid')
 
     class Meta:
         model = Product
         fields = ('id', 'name', 'name_uk', 'brand', 'country', 'description', 'description_uk', 'variants', 'category',
-                  'price', 'old_price', 'compositions', 'attributes')
+                  'price', 'old_price', 'compositions', 'attributes', 'preferred_size_grid')
 
     def get_name_uk(self, obj):
         try:

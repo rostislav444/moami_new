@@ -53,11 +53,12 @@ class ProductSerializer(serializers.ModelSerializer):
     breadcrumbs = serializers.SerializerMethodField()
     properties = CustomPropertySerializer(many=True)
     size_grids = SizeGridSerializer(source='category.size_group.grids', many=True)
+    preferred_size_grid = serializers.CharField(source='get_preferred_size_grid')
 
     class Meta:
         model = Product
         fields = ('name', 'slug', 'price', 'old_price', 'description', 'properties', 'variants', 'breadcrumbs',
-                  'size_grids', 'product_preferred_size_grid')
+                  'size_grids', 'preferred_size_grid')
 
     def get_breadcrumbs(self, obj):
         breadcrumbs = []

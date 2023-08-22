@@ -88,7 +88,7 @@ class OrderItem(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        size_name = self.size.get_size_name
+        size_name = self.size.get_size
         return f'Товар {self.size.variant.product.name} - {size_name} в  заказе №{self.order.id}'
 
 

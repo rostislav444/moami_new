@@ -28,10 +28,10 @@
                                 <picture>https://moami.com.ua{{ image.image }}</picture>
                             {% endfor %}
                             <vendor>{{ product.brand }}</vendor>
-                            <article>{{ variant.code }}-{{ size.size }}</article>
+                            <article>{{ size.full_id }}</article>
                             <stock_quantity>{{ size.stock }}</stock_quantity>
-                            <name>{{ product.name }} {{ variant.color }} ({{ variant.code }}-{{ size.size }})</name>
-                            <name_ua>{{ product.name_uk }} {{ variant.color_uk }} ({{ variant.code }}-{{ size.size }})
+                            <name>{{ product.name }} {{ variant.color }} ({{ size.full_id }})</name>
+                            <name_ua>{{ product.name_uk }} {{ variant.color_uk }} ({{ size.full_id }})
                             </name_ua>
                             <description>
                                 <![CDATA[{{ product.description }}]]>
