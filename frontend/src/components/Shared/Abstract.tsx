@@ -12,10 +12,12 @@ interface MarginProps {
 }
 
 const margins = (props: any) => `
-    margin-left: ${props.ml ? props.ml * 8 : 0}px;
-    margin-right: ${props.mr ? props.mr * 8 : 0}px;
-    margin-top: ${props.mt ? props.mt * 8 : 0}px;
-    margin-bottom: ${props.mb ? props.mb * 8 : 0}px;
+    margin: 0;
+    padding 0;
+    margin-left: ${props.ml ? props.ml * 4 : 0}px;
+    margin-right: ${props.mr ? props.mr * 4 : 0}px;
+    margin-top: ${props.mt ? props.mt * 4 : 0}px;
+    margin-bottom: ${props.mb ? props.mb * 4 : 0}px;
     text-align: ${props.center ? 'center' : 'left'};
     font-weight: ${props.bold ? '500' : '400'};
     color: ${props.grey ? props.theme.color.grey : 'inherit'};

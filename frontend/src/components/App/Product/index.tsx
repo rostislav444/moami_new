@@ -57,7 +57,8 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                 name: variant.product.name,
                 slug: variant.slug,
                 price: variant.product.price,
-                old_price: variant.product.price,
+                old_price: variant.product.old_price,
+                selectedGrid: selectedGrid,
             }
             store.dispatch(addItemToCart(data))
             event('AddToCart', {

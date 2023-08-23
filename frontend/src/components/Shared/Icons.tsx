@@ -22,7 +22,9 @@ const IconWrapper = styled.div<IconWrapperProps>`
 
 const IconCounterStyle = styled.span`
   position: absolute;
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 18px;
   height: 18px;
   background-color: ${props => props.theme.color.primary};
@@ -32,10 +34,11 @@ const IconCounterStyle = styled.span`
   font-size: 12px;
   text-align: center;
   border-radius: 50%;
+  line-height: 18px;
 `
 
 
-const IconStyle = styled.img<{grey?: boolean}>`
+const IconImg = styled.img<{grey?: boolean}>`
   width: 24px;
   height: 24px;
   ${props => props.grey && 'filter: invert(0.5);'}
@@ -55,7 +58,7 @@ const DynamicIconCounter = dynamic(() => Promise.resolve(IconCounter), {
 export const Icon = ({src, count, ml, mr, grey}: IconProps) => {
     return (
         <IconWrapper ml={ml} mr={mr}>
-            <IconStyle src={src} grey={grey}/>
+            <IconImg src={src} grey={grey}/>
             {!!count && <DynamicIconCounter>{count}</DynamicIconCounter>}
         </IconWrapper>
     )

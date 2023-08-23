@@ -10,7 +10,13 @@ export interface CartItemState {
     slug: string,
     price: number,
     old_price: number,
+    selectedGrid: string,
+}
 
+export interface CartItemProps {
+    item: CartItemState,
+    handelRemoveItem: (id: number) => void,
+    handleUpdate: (id: number, quantity: number) => void,
 }
 
 export interface CartState {
@@ -19,9 +25,10 @@ export interface CartState {
     quantity: number,
 }
 
-export interface CartTableProps {
+export interface CartProductsProps {
     items: CartItemState[],
+    quantity: number,
     total: number,
-    selected: string | number | null,
-    remove: (id: number) => void,
+    handelRemoveItem: (id: number) => void,
+    handleUpdate: (id: number, quantity: number) => void,
 }

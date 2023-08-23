@@ -1,5 +1,5 @@
-import styled from "@emotion/styled";
-
+import styled   from "@emotion/styled";
+import {Button} from "@/components/Shared/Buttons";
 
 export const Wrapper = styled.div`
   position: relative;
@@ -28,4 +28,15 @@ export const ActionsWrapper = styled.div`
       width: 100%;
     }
   }
+`
+
+export const ShoppingCartButton = styled(Button)`
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`
+
+export const RemoveButton = styled.div`
+  position: relative;
+  display: block;
 `

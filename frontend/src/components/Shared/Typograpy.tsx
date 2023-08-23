@@ -1,13 +1,13 @@
-import styled from '@emotion/styled'
-import {theme} from "@/styles/Theme";
-import {h1, h2, span, p} from "@/components/Shared/Abstract";
+import styled            from '@emotion/styled'
+import {theme}           from "@/styles/Theme";
+import {h1, h2, p, span} from "@/components/Shared/Abstract";
 
 export const H1 = styled(h1)`
   font-size: 48px;
   font-family: 'Lora', serif;
   font-weight: 400;
-  
-  @media(max-width: 768px) {
+
+  @media (max-width: 768px) {
     font-size: 36px;
   }
 `
@@ -36,15 +36,20 @@ export const P = styled(p)`
   font-family: 'Open Sans', sans-serif;
   line-height: 1.75;
   color: ${props => {
-      switch (props.color) {
-        case 'primary':
-            return theme.color.primary;
-        case 'white':
-            return 'white'
-        default:
-            return 'inherit';
-      }
+    switch (props.color) {
+      case 'primary':
+        return theme.color.primary;
+      case 'white':
+        return 'white'
+      default:
+        return 'inherit';
+    }
   }};
+`
+
+export const InfoTitle = styled(P)`
+  font-size: 14px;
+  line-height: 1.25;
 `
 
 export const PL = styled(p)`
@@ -74,7 +79,7 @@ export const BoldBody = styled(Span)`
 
 
 export const Caption = styled(span)`
-  font-size: 10px;
+  font-size: 12px;
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   line-height: 1.75;

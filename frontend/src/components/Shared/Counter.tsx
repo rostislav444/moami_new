@@ -1,22 +1,20 @@
 import styled from "@emotion/styled"
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ mt?: number, mb?: number }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 90px;
-  height: 30px;
-  border: 1px solid ${props => props.theme.color.primary};
+  width: 100px;
+  height: 32px;
+  border: 1px solid ${props => props.theme.color.light};
+  margin-top: ${props => props.mt ? props.mt * 4 : 0}px;
+  margin-bottom: ${props => props.mb ? props.mb * 4 : 0}px;
   
-  @media (max-width: 768px) {
-    width: auto;
-    height: auto;
-  }
 `
 
 const Button = styled.button`
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border: none;
   display: flex;
   align-items: center;
@@ -34,8 +32,8 @@ const Button = styled.button`
 `
 
 const Value = styled.span`
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,10 +45,12 @@ interface CounterProps {
     value: number,
     onChange: (value: number) => void,
     maxValue?: number,
+    mt?: number,
+    mb?: number
 }
 
 
-export const Counter = ({value, onChange, maxValue}: CounterProps) => {
+export const Counter = ({value, onChange, maxValue, mt, mb}: CounterProps) => {
     const handleIncrement = () => {
         if (maxValue && value >= maxValue) return;
         onChange(value + 1);
@@ -61,7 +61,7 @@ export const Counter = ({value, onChange, maxValue}: CounterProps) => {
         onChange(value - 1);
     }
 
-    return <Wrapper>
+    return <Wrapper {...{mt, mb}}>
         <Button onClick={handleDecrement}>-</Button>
         <Value>{value}</Value>
         <Button onClick={handleIncrement}>+</Button>
