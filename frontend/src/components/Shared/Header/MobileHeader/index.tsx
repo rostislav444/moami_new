@@ -11,7 +11,7 @@ interface MobileHeaderProps {
     data: any
 }
 
-export const MobileHeader = () => {
+export const MobileHeader = ({data}: MobileHeaderProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleMenu = (e: React.SyntheticEvent) => {
@@ -34,6 +34,6 @@ export const MobileHeader = () => {
                 <CartIcon/>
             </Link>
         </HeaderWrapper>
-        {isOpen && <MobileMenuPopup toggleMenu={toggleMenu}/>}
+        {isOpen && <MobileMenuPopup toggleMenu={toggleMenu} data={data} />}
     </>
 }

@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Count, Sum
 from mptt.models import MPTTModel, TreeForeignKey
 
 from apps.abstract.fields import DeletableImageField
@@ -7,12 +8,12 @@ from apps.abstract.models import NameSlug
 from apps.attributes.models import AttributeGroup
 from apps.sizes.models import SizeGrid, SizeGroup
 from apps.translation.models import Translatable
-from django.db.models import Count, Sum
 
 
 class Category(NameSlug, MPTTModel, Translatable):
     parent = TreeForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
-    size_group = models.ForeignKey(SizeGroup, null=True, blank=True, on_delete=models.PROTECT, related_name='categories')
+    size_group = models.ForeignKey(SizeGroup, null=True, blank=True, on_delete=models.PROTECT,
+                                   related_name='categories')
     preferred_size_grid = models.ForeignKey(SizeGrid, null=True, blank=True, on_delete=models.SET_NULL,
                                             verbose_name='предпочтительная размерная сетка')
 
@@ -96,4 +97,3 @@ class Collections(NameSlug):
 
     def get_products_count(self):
         return self.products.annotate(num_variants=Count('variants')).aggregate(total=Sum('num_variants'))['total'] or 0
-

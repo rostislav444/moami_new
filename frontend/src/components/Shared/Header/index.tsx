@@ -19,5 +19,5 @@ export const Header = () => {
         collections: selectCollections(store.getState())
     }
 
-    return isMobile ? <MobileHeader /> : <DesktopHeader data={data}/>
+    return isMobile ? <MobileHeader data={data} /> : <DesktopHeader data={data}/>
 }

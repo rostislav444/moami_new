@@ -6,12 +6,13 @@ import {Phone} from "@/components/Shared/Header/components/Phone";
 
 interface Props {
     toggleMenu: (e: React.SyntheticEvent) => void;
+    data: any
 }
 
 
-export const MobileMenuPopup = ({toggleMenu}: Props) => {
+export const MobileMenuPopup = ({toggleMenu, data}: Props) => {
     return <s.Wrapper>
         <Phone />
-        <MobileMenuPopupCategories toggleMenu={toggleMenu}/>
+        <MobileMenuPopupCategories toggleMenu={toggleMenu} data={data} />
     </s.Wrapper>
 }
