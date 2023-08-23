@@ -4,6 +4,7 @@ from apps.integrations.models import RozetkaCategories
 from apps.product.models import Product, Variant, VariantSize, VariantImage, ProductComposition, ProductAttribute
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.text import slugify
 
 
 class RozetkaCategoriesSerializer(serializers.ModelSerializer):
@@ -23,15 +24,21 @@ class ProductCompositionSerializer(serializers.ModelSerializer):
 class FeedVariantSizeSerializer(serializers.ModelSerializer):
     size = serializers.CharField(source='get_size')
     full_id = serializers.SerializerMethodField()
+    full_id_slugified = serializers.SerializerMethodField()
 
     class Meta:
         model = VariantSize
-        fields = ('id', 'full_id', 'size', 'stock')
+        fields = ('id', 'full_id', 'full_id_slugified', 'size', 'stock')
 
     @staticmethod
     def get_full_id(obj):
         full_id = obj.variant.code + ' ' + obj.get_size
         return full_id.upper()
+
+    @staticmethod
+    def get_full_id_slugified(obj):
+        full_id = obj.variant.code + '-' + obj.get_size
+        return slugify(full_id)
 
 
 class FeedVariantImageSerializer(serializers.ModelSerializer):
@@ -70,20 +77,22 @@ class FeedProductAttributeSerializer(serializers.ModelSerializer):
 
 
 class FeedProductSerializer(serializers.ModelSerializer):
-    category = RozetkaCategoriesSerializer(source='rozetka_category')
-    variants = FeedVariantSerializer(many=True)
     brand = serializers.CharField(source='brand.name')
     country = serializers.CharField(source='country.name')
+    preferred_size_grid = serializers.CharField(source='get_preferred_size_grid')
+    # Method fields
     name_uk = serializers.SerializerMethodField()
     description_uk = serializers.SerializerMethodField()
+    # Nested fields
+    rozetka_category = RozetkaCategoriesSerializer()
+    variants = FeedVariantSerializer(many=True)
     compositions = ProductCompositionSerializer(many=True)
     attributes = FeedProductAttributeSerializer(many=True)
-    preferred_size_grid = serializers.CharField(source='get_preferred_size_grid')
 
     class Meta:
         model = Product
         fields = ('id', 'name', 'name_uk', 'brand', 'country', 'description', 'description_uk', 'variants', 'category',
-                  'price', 'old_price', 'compositions', 'attributes', 'preferred_size_grid')
+                  'price', 'promo_price', 'old_price', 'compositions', 'attributes', 'preferred_size_grid', 'rozetka_category')
 
     def get_name_uk(self, obj):
         try:

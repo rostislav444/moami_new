@@ -81,6 +81,7 @@ class Product(Translatable):
     description = models.TextField(blank=True, null=True, verbose_name='Описание')
     slug = models.SlugField(max_length=255, blank=True)
     price = models.PositiveIntegerField(default=0, verbose_name='Цена')
+    promo_price = models.PositiveIntegerField(default=0, verbose_name='Акционная цена')
     old_price = models.PositiveIntegerField(default=0, verbose_name='Старая цена')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
