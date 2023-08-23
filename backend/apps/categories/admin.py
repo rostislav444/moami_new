@@ -13,7 +13,7 @@ class CategoryAttributeGroupInline(admin.TabularInline):
 @admin.register(Category)
 class CategoryAdmin(MPTTModelAdmin):
     mptt_level_indent = 20
-    list_display = ('name', 'parent')
+    list_display = ('name', 'size_group', 'parent')
     list_filter = ('attribute_groups',)
 
     inlines = [CategoryAttributeGroupInline]
