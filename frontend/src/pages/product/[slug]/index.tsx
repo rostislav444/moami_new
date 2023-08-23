@@ -2,7 +2,7 @@ import Layout from "@/components/Shared/Layout";
 import {useRouter} from "next/router";
 import {ProductPage} from "@/components/App/Product";
 
-import {GetServerSideProps} from "next";
+import {GetStaticProps} from "next";
 import {VariantPageProps} from "@/interfaces/variant";
 import fetchWithLocale from "@/utils/fetchWrapper";
 import {useEffect} from "react";
@@ -32,9 +32,11 @@ export default function Product({variant}: VariantPageProps) {
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    const apiFetch = fetchWithLocale(context.locale || 'uk')
-    const {slug} = context.params as { slug: string }
+
+
+export const getStaticProps: GetStaticProps = async ({params, locale}) => {
+    const apiFetch = fetchWithLocale(locale || 'uk')
+    const {slug} = params as { slug: string }
 
     const response = await apiFetch.get(`/product/variants/${slug}/`)
 
@@ -48,5 +50,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props: {
             variant: response.data
         }
+    }
+}
+
+
+
+export const getStaticPaths = async () => {
+    const api = fetchWithLocale()
+    const response = await api.get('/product/variants/slug-list/')
+
+    const paths = response.data.map((slug: string) => ({
+        params: {slug}
+    }))
+
+    return {
+        paths,
+        fallback: 'blocking'
     }
 }
