@@ -317,6 +317,6 @@ class Command(BaseCommand):
         """
         Main handler for management command.
         """
-        # self.load_areas()
-        # self.load_cities()
+        self.load_areas()
+        self.load_cities()
         self.load_departments()

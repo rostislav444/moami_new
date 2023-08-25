@@ -1,14 +1,14 @@
-import * as s from './style'
-import {IconsWrapper} from './style'
-import {Content} from '@/styles/Blocks/Content'
-import {Icon} from "@/components/Shared/Icons";
-import Link from 'next/link'
-import React from "react";
-import {CartIcon} from "./CartIcon";
-import {useRouter} from 'next/router';
-import {DropdownSelect} from "@/components/Shared/choices";
-import {Logo} from "@/components/Shared/Header/components/Logo";
+import * as s           from './style'
+import {IconsWrapper}   from './style'
+import {Content}        from '@/styles/Blocks/Content'
+import {Icon}           from "@/components/Shared/Icons";
+import Link             from 'next/link'
+import React            from "react";
+import {CartIcon}       from "./CartIcon";
+import {useRouter}      from 'next/router';
+import {Logo}           from "@/components/Shared/Header/components/Logo";
 import {DesktopNavMenu} from "@/components/Shared/Header/DesktopHeader/NavMenu";
+import {DropdownSelect} from "@/components/Shared/UI/DropdownSelect";
 
 
 interface DesktopHeaderProps {

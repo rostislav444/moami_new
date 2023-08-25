@@ -6,16 +6,16 @@ import {FlexSpaceBetween}                                                       
 import {Icon}                                                                                                                                           from "@/components/Shared/Icons";
 import {useAppSelector}                              from "@/state/hooks";
 import {selectGrid, selectSelectedGrid, selectSizes} from "@/state/reducers/sizes";
-import {DropdownSelect}                              from "@/components/Shared/choices";
-import {useRouter}                                                                                                                                      from 'next/navigation';
-import {SizeGridState}                                                                                                                                  from "@/interfaces/sizes";
-import {CartItemState}                                                                                                                                  from "@/interfaces/cart";
-import {addItemToCart}                                                                                                                                  from "@/state/reducers/cart";
-import {VariantsLinks}                                                                                                                                  from "@/components/App/Product/VariantsLinks";
-import {ProductDescription}                                                                                                                             from "@/components/App/Product/Description";
-import {ProductImageGallery}                                                                                                                            from "@/components/App/Product/Galery";
-import {event}                                                                                                                                          from "@/lib/FacebookPixel";
-import {useStore}                                                                                                                                       from "react-redux";
+import {useRouter}                                   from 'next/navigation';
+import {SizeGridState}                               from "@/interfaces/sizes";
+import {CartItemState}                               from "@/interfaces/cart";
+import {addItemToCart}                               from "@/state/reducers/cart";
+import {VariantsLinks}                               from "@/components/App/Product/VariantsLinks";
+import {ProductDescription}                          from "@/components/App/Product/Description";
+import {ProductImageGallery}                         from "@/components/App/Product/Galery";
+import {event}                                       from "@/lib/FacebookPixel";
+import {useStore}                                    from "react-redux";
+import {DropdownSelect}                              from "@/components/Shared/UI/DropdownSelect";
 
 
 export const ProductPage = ({variant}: VariantPageProps) => {
