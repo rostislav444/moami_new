@@ -23,29 +23,34 @@ export interface AreaState {
 export const NewPostForm = ({formData, setValue, register, errors}: NewPostFormProps) => {
     const api = fetchWithLocale()
     const [areas, setAreas] = useState<AreaState[]>([])
-    const fields = ['area', 'city', 'department']
-
 
     useEffect(() => {
-        api.get('newpost/areas').then((data: any) => {
-            setAreas([...data.data]);
-        })
+        api.get('newpost/areas')
+           .then((data: any) => {
+               setAreas([...data.data]);
+           })
     }, [])
-
 
 
     return <div>
         <H3 mt={3} mb={3}>Выберите город и отделение Новой Почты</H3>
         <Grid gap={16}>
-            <Areas {...{formData, areas, setValue, register, errors}}/>
-            {formData?.delivery?.area && <Cities {...{formData, setValue, register, errors}}
-                                                 selectedArea={formData?.delivery?.area}
-                                                 selectedCity={formData?.delivery?.city}
-            />}
-            {formData?.delivery?.city && <Department {...{formData, setValue, register, errors}}
-                                                     selectedCity={formData?.delivery?.city}
-                                                     selectDepartment={formData?.delivery?.department}
-            />}
+            <Areas name={'delivery.newpost.area'} {...{formData, areas, setValue, register, errors}}/>
+            {formData?.delivery?.newpost?.area &&
+                <Cities name={'delivery.newpost.city'}
+                        selectedArea={formData?.delivery?.newpost?.area}
+                        selectedCity={formData?.delivery?.newpost?.city}
+                        {...{formData, setValue, register, errors}}
+                />
+            }
+            {formData?.delivery?.newpost?.city &&
+                <Department
+                    name={'delivery.newpost.department'}
+                    selectedCity={formData?.delivery?.newpost?.city}
+                    selectDepartment={formData?.delivery?.newpost?.department}
+                    {...{formData, setValue, register, errors}}
+                />
+            }
         </Grid>
     </div>
 }

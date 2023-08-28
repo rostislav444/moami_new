@@ -165,6 +165,11 @@ class Variant(models.Model):
     def __str__(self):
         return f'{self.product.name} - {self.code}'
 
+    def get_absolute_url(self):
+        domain = 'https://moami.com.ua'
+        path = f'/product/{self.product.slug}-code-{self.code}'
+        return domain + path
+
     @property
     def get_first_image_url(self):
         image = self.images.first()
@@ -211,7 +216,7 @@ class VariantSize(models.Model):
             return sizes[key]
 
     def __str__(self):
-        return f'{self.variant} ({self.get_size})'
+        return self.size.__str__()
 
 
 class VariantImageManager(models.Manager):

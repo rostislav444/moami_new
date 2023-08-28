@@ -17,7 +17,7 @@ export const AddressInfo = ({register, errors}: AddressInfoProps) => {
                     <Input
                         error={!!errors.adress}
                         placeholder='Адрес доставки'
-                        type="text" {...register('delivery.address', {required: true})}
+                        type="text" {...register('delivery.address.address', {required: true})}
                     />
                     {errors.father_name && <Error>Введите отчество</Error>}
                 </InputWrapper>

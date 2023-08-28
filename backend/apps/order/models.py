@@ -1,7 +1,7 @@
 from django.db import models
 from apps.product.models import VariantSize
 from apps.user.models import User
-from apps.newpost.models import NewPostRegion, NewPostCities, NewPostDepartments
+from apps.newpost.models import NewPostRegion, NewPostCities, NewPostDepartments, NewPostAreas
 
 
 class Order(models.Model):
@@ -36,8 +36,12 @@ class Order(models.Model):
     def total_price(self):
         return sum([item.total_price() for item in self.items.all()])
 
+    total_price.short_description = 'Сумма'
+
     def total_quantity(self):
         return sum([item.quantity for item in self.items.all()])
+
+    total_quantity.short_description = 'Кол-во'
 
     def completed_order(self):
         if self.status == 'completed':
@@ -78,34 +82,37 @@ class OrderItem(models.Model):
     def get_price(self):
         return self.size.variant.product.price
 
+    @property
+    def get_item_image(self):
+        return self.size.variant.get_first_image_url
+
     def total_price(self):
         if self.price:
             return self.price * self.quantity
         return 0
 
     def save(self, *args, **kwargs):
-        self.price = self.get_price
+        if not self.price:
+            self.price = self.get_price
         super().save(*args, **kwargs)
 
     def __str__(self):
         size_name = self.size.get_size
         return f'Товар {self.size.variant.product.name} - {size_name} в  заказе №{self.order.id}'
 
+    total_price.short_description = 'Сумма'
+
 
 class OrderDelivery(models.Model):
     DELIVERY_TYPES = (
-        ('courier', 'Курьером по Киеву'),
+        ('address', 'Курьером по Киеву'),
         ('newpost', 'Новая почта'),
         ('other', 'Другое'),
     )
 
     delivery_type = models.CharField(max_length=100, choices=DELIVERY_TYPES, verbose_name='Тип доставки')
     order = models.OneToOneField(Order, on_delete=models.CASCADE, verbose_name='Заказ', related_name='delivery')
-    address = models.CharField(max_length=100, verbose_name='Адрес', blank=True, null=True)
     comment = models.TextField(verbose_name='Комментарий', blank=True, null=True)
-
-    # def __str__(self):
-    #     return f'Доставка заказа №{self.order.id}'
 
     class Meta:
         verbose_name = 'Доставка'
@@ -115,8 +122,8 @@ class OrderDelivery(models.Model):
 
 class OrderDeliveryAddress(models.Model):
     delivery = models.OneToOneField(OrderDelivery, on_delete=models.CASCADE, verbose_name='Доставка',
-                                    related_name='address_delivery')
-    city = models.CharField(max_length=100, verbose_name='Город')
+                                    related_name='address')
+    city = models.CharField(max_length=100, verbose_name='Город', default='Киев')
     address = models.CharField(max_length=100, verbose_name='Адрес')
 
     def __str__(self):
@@ -130,9 +137,10 @@ class OrderDeliveryAddress(models.Model):
 
 class OrderDeliveryNewPost(models.Model):
     delivery = models.OneToOneField(OrderDelivery, on_delete=models.CASCADE, verbose_name='Доставка',
-                                    related_name='newpost_delivery')
+                                    related_name='newpost')
+    area = models.ForeignKey(NewPostAreas, on_delete=models.CASCADE, verbose_name='Область', blank=True, null=True)
     region = models.ForeignKey(NewPostRegion, on_delete=models.CASCADE, verbose_name='Регион', blank=True, null=True)
-    city = models.ForeignKey(NewPostCities, on_delete=models.CASCADE, verbose_name='Город')
+    city = models.ForeignKey(NewPostCities, on_delete=models.CASCADE, default='Киев', verbose_name='Город')
     department = models.ForeignKey(NewPostDepartments, on_delete=models.CASCADE, verbose_name='Отделение')
 
     def __str__(self):

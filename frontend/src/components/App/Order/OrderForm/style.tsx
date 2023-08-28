@@ -91,7 +91,7 @@ export const inputStyles = {
 
 
 export const Input = styled.input<{ error?: boolean | undefined }>`
-  ${inputStyles}
+  ${inputStyles};
   border-color: ${props => props.error ? props.theme.color.error : props.theme.color.primary};
   height: 48px;
   padding: 0 16px;
@@ -100,6 +100,7 @@ export const Input = styled.input<{ error?: boolean | undefined }>`
 
 export const Textarea = styled.textarea<{ error?: boolean | undefined }>`
   ${inputStyles};
+  font-family: 'Open Sans', sans-serif;
   border-color: ${props => props.error ? props.theme.color.error : props.theme.color.primary};
   height: 96px;
   padding: 16px;

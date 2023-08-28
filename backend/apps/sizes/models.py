@@ -50,11 +50,17 @@ class Size(models.Model):
             return {interpretation.grid.slug: interpretation.value for interpretation in interpretations}
         return {}
 
+    def get_size_with_grid(self):
+        base_grid = self.group.base_grid
+        if not base_grid:
+            return self.group.grids.first()
+        interpretation = self.interpretations.filter(grid=base_grid).first()
+        if interpretation:
+            return f'{interpretation.value} ({base_grid.name})'
+        return None
+
     def __str__(self):
-        interpretations = self.interpretations.all()
-        if interpretations.exists():
-            return ' > '.join([interpretation.value for interpretation in interpretations])
-        return '-'
+        return self.get_size_with_grid()
 
 
 class SizeInterpretation(models.Model):

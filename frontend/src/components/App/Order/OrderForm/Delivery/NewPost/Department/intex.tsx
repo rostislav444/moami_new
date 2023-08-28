@@ -12,12 +12,13 @@ interface DepartmentState {
 interface Props {
     selectedCity: string | null;
     selectDepartment: string | null;
+    name: string;
     register: any;
     errors: any;
     setValue: any;
 }
 
-export const Department = ({selectedCity, selectDepartment, setValue, register, errors}: Props) => {
+export const Department = ({name, selectedCity, selectDepartment, setValue, register, errors}: Props) => {
     const [departments, setDepartments] = useState<DepartmentState[]>([])
     const api = fetchWithLocale()
 
@@ -31,7 +32,7 @@ export const Department = ({selectedCity, selectDepartment, setValue, register, 
 
     return <DropdownSelect
         pd={8}
-        name={'delivery.department'}
+        name={name}
         placeholder={'Выберите отделение Новой Почты'}
         value={selectDepartment}
         setValue={setValue}
