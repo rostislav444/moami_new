@@ -57,10 +57,8 @@ export const DropdownSelect = ({
     const errorMessage = name && errors ? getErrorByName(name, errors) : null;
 
     if (!setValue && !onChange) {
-        // FATaL ERROR
         throw new Error('setValue or onChange must be provided');
     }
-
 
     const handleOptionClick = (option: OptionState) => {
         setValue && setValue(name, option.value, {shouldValidate: true});
@@ -76,7 +74,6 @@ export const DropdownSelect = ({
 
     useEffect(() => {
         if (value === undefined && defaultValue !== null) {
-            console.log('set default value', options[defaultValue])
             setValue && setValue(name, options[defaultValue].value, {shouldValidate: true});
         }
     }, [setValue, defaultValue]);

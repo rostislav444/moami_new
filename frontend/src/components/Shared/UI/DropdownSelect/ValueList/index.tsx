@@ -1,11 +1,5 @@
-import {
-    DropdownOption,
-    DropdownOptions,
-    DropdownOptionsWrapper,
-    DropdownSearch
-} from "@/components/Shared/UI/DropdownSelect/style";
+import {DropdownOption, DropdownOptions, DropdownOptionsWrapper, DropdownSearch} from "./style";
 import {useIsMobile} from "@/components/Shared/Header/hooks";
-
 
 
 interface OptionState {
@@ -26,40 +20,37 @@ interface ValueListProps {
     isMobile?: boolean;
 }
 
-export const ValueList = ({
-    isOpen,
-    search,
-    name,
-    options,
-    handleOptionClick,
-    searchTerm,
-    setSearchTerm,
-    handleBlur
-}: ValueListProps) => {
+export const ValueList = ({isOpen, search, name, options, handleOptionClick, searchTerm, setSearchTerm, handleBlur}: ValueListProps) => {
     const isMobile = useIsMobile();
+
 
     if (!isOpen) {
         return null;
     }
 
     const filterOptions = () => options.filter(option =>
-        option.label.toLowerCase().includes(searchTerm?.toLowerCase() || "") ||
-        option.extraLabel?.toLowerCase().includes(searchTerm?.toLowerCase() || "")
+        option.label.toLowerCase()
+              .includes(searchTerm?.toLowerCase() || "") ||
+        option.extraLabel?.toLowerCase()
+              .includes(searchTerm?.toLowerCase() || "")
     );
+
     return <DropdownOptionsWrapper isOpen={isOpen} isMobile={isMobile}>
         {search && <DropdownSearch
             name={name && name + '__search'}
+            value={searchTerm || ''}
             placeholder="Поиск"
             onFocus={handleBlur}
             onBlur={handleBlur}
             onChange={(e) => setSearchTerm(e.target.value)}
         />}
         <DropdownOptions isMobile={isMobile}>
-            {filterOptions().map(option => (
-                <DropdownOption key={option.value} onClick={() => handleOptionClick(option)}>
-                    {option.label}
-                </DropdownOption>
-            ))}
+            {filterOptions()
+                .map(option => (
+                    <DropdownOption key={option.value} onClick={() => handleOptionClick(option)}>
+                        {option.label}
+                    </DropdownOption>
+                ))}
         </DropdownOptions>
     </DropdownOptionsWrapper>
 }

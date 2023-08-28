@@ -41,8 +41,6 @@ const fetchWithLocale = (locale: string|undefined = undefined): FetchWrapper => 
             const response = await fetch(baseUrl + url, options);
             const responseData = await response.json();
 
-            console.log('Request:',  responseData)
-
             return {
                 ok: response.ok,
                 status: response.status,
