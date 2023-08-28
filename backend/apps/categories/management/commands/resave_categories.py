@@ -11,4 +11,5 @@ class Command(BaseCommand):
             print(category)
             category.ordering = 0
             category.save()
+        Category.objects.rebuild()
 
