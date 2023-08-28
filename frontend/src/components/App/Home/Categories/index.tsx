@@ -14,8 +14,6 @@ export const HomeCategories = () => {
     const categories = selectCategories(store.getState())
     const collections = selectCollections(store.getState())
 
-    console.log(categories)
-
     return <CategoriesWrapper>
         {categories.map((category: any) => {
             return <ParentCategory key={category.id}>
@@ -27,7 +25,7 @@ export const HomeCategories = () => {
                         return <Link key={child.id} locale={locale} href={`/${category.slug}/${child.slug}`}>
                             <ChildCategory>
                                 <div>
-                                    <H2>{child.name}</H2>
+                                    <H2 white>{child.name}</H2>
                                     <CategoryImage
                                         fill
                                         style={{objectFit: 'cover'}}

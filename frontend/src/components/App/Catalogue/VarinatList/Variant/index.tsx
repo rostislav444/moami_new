@@ -9,7 +9,6 @@ interface VariantProps {
 }
 
 export const Variant = ({variant}: VariantProps) => {
-    console.log(variant)
     return (
         <div>
             <Link href={`/product/${variant.slug}`}>

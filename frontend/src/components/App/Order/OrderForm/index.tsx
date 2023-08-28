@@ -49,8 +49,6 @@ export const OrderForm = () => {
             }))
         };
 
-        console.log(requestBody);
-
         api.post('order/', requestBody)
            .then((response: any) => {
                if (response.status === 201) {

@@ -3,7 +3,6 @@ import {DropdownWrapper} from "./style";
 import {ValueList} from "@/components/Shared/UI/DropdownSelect/ValueList";
 import {Value} from "@/components/Shared/UI/DropdownSelect/Value";
 import {Error as UIError} from "@/components/Shared/Typograpy";
-import {useIsMobile} from "@/components/Shared/Header/hooks";
 
 interface OptionState {
     label: string;
@@ -16,7 +15,7 @@ interface DropdownSelectProps {
     errors?: any;
     setValue?: any;
     value: null | string;
-    name: string;
+    name?: string;
     required?: boolean | string
     onChange?: (value: string) => void;
     options: OptionState[];
@@ -61,7 +60,7 @@ export const DropdownSelect = ({
     }
 
     const handleOptionClick = (option: OptionState) => {
-        setValue && setValue(name, option.value, {shouldValidate: true});
+        setValue && name && setValue(name, option.value, {shouldValidate: true});
         onChange && onChange(option.value);
         setIsOpen(false);
     };
@@ -74,7 +73,7 @@ export const DropdownSelect = ({
 
     useEffect(() => {
         if (value === undefined && defaultValue !== null) {
-            setValue && setValue(name, options[defaultValue].value, {shouldValidate: true});
+            setValue && name && setValue(name, options[defaultValue].value, {shouldValidate: true});
         }
     }, [setValue, defaultValue]);
 
