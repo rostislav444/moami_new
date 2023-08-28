@@ -20,7 +20,7 @@ class Category(NameSlug, MPTTModel, Translatable):
     image = DeletableImageField(upload_to='categories', blank=True, null=True, verbose_name='Изображение')
 
     class MPTTMeta:
-        order_insertion_by = ['ordering']
+        order_insertion_by = ['name']
 
     class Meta:
         verbose_name = 'Категория'
