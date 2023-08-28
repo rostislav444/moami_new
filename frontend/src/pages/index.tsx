@@ -1,10 +1,10 @@
-import Layout           from '@/components/Shared/Layout'
-import {HomeSlider}     from "@/components/App/Home/Slider";
+import Layout from '@/components/Shared/Layout'
 import 'keen-slider/keen-slider.min.css'
-import {BaseProps}      from "@/interfaces/_base";
+import {BaseProps} from "@/interfaces/_base";
 import {GetStaticProps} from "next";
-import fetchWithLocale  from "@/utils/fetchWrapper";
+import fetchWithLocale from "@/utils/fetchWrapper";
 import {HomeSlideState} from "@/interfaces/home/silder";
+import {HomeCategories} from "@/components/App/Home/Categories";
 
 interface HomeProps extends BaseProps {
     slides: HomeSlideState[];
@@ -13,7 +13,7 @@ interface HomeProps extends BaseProps {
 export default function Home({slides}: HomeProps) {
     return (
         <Layout>
-            <HomeSlider slides={slides}/>
+            <HomeCategories/>
         </Layout>
     )
 }

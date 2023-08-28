@@ -9,12 +9,13 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'slug', 'parent', 'children', 'products_count')
+        fields = ('id', 'name', 'slug', 'parent', 'children', 'products_count', 'image',)
 
-    @staticmethod
-    def get_children(obj):
+    def get_children(self, obj):
         children_categories = obj.get_children().filter(products__isnull=False).distinct()
-        return CategorySerializer(children_categories, many=True).data
+        serializer = CategorySerializer(children_categories, many=True)
+        serializer.context.update(self.context)
+        return serializer.data
 
 
 class CollectionsSerializer(serializers.ModelSerializer):

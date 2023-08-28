@@ -16,13 +16,16 @@ class Category(NameSlug, MPTTModel, Translatable):
                                    related_name='categories')
     preferred_size_grid = models.ForeignKey(SizeGrid, null=True, blank=True, on_delete=models.SET_NULL,
                                             verbose_name='предпочтительная размерная сетка')
+    ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
+    image = DeletableImageField(upload_to='categories', blank=True, null=True, verbose_name='Изображение')
 
     class MPTTMeta:
-        order_insertion_by = ['name']
+        order_insertion_by = ['ordering']
 
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+        ordering = ('ordering',)
 
     def __str__(self):
         return self.name

@@ -8,6 +8,7 @@ interface MarginProps {
     center?: boolean;
     bold?: boolean;
     grey?: boolean;
+    white?: boolean;
     upper?: boolean;
 }
 
@@ -20,7 +21,12 @@ const margins = (props: any) => `
     margin-bottom: ${props.mb ? props.mb * 4 : 0}px;
     text-align: ${props.center ? 'center' : 'left'};
     font-weight: ${props.bold ? '500' : '400'};
-    color: ${props.grey ? props.theme.color.grey : 'inherit'};
+    
+    color: ${
+        props.grey ? 'grey' :
+            props.white ? 'white !important' :
+                'inherit'
+    };
     text-transform: ${props.upper ? 'uppercase' : 'none'};
 `;
 

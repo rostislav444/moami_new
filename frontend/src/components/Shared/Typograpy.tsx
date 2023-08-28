@@ -3,7 +3,7 @@ import {theme}           from "@/styles/Theme";
 import {h1, h2, p, span} from "@/components/Shared/Abstract";
 
 export const H1 = styled(h1)`
-  font-size: 48px;
+  font-size: 36px;
   font-family: 'Lora', serif;
   font-weight: 400;
 
