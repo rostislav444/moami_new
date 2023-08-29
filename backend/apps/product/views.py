@@ -1,15 +1,11 @@
 import json
 
-import mixins as mixins
 from django.http import HttpResponse
-from django.views.decorators.http import require_http_methods
-from rest_framework import viewsets
+from rest_framework import mixins, viewsets
 from unidecode import unidecode
-from rest_framework.response import Response
+
 from apps.product.models import Product, Variant
 from apps.product.serializers import ProductSerializer, VariantSerializer
-
-from rest_framework import generics, mixins, views, viewsets
 
 
 class ProductList(viewsets.ModelViewSet):
@@ -47,5 +43,3 @@ def variant_slug_list_json(request):
 
     response = json.dumps(variant_slug_list)
     return HttpResponse(response, content_type='application/json')
-
-
