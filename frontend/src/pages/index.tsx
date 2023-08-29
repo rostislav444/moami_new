@@ -18,15 +18,3 @@ export default function Home({slides}: HomeProps) {
     )
 }
 
-export const getStaticProps: GetStaticProps = async ({params, locale}) => {
-    const api = fetchWithLocale(locale)
-    const response = await api.get('/pages/home-slider')
-
-    return {
-        props: {
-            slides: response.ok ? response.data : []
-        }
-    }
-}
-
-

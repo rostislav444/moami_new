@@ -17,7 +17,7 @@ class CategoriesView(generics.GenericAPIView, mixins.ListModelMixin, viewsets.Vi
     def get_queryset(self):
         return Category.objects.filter(
             parent=None, children__products__isnull=False
-        ).distinct()
+        ).order_by('ordering').distinct()
 
 
 # @method_decorator(vary_on_headers('Accept-Language'), name='dispatch')
