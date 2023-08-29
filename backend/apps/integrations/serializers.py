@@ -1,10 +1,9 @@
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.text import slugify
 from rest_framework import serializers
 
 from apps.integrations.models import RozetkaCategories
 from apps.product.models import Product, Variant, VariantSize, VariantImage, ProductComposition, ProductAttribute
-
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils.text import slugify
 
 
 class RozetkaCategoriesSerializer(serializers.ModelSerializer):
@@ -80,6 +79,7 @@ class FeedProductSerializer(serializers.ModelSerializer):
     brand = serializers.CharField(source='brand.name')
     country = serializers.CharField(source='country.name')
     preferred_size_grid = serializers.CharField(source='get_preferred_size_grid')
+    category = serializers.CharField(source='category.name')
     # Method fields
     name_uk = serializers.SerializerMethodField()
     description_uk = serializers.SerializerMethodField()
@@ -91,8 +91,9 @@ class FeedProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'name_uk', 'brand', 'country', 'description', 'description_uk', 'variants', 'category',
-                  'price', 'promo_price', 'old_price', 'compositions', 'attributes', 'preferred_size_grid', 'rozetka_category')
+        fields = ('id', 'name', 'category', 'name_uk', 'brand', 'country', 'description', 'description_uk', 'variants',
+                  'category', 'price', 'promo_price', 'old_price', 'compositions', 'attributes', 'preferred_size_grid',
+                  'rozetka_category')
 
     def get_name_uk(self, obj):
         try:
