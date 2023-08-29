@@ -11,7 +11,7 @@ from apps.sizes.models import SizeGrid
 
 class RozetkaCategories(NameSlug, MPTTModel):
     parent = TreeForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
-    rozetka_id = models.PositiveIntegerField()
+    rozetka_id = models.CharField(max_length=24)
 
     class MPTTMeta:
         order_insertion_by = ['name']
