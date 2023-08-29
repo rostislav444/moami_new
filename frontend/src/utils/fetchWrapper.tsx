@@ -27,13 +27,14 @@ const fetchWithLocale = (locale: string|undefined = undefined): FetchWrapper => 
 
         const headers: { [key: string]: string } = {
             'Content-Type': 'application/json',
-            'Accept-Language': locale || 'uk'
+            'Accept-Language': locale || 'uk',
+            "X-CSRFToken": ''
         };
 
         const options: FetchOptions = {
             method,
             headers,
-            mode: 'cors',
+            // mode: 'cors',
             body: JSON.stringify(body),
         };
 

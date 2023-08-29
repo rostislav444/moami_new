@@ -1,3 +1,5 @@
+import {variantState} from "@/interfaces/catalogue";
+
 export interface UserState {
     uuid: string | null
     email: string | null,
@@ -7,4 +9,6 @@ export interface UserState {
     father_name: string | null,
     date_of_birth: string | null,
     token: string | null,
+    viewedProductsIds: number[],
+    viewedProductsData: variantState[],
 }

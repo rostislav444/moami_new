@@ -53,11 +53,9 @@ class Size(models.Model):
     def get_size_with_grid(self):
         base_grid = self.group.base_grid
         if not base_grid:
-            return self.group.grids.first()
+            base_grid = self.group.grids.first()
         interpretation = self.interpretations.filter(grid=base_grid).first()
-        if interpretation:
-            return f'{interpretation.value} ({base_grid.name})'
-        return None
+        return f'{interpretation.value} ({base_grid.name})'
 
     def __str__(self):
         return self.get_size_with_grid()

@@ -9,6 +9,7 @@ import {usePathname}                from 'next/navigation';
 import Script                       from 'next/script'
 import {useStore}                   from "react-redux";
 import {selectRoute}                from "@/state/reducers/routing";
+import {ViewedProducts} from "@/components/Shared/ViewedProducts";
 
 export interface BreadcrumbsState {
     title: string,
@@ -56,7 +57,9 @@ export default function Layout({children, breadcrumbs}: LayoutProps) {
                 </Content>}
                 <MainContent>
                     {children}
+                    <ViewedProducts/>
                 </MainContent>
+
             </Main>
             <Footer/>
         </CustomThemeProvider>

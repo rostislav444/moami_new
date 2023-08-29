@@ -1,17 +1,19 @@
-import {useEffect, useState}       from 'react'
-import {Provider}                  from 'react-redux'
+import {useEffect, useState} from 'react'
+import {Provider, useDispatch} from 'react-redux'
 import '@/styles/globals.css'
 import App, {AppContext, AppProps} from 'next/app'
-import ThemeProvider               from "@/styles/ThemeProvider";
-import globalStyles                from "@/styles/Global";
-import {Global}                    from '@emotion/react';
-import Layout                      from '@/components/Shared/Layout'
-import {setCategories}             from "@/state/reducers/categories";
-import {setCollections}            from "@/state/reducers/collections";
-import {initializeStore}           from "@/state/store";
-import {setSizeGrids}              from "@/state/reducers/sizes";
-import {setPages}                  from "@/state/reducers/pages";
-import {API_BASE_URL}              from "@/local";
+import ThemeProvider from "@/styles/ThemeProvider";
+import globalStyles from "@/styles/Global";
+import {Global} from '@emotion/react';
+import {setCategories} from "@/state/reducers/categories";
+import {setCollections} from "@/state/reducers/collections";
+import {initializeStore} from "@/state/store";
+import {setSizeGrids} from "@/state/reducers/sizes";
+import {setPages} from "@/state/reducers/pages";
+import {API_BASE_URL} from "@/local";
+import fetchWithLocale from "@/utils/fetchWrapper";
+import {variantState} from "@/interfaces/catalogue";
+import {setViewedProductsData} from "@/state/reducers/user";
 
 
 const useStore = (initialState: any) => {
@@ -25,10 +27,44 @@ interface MyAppProps extends AppProps {
     initialReduxState: any
 }
 
+
+const getDataFromLocalStorage = () => {
+    if (typeof window !== 'undefined') {
+        const cart: any = JSON.parse(localStorage.getItem('user.cart') || 'null')
+        const viewedIds: number[]= JSON.parse(localStorage.getItem('user.viewedProductsIds') || '[]')
+        return {cart, viewedIds}
+    }
+    return {cart: null, viewedIds: null}
+}
+
 function MyApp({Component, pageProps, initialReduxState}: MyAppProps) {
-    const store = useStore(initialReduxState);
+    const {cart, viewedIds} = getDataFromLocalStorage()
+    const preparedState = {
+        ...initialReduxState,
+        user: {
+            ...initialReduxState.user,
+            viewedProductsIds: viewedIds
+        }
+    }
+
+    if (cart) {
+        preparedState.cart = cart
+    }
+
+    const store = useStore(preparedState);
+    const api = fetchWithLocale('uk')
 
     useEffect(() => {
+        if (viewedIds && viewedIds.length > 0) {
+            api.get('/product/variants?ids=' + viewedIds.join(','))
+               .then(response => {
+                   if (response.ok) {
+                       const data: variantState[] = response.data;
+                       const orderedVariants = viewedIds.map(id => data.find(variant => variant.id === id))
+                       store.dispatch(setViewedProductsData(orderedVariants));
+                   }
+               });
+        }
         const jssStyles = document.querySelector('#jss-server-side');
         if (jssStyles) {
             jssStyles.parentElement?.removeChild(jssStyles);
@@ -69,7 +105,8 @@ MyApp.getInitialProps = async (context: AppContext) => {
 
         const [categories, collections, sizeGrids, pages] = await Promise.all(
             urls.map(url =>
-                fetch(baseUrl + url, {headers}).then(res => res.json())
+                fetch(baseUrl + url, {headers})
+                    .then(res => res.json())
             )
         );
 

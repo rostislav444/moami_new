@@ -29,7 +29,7 @@ const calculateTotal = (state: Draft<CartState>) => {
         state.total += item.price * item.quantity
         state.quantity += item.quantity
     })
-    localStorage.setItem('cart', JSON.stringify(state))
+    localStorage.setItem('user.cart', JSON.stringify(state))
     return state
 }
 
@@ -38,6 +38,9 @@ export const cartSlice = createSlice({
         name: 'cart',
         initialState,
         reducers: {
+            setCart: (state, action: PayloadAction<CartState>) => {
+                return action.payload
+            },
             addItemToCart: (state: Draft<CartState>, action: PayloadAction<CartItemState>) => {
                 const item = state.items.find((item) => item.id === action.payload.id)
                 if (item) {
@@ -74,7 +77,7 @@ export const cartSlice = createSlice({
     }
 )
 
-export const {addItemToCart, updateItemInCart, removeItemFromCart, clearCart} = cartSlice.actions
+export const {setCart, addItemToCart, updateItemInCart, removeItemFromCart, clearCart} = cartSlice.actions
 
 export const selectCart = (state: RootState) => state.cart
 

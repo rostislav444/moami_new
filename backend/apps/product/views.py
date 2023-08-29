@@ -1,11 +1,15 @@
 import json
 
+import mixins as mixins
 from django.http import HttpResponse
+from django.views.decorators.http import require_http_methods
 from rest_framework import viewsets
 from unidecode import unidecode
-
+from rest_framework.response import Response
 from apps.product.models import Product, Variant
 from apps.product.serializers import ProductSerializer, VariantSerializer
+
+from rest_framework import generics, mixins, views, viewsets
 
 
 class ProductList(viewsets.ModelViewSet):
@@ -13,13 +17,16 @@ class ProductList(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
 
 
-class VariantViewSet(viewsets.ModelViewSet):
+class VariantViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Variant.objects.all()
     serializer_class = VariantSerializer
     lookup_field = 'slug'
 
     def get_queryset(self):
-        return Variant.objects.all()
+        if self.request.GET.get('ids'):
+            ids = self.request.GET.get('ids').split(',')
+            return Variant.objects.filter(id__in=ids)
+        return Variant.objects.none()
 
     def get_object(self):
         split_slug = self.kwargs['slug'].split('-code-')
@@ -40,3 +47,5 @@ def variant_slug_list_json(request):
 
     response = json.dumps(variant_slug_list)
     return HttpResponse(response, content_type='application/json')
+
+

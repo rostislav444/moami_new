@@ -212,6 +212,10 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     'http://localhost:3000',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+]
+
 # Use the custom session auth token
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_COOKIE_NAME = 'sessionid'

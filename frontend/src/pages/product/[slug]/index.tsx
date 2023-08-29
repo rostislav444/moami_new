@@ -7,15 +7,20 @@ import {VariantPageProps} from "@/interfaces/variant";
 import fetchWithLocale from "@/utils/fetchWrapper";
 import {useEffect} from "react";
 import {pageView} from "@/lib/FacebookPixel";
-
+import {useStore} from "react-redux";
+import {addViewedProductData} from "@/state/reducers/user";
 
 
 export default function Product({variant}: VariantPageProps) {
     const router = useRouter()
+    const store = useStore()
     const {slug} = router.query
     const categoriesBreadcrumbs = variant.product.breadcrumbs
+    const {id} = variant
+
 
     useEffect(() => {
+        store.dispatch(addViewedProductData(variant))
         pageView()
     }, []);
 
@@ -31,7 +36,6 @@ export default function Product({variant}: VariantPageProps) {
         </Layout>
     )
 }
-
 
 
 export const getStaticProps: GetStaticProps = async ({params, locale}) => {
@@ -52,7 +56,6 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
         }
     }
 }
-
 
 
 export const getStaticPaths = async () => {

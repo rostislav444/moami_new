@@ -16,6 +16,7 @@ import {ProductImageGallery}                         from "@/components/App/Prod
 import {event}                                       from "@/lib/FacebookPixel";
 import {useStore}                                    from "react-redux";
 import {DropdownSelect}                              from "@/components/Shared/UI/DropdownSelect";
+import {addViewedProductData} from "@/state/reducers/user";
 
 
 export const ProductPage = ({variant}: VariantPageProps) => {
@@ -32,6 +33,10 @@ export const ProductPage = ({variant}: VariantPageProps) => {
 
     const selected = useAppSelector(selectSelectedGrid)
     const [selectedGrid, setSelectedGrid] = useState<string>(sizeGrids.find(grid => grid.slug === selected)?.slug || productPreferredSizeGrid || sizeGrids[0].slug);
+
+    useEffect(() => {
+        store.dispatch(addViewedProductData(variant))
+    }, [variant])
 
 
     useEffect(() => {
