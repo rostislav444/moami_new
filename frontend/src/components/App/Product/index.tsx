@@ -78,7 +78,7 @@ export const ProductPage = ({variant}: VariantPageProps) => {
 
     return (
         <ProductContainer>
-            <ProductImageGallery images={variant.images}/>
+            <ProductImageGallery product_video={variant.product_video} video={variant.video} images={variant.images}/>
             <DescriptionColumn ref={descriptionColumnRef}>
                 <FlexSpaceBetween mb={2}>
                     <Caption>Код: {variant.code}</Caption>
