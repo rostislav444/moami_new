@@ -16,8 +16,6 @@ export default function Product({variant}: VariantPageProps) {
     const store = useStore()
     const {slug} = router.query
     const categoriesBreadcrumbs = variant.product.breadcrumbs
-    const {id} = variant
-
 
     useEffect(() => {
         store.dispatch(addViewedProductData(variant))

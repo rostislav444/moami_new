@@ -11,7 +11,7 @@ from PIL import Image
 from unidecode import unidecode
 
 from adminsortable.models import SortableMixin
-from apps.abstract.fields import DeletableImageField
+from apps.abstract.fields import DeletableImageField, DeletableVideoField
 from apps.attributes.models import Attribute, AttributeGroup, Composition
 from apps.categories.models import Collections
 from apps.sizes.models import Size, SizeGrid
@@ -101,6 +101,18 @@ class Product(Translatable):
     @property
     def get_preferred_size_grid(self):
         return self.category.preferred_size_grid.name if self.category.preferred_size_grid else 'ua'
+
+
+class ProductVideo(models.Model):
+    product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='video')
+    video = DeletableVideoField(upload_to='videos', blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Видео'
+        verbose_name_plural = 'Видео'
+
+    def __str__(self):
+        return f'{self.product.name} - {self.video.name}'
 
 
 class ProductComposition(models.Model):
@@ -222,6 +234,18 @@ class VariantSize(models.Model):
 class VariantImageManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().select_related('variant').prefetch_related('thumbnails')
+
+
+class VariantVideo(models.Model):
+    variant = models.OneToOneField(Variant, on_delete=models.CASCADE, related_name='video')
+    video = DeletableVideoField(upload_to='videos', blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Видео'
+        verbose_name_plural = 'Видео'
+
+    def __str__(self):
+        return f'{self.variant.code} - {self.video.name}'
 
 
 class VariantImage(SortableMixin):

@@ -61,6 +61,8 @@ interface VariantState {
     images: VariantImage[];
     sizes: VariantSize[];
     color: string;
+    product_video?: string;
+    video?: string;
 }
 
 export interface VariantPageProps {

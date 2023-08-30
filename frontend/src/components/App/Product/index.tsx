@@ -21,22 +21,21 @@ import {addViewedProductData} from "@/state/reducers/user";
 
 export const ProductPage = ({variant}: VariantPageProps) => {
     const store = useStore()
-
     const descriptionColumnRef = useRef<HTMLDivElement>(null)
-
     const initialSize = variant.sizes.find(size => size.stock !== 0)?.id
     const [selectedSize, setSelectedSize] = useState<number | undefined>(initialSize)
     const {push} = useRouter();
-
     const sizeGrids = variant.product.size_grids
     const productPreferredSizeGrid = variant.product.product_preferred_size_grid
-
     const selected = useAppSelector(selectSelectedGrid)
     const [selectedGrid, setSelectedGrid] = useState<string>(sizeGrids.find(grid => grid.slug === selected)?.slug || productPreferredSizeGrid || sizeGrids[0].slug);
 
     useEffect(() => {
         store.dispatch(addViewedProductData(variant))
     }, [variant])
+
+
+    console.log(variant)
 
 
     useEffect(() => {

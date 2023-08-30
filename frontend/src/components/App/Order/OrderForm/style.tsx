@@ -92,6 +92,7 @@ export const inputStyles = {
 
 export const Input = styled.input<{ error?: boolean | undefined }>`
   ${inputStyles};
+  border-radius: 0;
   border-color: ${props => props.error ? props.theme.color.error : props.theme.color.primary};
   height: 48px;
   padding: 0 16px;

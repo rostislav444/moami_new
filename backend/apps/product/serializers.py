@@ -99,13 +99,20 @@ class VariantSerializer(serializers.ModelSerializer):
     sizes = VariantSizeSerializer(many=True)
     color = serializers.CharField(source='color.name')
     slug = serializers.CharField(source='get_slug')
+    product_video = serializers.SerializerMethodField()
 
     class Meta:
         model = Variant
-        fields = ['id', 'name', 'slug', 'code', 'product', 'images', 'sizes', 'color']
+        fields = ['id', 'name', 'slug', 'code', 'product', 'images', 'sizes', 'color', 'product_video']
         extra_kwargs = {
             'url': {'lookup_field': 'slug'}
         }
 
     def get_name(self, obj):
         return obj.product.name + ' - ' + obj.color.name
+
+    def get_product_video(self, obj):
+        request = self.context.get('request')
+        if request and obj.product.video.video:
+            return request.build_absolute_uri(obj.product.video.video.url)
+        return None

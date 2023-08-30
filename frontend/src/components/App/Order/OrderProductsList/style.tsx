@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 
 export const Wrapper = styled.div`
   position: relative;
-  background-color: white;
+  background-color: #ffffff;
   display: block;
   width: calc(100% - 48px);
   height: auto;
@@ -12,7 +12,7 @@ export const Wrapper = styled.div`
 export const OrderItemsList = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-gap: 24px;
+  grid-gap: 8px;
   padding-bottom: 24px;
   margin-bottom: 24px;
   border-bottom: 2px solid ${props => props.theme.color.grey};

@@ -10,6 +10,7 @@ import Image                from 'next/image'
 import {selectSelectedGrid} from "@/state/reducers/sizes";
 import {useEffect}          from "react";
 import {useRouter}          from "next/navigation";
+import {MobileItemData} from "@/components/App/Cart/CartMobile/CartItem/ItemIData";
 
 
 const OrderProductsListComponent = () => {
@@ -21,31 +22,16 @@ const OrderProductsListComponent = () => {
 
     return (
         <div className={'order-product-list'}>
-            <H3 mb={3}>Order products</H3>
+            <H3 mb={3}>Товары в заказе</H3>
             <Wrapper>
                 <OrderItemsList>
                     {items.map((item: CartItemState, index: number) => (
-                        <OrderItem key={index}>
-                            <div>
-                                <Image width={50} height={70} src={item.image} alt={item.name}/>
-                            </div>
-                            <OrderItemDescription>
-                                <div>
-                                    <H4 mb={1}>{item.name}</H4>
-                                    <P>Размер: {selected && item.size[selected]}</P>
-                                </div>
-                                <OrderItemDescriptionRight>
-                                    <PL bold>{item.price * item.quantity} ₴</PL>
-                                    <Caption>Price: {item.price} ₴</Caption>
-                                    <Caption>Qty: {item.quantity}</Caption>
-                                </OrderItemDescriptionRight>
-                            </OrderItemDescription>
-                        </OrderItem>
+                        <MobileItemData key={index} item={item}/>
                     ))}
                 </OrderItemsList>
                 <OrderTotalWrapper>
-                    <H3>Total: {total} ₴</H3>
-                    <Caption>Qty: {quantity}</Caption>
+                    <H3>Всего: {total} ₴</H3>
+                    <Caption>Общее кол-во: {quantity}</Caption>
                 </OrderTotalWrapper>
             </Wrapper>
         </div>

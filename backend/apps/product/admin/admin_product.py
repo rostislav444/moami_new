@@ -1,13 +1,15 @@
+from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+
 from apps.categories.models import Category, CategoryAttributeGroup
 from apps.product.admin.admin_variant import VariantInline
 from apps.product.forms import ProductAttributeFormSet
-from apps.product.models import Brand, Color, Country, CustomProperty, Product, ProductAttribute, ProductComposition
-from adminsortable2.admin import SortableAdminMixin
+from apps.product.models import Brand, Color, Country, CustomProperty, Product, ProductAttribute, ProductComposition, \
+    ProductVideo
 
 
 @admin.register(Brand)
@@ -57,6 +59,11 @@ class ProductAttributeInline(admin.TabularInline):
         if self.category_attribute_groups:
             return self.category_attribute_groups.count()
         return 0
+
+
+class ProductVideoInline(admin.TabularInline):
+    model = ProductVideo
+    extra = 1
 
 
 class CustomPropertyInline(admin.TabularInline):
@@ -111,7 +118,7 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
     search_fields = ('name', 'category__name', 'brand__name', 'price', 'old_price',)
     readonly_fields = ('slug', 'get_varinats_images',)
     ordering = ['index']
-    inlines = (ProductCompositionInline, ProductAttributeInline, CustomPropertyInline, VariantInline,)
+    inlines = (ProductVideoInline, ProductCompositionInline, ProductAttributeInline, CustomPropertyInline, VariantInline,)
 
     def get_list_filter(self, request):
         filters = super().get_list_filter(request)
@@ -163,5 +170,3 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
             ''')
         html = f'''<ul style="{ul_styles}">{''.join(images)}</ul>'''
         return format_html(html)
-
-

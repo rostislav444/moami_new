@@ -63,7 +63,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'nested_inline',
     'mptt',
-
 ]
 
 MIDDLEWARE = [

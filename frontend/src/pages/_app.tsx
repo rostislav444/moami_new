@@ -60,7 +60,7 @@ function MyApp({Component, pageProps, initialReduxState}: MyAppProps) {
                .then(response => {
                    if (response.ok) {
                        const data: variantState[] = response.data;
-                       const orderedVariants = viewedIds.map(id => data.find(variant => variant.id === id))
+                       const orderedVariants = viewedIds.map(id => data.find(variant => variant.id === id)).filter(Boolean);
                        store.dispatch(setViewedProductsData(orderedVariants));
                    }
                });
