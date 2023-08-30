@@ -100,10 +100,11 @@ class VariantSerializer(serializers.ModelSerializer):
     color = serializers.CharField(source='color.name')
     slug = serializers.CharField(source='get_slug')
     product_video = serializers.SerializerMethodField()
+    video = serializers.SerializerMethodField()
 
     class Meta:
         model = Variant
-        fields = ['id', 'name', 'slug', 'code', 'product', 'images', 'sizes', 'color', 'product_video']
+        fields = ['id', 'name', 'slug', 'code', 'product', 'images', 'sizes', 'color', 'product_video', 'video']
         extra_kwargs = {
             'url': {'lookup_field': 'slug'}
         }
@@ -111,8 +112,26 @@ class VariantSerializer(serializers.ModelSerializer):
     def get_name(self, obj):
         return obj.product.name + ' - ' + obj.color.name
 
+    def get_video(self, obj):
+        request = self.context.get('request')
+
+        if request and hasattr(obj, 'video'):
+            try:
+                video_obj = obj.video
+                if video_obj.video:
+                    return request.build_absolute_uri(video_obj.video.url)
+            except Variant.video.RelatedObjectDoesNotExist:
+                return None
+
     def get_product_video(self, obj):
         request = self.context.get('request')
-        if request and obj.product.video.video:
-            return request.build_absolute_uri(obj.product.video.video.url)
+
+        if request and hasattr(obj.product, 'video'):
+            try:
+                video_obj = obj.product.video
+                if video_obj.video:
+                    return request.build_absolute_uri(video_obj.video.url)
+            except Product.video.RelatedObjectDoesNotExist:
+                return None
         return None
+
