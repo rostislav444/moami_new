@@ -35,6 +35,7 @@ export const userSlice = createSlice({
         },
         addViewedProductData: (state, action: PayloadAction<any>) => {
             const index = state.viewedProductsIds.findIndex(id => id === action.payload.id);
+            console.log(index)
 
             if (index === -1) {
                 state.viewedProductsIds.unshift(action.payload.id)
@@ -43,12 +44,12 @@ export const userSlice = createSlice({
                 const id = state.viewedProductsIds[index]
 
                 state.viewedProductsIds.splice(index, 1)
-                state.viewedProductsIds.splice(0, 0, id)
+                state.viewedProductsIds.unshift(id)
 
                 if (state.viewedProductsData.length > 0) {
                     const data = state.viewedProductsData[index]
                     state.viewedProductsData.splice(index, 1)
-                    state.viewedProductsData.splice(0, 0, data)
+                    state.viewedProductsData.unshift(data)
                 }
             }
 

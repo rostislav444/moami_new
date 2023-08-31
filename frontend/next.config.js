@@ -9,7 +9,7 @@ module.exports = {
             'ru',
             'en'
         ],
-        defaultLocale: 'uk',
+        defaultLocale: 'ru',
         localeDetection: false,
     },
 };

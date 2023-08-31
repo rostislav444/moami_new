@@ -1,7 +1,7 @@
 import {Actions, AddToWishlistWrapper, BuyButton, DescriptionColumn, OldPrice, Price, PriceBlock, ProductContainer, ProductPreview, SizeItem, SizeList} from "@/components/App/Product/style";
 import {useEffect, useRef, useState}                                                                                                                    from "react";
 import {VariantPageProps}                                                                                                                               from "@/interfaces/variant";
-import {Caption, H2, Span}                                                                                                                              from "@/components/Shared/Typograpy";
+import {Caption, Error, H2, Span} from "@/components/Shared/Typograpy";
 import {FlexSpaceBetween}                                                                                                                               from "@/components/Shared/Blocks";
 import {Icon}                                                                                                                                           from "@/components/Shared/Icons";
 import {useAppSelector}                              from "@/state/hooks";
@@ -22,8 +22,8 @@ import {addViewedProductData} from "@/state/reducers/user";
 export const ProductPage = ({variant}: VariantPageProps) => {
     const store = useStore()
     const descriptionColumnRef = useRef<HTMLDivElement>(null)
-    const initialSize = variant.sizes.find(size => size.stock !== 0)?.id
-    const [selectedSize, setSelectedSize] = useState<number | undefined>(initialSize)
+    const [selectedSize, setSelectedSize] = useState<number | null>(null)
+    const [sizeNotSelected, setSizeNotSelected] = useState<boolean>(false)
     const {push} = useRouter();
     const sizeGrids = variant.product.size_grids
     const productPreferredSizeGrid = variant.product.product_preferred_size_grid
@@ -35,14 +35,17 @@ export const ProductPage = ({variant}: VariantPageProps) => {
     }, [variant])
 
 
-    console.log(variant)
-
-
     useEffect(() => {
         if (descriptionColumnRef.current) {
             descriptionColumnRef.current.style.height = `${descriptionColumnRef.current.scrollHeight + 8}px`
         }
     }, [descriptionColumnRef.current])
+
+
+    const handleSelectSize = (id: number) => {
+        setSelectedSize(id)
+        setSizeNotSelected(false)
+    }
 
     const handleGridChange = (slug: string) => {
         setSelectedGrid(slug)
@@ -73,6 +76,8 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                 currency: 'UAH'
             })
             push('/cart')
+        } else {
+            setSizeNotSelected(true)
         }
     }
 
@@ -98,12 +103,13 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                 <SizeList>
                     {variant.sizes.map((size, key) => {
                             return <SizeItem active={size.stock !== 0} selected={size.id === selectedSize} key={key}
-                                             onClick={() => size.stock !== 0 && setSelectedSize(size.id)}>
+                                             onClick={() => size.stock !== 0 && handleSelectSize(size.id)}>
                                 {selectedGrid && <span>{size.size[selectedGrid]}</span>}
                             </SizeItem>
                         }
                     )}
                 </SizeList>
+                {sizeNotSelected && <Error mt={4}>Выберите размер</Error>}
                 <ProductPreview>
                     {variant.product.properties.map((property, key) =>
                         <li key={key}>
@@ -119,8 +125,6 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                         <Icon src={'/icons/heart.svg'}/>
                     </AddToWishlistWrapper>
                 </Actions>
-
-
             </DescriptionColumn>
         </ProductContainer>
     )

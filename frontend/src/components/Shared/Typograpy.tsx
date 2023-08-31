@@ -87,7 +87,7 @@ export const Caption = styled(span)`
 `
 
 export const Error = styled(span)`
-  font-size: 10px;
+  font-size: 12px;
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   color: ${props => props.theme.color.error};
