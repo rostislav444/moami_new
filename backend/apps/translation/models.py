@@ -63,8 +63,10 @@ class Translatable(models.Model):
                     return super().__getattribute__(name)
                 try:
                     translated_instance = super().__getattribute__('translations').get(language_code=current_language)
-                    return getattr(translated_instance, name)
+                    value = getattr(translated_instance, name)
+                    if value:
+                        return value
+                    return super().__getattribute__(name)
                 except (ObjectDoesNotExist, ValueError):
                     pass
-
         return super().__getattribute__(name)
