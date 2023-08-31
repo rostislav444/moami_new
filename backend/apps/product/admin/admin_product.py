@@ -10,7 +10,7 @@ from apps.product.admin.admin_variant import VariantInline
 from apps.product.forms import ProductAttributeFormSet
 from apps.product.models import Brand, Color, Country, CustomProperty, Product, ProductAttribute, ProductComposition, \
     ProductVideo
-
+from django.utils.safestring import mark_safe
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
@@ -64,6 +64,24 @@ class ProductAttributeInline(admin.TabularInline):
 class ProductVideoInline(admin.TabularInline):
     model = ProductVideo
     extra = 1
+
+    def get_video(self, obj):
+        if obj.video:
+            return mark_safe(f'''<div>
+                <video src="{obj.video.url}" width="300" height="450" style="object-fit: cover;"controls ></video>
+            </div>''')
+        return '-'
+
+    get_video.short_description = 'Video'
+
+    fields = ('get_video', 'video',)
+    readonly_fields = ('get_video',)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'product':
+            kwargs['queryset'] = Product.objects.filter(id=request.resolver_match.kwargs['object_id'])
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 
 class CustomPropertyInline(admin.TabularInline):

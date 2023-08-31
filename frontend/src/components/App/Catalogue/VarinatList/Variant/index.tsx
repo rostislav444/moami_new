@@ -11,9 +11,7 @@ interface VariantProps {
 export const Variant = ({variant}: VariantProps) => {
     return (
         <div>
-
             <CatalogueImage link={`/product/${variant.slug}`} images={variant.images} alt={'alt'}/>
-
             <P bold mt={2}>
                 <Link href={`/product/${variant.slug}`}>{variant.product.name}</Link>
             </P>

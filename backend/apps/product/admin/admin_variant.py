@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from apps.product.admin.admin_variant_size import VariantSizeInline
-from apps.product.models import Variant, VariantImage, VariantImageThumbnail
+from apps.product.models import Variant, VariantImage, VariantImageThumbnail, VariantVideo
 from adminsortable2.admin import SortableTabularInline, SortableAdminMixin
 
 
@@ -75,6 +75,28 @@ class VariantImageInline(SortableTabularInline):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+class VariantVideoInline(admin.TabularInline):
+    model = VariantVideo
+    extra = 1
+
+    def get_video(self, obj):
+        if obj.video:
+            return mark_safe(f'''<div>
+                <video src="{obj.video.url}" width="300" height="450" style="object-fit: cover;"controls ></video>
+            </div>''')
+        return '-'
+
+    get_video.short_description = 'Video'
+
+    fields = ('get_video', 'video',)
+    readonly_fields = ('get_video',)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'variant':
+            kwargs['queryset'] = Variant.objects.filter(product__id=request.resolver_match.kwargs['object_id'])
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
 @admin.register(Variant)
 class VariantAdmin(SortableAdminMixin, admin.ModelAdmin):
     def product_link(self, obj):
@@ -107,7 +129,7 @@ class VariantAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display = ('get_image', 'code', 'color')
 
     readonly_fields = ('get_image', 'product_link', 'slug',)
-    inlines = (VariantImageInline, VariantSizeInline,)
+    inlines = (VariantVideoInline, VariantImageInline, VariantSizeInline,)
 
 
 @admin.register(VariantImage)
