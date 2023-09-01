@@ -48,7 +48,7 @@ export const CatalogueImage = ({link, images, alt}: CatalogueImageProps) => {
 
     return <>
         <Wrapper>
-            {!loaded && <ImageWrapper key={0}>
+            {!loaded && imagesOptimized[0] && <ImageWrapper key={0}>
                 <Link href={link}>
                     <Image
                         fill
