@@ -33,3 +33,14 @@ export const Slide = styled.div`
   top: 0;
   left: 0;
 `;
+
+export const BlankImage = styled.div`
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: #fff;
+    z-index: 1;
+`;

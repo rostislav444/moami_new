@@ -2,11 +2,11 @@ import {ImageWrapper, Slide, SlidesWrapper, Wrapper} from "@/components/App/Cata
 import {VariantImage} from "@/interfaces/variant";
 import 'keen-slider/keen-slider.min.css';
 import {useKeenSlider} from "keen-slider/react";
-import {Image} from "@/components/App/Product/Galery/style";
 import Link from "next/link";
 import {useState} from "react";
 import {Arrow} from "./Arrows";
 import {Pagination} from "@/components/App/Catalogue/VarinatList/Variant/Image/Pagination";
+import Image from "next/image";
 
 interface CatalogueImageProps {
     link: string;
@@ -18,7 +18,7 @@ export const CatalogueImage = ({link, images, alt}: CatalogueImageProps) => {
     const [imagesOptimized, setImagesOptimized] = useState(images.map((image, index) => ({
             l: image.thumbnails[1].image,
             s: image.thumbnails[3]?.image,
-            activated: index === 0,  // Set the first image as activated
+            activated: index === 0,
             alt: alt
         })
     ))
@@ -44,7 +44,6 @@ export const CatalogueImage = ({link, images, alt}: CatalogueImageProps) => {
         },
     })
 
-
     const slidesLength = instanceRef.current?.track.details.slides.length || 0
 
     return <>
@@ -54,12 +53,18 @@ export const CatalogueImage = ({link, images, alt}: CatalogueImageProps) => {
                     <ImageWrapper key={key} className="keen-slider__slide">
                         <Slide>
                             <Link href={link}>
-                                <Image src={imageOptimized.activated ? imageOptimized.l : imageOptimized.s} alt={'alt-' + key}/>
+                                <Image
+                                    fill
+                                    placeholder="blur"
+                                    src={imageOptimized.l}
+                                    quality={100}
+                                    blurDataURL={imageOptimized.s}
+                                    alt={'alt-' + key}
+                                />
                             </Link>
                         </Slide>
                     </ImageWrapper>
                 )}
-
             </SlidesWrapper>
             {loaded && instanceRef.current && (
                 <>
