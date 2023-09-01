@@ -48,19 +48,7 @@ export const CatalogueImage = ({link, images, alt}: CatalogueImageProps) => {
 
     return <>
         <Wrapper>
-            {!loaded && imagesOptimized[0] && <ImageWrapper key={0}>
-                <Link href={link}>
-                    <Image
-                        fill
-                        placeholder="blur"
-                        src={imagesOptimized[0].l}
-                        quality={100}
-                        blurDataURL={imagesOptimized[0].s}
-                        alt={'alt'}
-                    />
-                </Link>
-            </ImageWrapper>}
-            <SlidesWrapper loaded={loaded} ref={sliderRef} className="keen-slider">
+            <SlidesWrapper ref={sliderRef} className="keen-slider">
                 {imagesOptimized.map((imageOptimized, key) =>
                     <ImageWrapper key={key} className="keen-slider__slide">
                         <Slide>
