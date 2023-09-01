@@ -15,32 +15,51 @@ interface CatalogueImageProps {
 }
 
 export const CatalogueImage = ({link, images, alt}: CatalogueImageProps) => {
+    const [imagesOptimized, setImagesOptimized] = useState(images.map((image, index) => ({
+            l: image.thumbnails[1].image,
+            s: image.thumbnails[3]?.image,
+            activated: index === 0,  // Set the first image as activated
+            alt: alt
+        })
+    ))
     const [currentSlide, setCurrentSlide] = useState(0)
     const [loaded, setLoaded] = useState(false)
     const [sliderRef, instanceRef] = useKeenSlider({
         initial: 0,
         slideChanged(slider) {
             setCurrentSlide(slider.track.details.rel)
+
+            // Set the 'activated' property for the current slide to true
+            setImagesOptimized(prevImages => {
+                return prevImages.map((image, index) => {
+                    if (index === slider.track.details.rel) {
+                        return {...image, activated: true};
+                    }
+                    return image;
+                });
+            });
         },
         created() {
             setLoaded(true)
         },
     })
 
+
     const slidesLength = instanceRef.current?.track.details.slides.length || 0
 
     return <>
         <Wrapper>
             <SlidesWrapper ref={sliderRef} className="keen-slider">
-                {images.map((image, key) =>
+                {imagesOptimized.map((imageOptimized, key) =>
                     <ImageWrapper key={key} className="keen-slider__slide">
                         <Slide>
                             <Link href={link}>
-                                <Image src={image.thumbnails[1].image} alt={'alt-' + key}/>
+                                <Image src={imageOptimized.activated ? imageOptimized.l : imageOptimized.s} alt={'alt-' + key}/>
                             </Link>
                         </Slide>
                     </ImageWrapper>
                 )}
+
             </SlidesWrapper>
             {loaded && instanceRef.current && (
                 <>

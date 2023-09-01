@@ -11,7 +11,7 @@ import {useStore} from "react-redux";
 import {addViewedProductData} from "@/state/reducers/user";
 
 
-export default function Product({variant}: VariantPageProps) {
+export default function Product({variant, locale}: VariantPageProps) {
     const router = useRouter()
     const store = useStore()
     const {slug} = router.query
@@ -29,8 +29,8 @@ export default function Product({variant}: VariantPageProps) {
     ]
 
     return (
-        <Layout breadcrumbs={breadcrumbs}>
-            <ProductPage variant={variant}/>
+        <Layout key={locale} breadcrumbs={breadcrumbs}>
+            <ProductPage locale={locale} variant={variant}/>
         </Layout>
     )
 }
@@ -42,16 +42,14 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
 
     const response = await apiFetch.get(`/product/variants/${slug}/`)
 
-    if (!response.ok) {
-        return {
-            notFound: true
-        }
-    }
-
-    return {
+    return response.ok ? {
         props: {
-            variant: response.data
-        }
+            variant: response.data,
+            locale
+        },
+        revalidate: 60 * 60 * 24 // 1 day
+    } : {
+        notFound: true
     }
 }
 

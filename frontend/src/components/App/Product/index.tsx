@@ -1,21 +1,32 @@
-import {Actions, AddToWishlistWrapper, BuyButton, DescriptionColumn, OldPrice, Price, PriceBlock, ProductContainer, ProductPreview, SizeItem, SizeList} from "@/components/App/Product/style";
-import {useEffect, useRef, useState}                                                                                                                    from "react";
-import {VariantPageProps}                                                                                                                               from "@/interfaces/variant";
+import {
+    Actions,
+    AddToWishlistWrapper,
+    BuyButton,
+    DescriptionColumn,
+    OldPrice,
+    Price,
+    PriceBlock,
+    ProductContainer,
+    ProductPreview,
+    SizeItem,
+    SizeList
+} from "@/components/App/Product/style";
+import {useEffect, useRef, useState} from "react";
+import {VariantPageProps} from "@/interfaces/variant";
 import {Caption, Error, H2, Span} from "@/components/Shared/Typograpy";
-import {FlexSpaceBetween}                                                                                                                               from "@/components/Shared/Blocks";
-import {Icon}                                                                                                                                           from "@/components/Shared/Icons";
-import {useAppSelector}                              from "@/state/hooks";
-import {selectGrid, selectSelectedGrid, selectSizes} from "@/state/reducers/sizes";
-import {useRouter}                                   from 'next/navigation';
-import {SizeGridState}                               from "@/interfaces/sizes";
-import {CartItemState}                               from "@/interfaces/cart";
-import {addItemToCart}                               from "@/state/reducers/cart";
-import {VariantsLinks}                               from "@/components/App/Product/VariantsLinks";
-import {ProductDescription}                          from "@/components/App/Product/Description";
-import {ProductImageGallery}                         from "@/components/App/Product/Galery";
-import {event}                                       from "@/lib/FacebookPixel";
-import {useStore}                                    from "react-redux";
-import {DropdownSelect}                              from "@/components/Shared/UI/DropdownSelect";
+import {FlexSpaceBetween} from "@/components/Shared/Blocks";
+import {Icon} from "@/components/Shared/Icons";
+import {useAppSelector} from "@/state/hooks";
+import {selectGrid, selectSelectedGrid} from "@/state/reducers/sizes";
+import {useRouter} from 'next/navigation';
+import {CartItemState} from "@/interfaces/cart";
+import {addItemToCart} from "@/state/reducers/cart";
+import {VariantsLinks} from "@/components/App/Product/VariantsLinks";
+import {ProductDescription} from "@/components/App/Product/Description";
+import {ProductImageGallery} from "@/components/App/Product/Galery";
+import {event} from "@/lib/FacebookPixel";
+import {useStore} from "react-redux";
+import {DropdownSelect} from "@/components/Shared/UI/DropdownSelect";
 import {addViewedProductData} from "@/state/reducers/user";
 
 
@@ -99,7 +110,6 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                 </PriceBlock>
                 <ProductDescription description={variant.product.description} parent={descriptionColumnRef}/>
                 <VariantsLinks variants={variant.product.variants} selected={variant.id}/>
-
                 <SizeList>
                     {variant.sizes.map((size, key) => {
                             return <SizeItem active={size.stock !== 0} selected={size.id === selectedSize} key={key}
@@ -118,7 +128,6 @@ export const ProductPage = ({variant}: VariantPageProps) => {
                         </li>
                     )}
                 </ProductPreview>
-
                 <Actions>
                     <BuyButton onClick={handleAddToCart}>Купить</BuyButton>
                     <AddToWishlistWrapper>

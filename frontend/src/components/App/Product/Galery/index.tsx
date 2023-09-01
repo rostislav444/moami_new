@@ -1,6 +1,8 @@
 import {VariantImage} from "@/interfaces/variant";
 
-import {Image, ImageColumn, ImageWrapper, Video} from "@/components/App/Product/Galery/style";
+import {Image, ImageColumn, ImageWrapper} from "@/components/App/Product/Galery/style";
+import {useEffect, useState} from "react";
+import {Video} from "@/components/Shared/Video";
 
 interface ProductImageGalleryProps {
     images: VariantImage[];
@@ -10,20 +12,25 @@ interface ProductImageGalleryProps {
 
 
 export const ProductImageGallery = ({product_video, video, images}: ProductImageGalleryProps) => {
+    const [hasWindow, setHasWindow] = useState(false);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setHasWindow(true);
+        }
+    }, []);
+
+
     return (
         <ImageColumn>
-            {product_video &&
+            {hasWindow && product_video &&
                 <ImageWrapper>
-                    <Video controls>
-                        <source src={product_video} type="video/mp4"/>
-                    </Video>
+                    <Video url={product_video}/>
                 </ImageWrapper>
             }
-            {video &&
+            {hasWindow && video &&
                 <ImageWrapper>
-                    <Video controls>
-                        <source src={video} type="video/mp4"/>
-                    </Video>
+                    <Video url={video}/>
                 </ImageWrapper>
             }
             {images.map((image, key) =>

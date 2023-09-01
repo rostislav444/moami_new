@@ -31,13 +31,16 @@ export const ImageWrapper = styled.div`
 `;
 
 
-export const Image = styled.img`
+export const Image = styled.img<{blur?: boolean}>`
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    
+    filter: ${props => props.blur ? 'blur(5px)' : 'none'};
+    transition: filter 0.5s ease;
 `;
 
 export const Video = styled.video`

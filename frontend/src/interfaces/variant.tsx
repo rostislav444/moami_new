@@ -67,6 +67,7 @@ interface VariantState {
 
 export interface VariantPageProps {
     variant: VariantState;
+    locale: string;
 }
 
 export interface PaginatedVariants {
