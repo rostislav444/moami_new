@@ -14,6 +14,8 @@ export const Video = ({url}: { url: string }) => {
             id={url}
             sources={sources}
             autoplay
+            muted
+            loop
             initialObjectFit={'cover'}
             hiddenQualityMenu
             disablePictureInPicture
