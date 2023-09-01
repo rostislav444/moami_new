@@ -6,12 +6,12 @@ export const Wrapper = styled.div`
   display: block;
 `
 
-export const SlidesWrapper = styled.div`
+export const SlidesWrapper = styled.div<{loaded: boolean}>`
   position: relative;
   top: 0;
   left: 0;
   width: 100%;
-  height: auto;
+  height: ${props => props.loaded ? 'auto' : '0'};
 `;
 
 
