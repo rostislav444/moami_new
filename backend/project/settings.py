@@ -274,7 +274,8 @@ REST_AUTH = {
 }
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    # 'django.contrib.auth.backends.ModelBackend',
+    'apps.user.middleware.SettingsBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
