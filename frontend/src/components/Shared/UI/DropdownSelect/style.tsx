@@ -12,7 +12,7 @@ export const DropdownValueWrapper = styled.div<{ transparent: boolean, pd: numbe
   align-items: center;
   width: ${({ pd }) => pd ? `calc(100% - ${pd * 2 * 2}px)` : 'calc(100% - 8px)'};
   min-height: 16px;
-  padding: ${({ pd }) => pd ? `${pd * 2}px` : '0 8px 0 0'};
+  padding: ${({ pd }) => pd ? `${pd * 2}px` : '0'};
   border: ${({ transparent, theme }) => transparent ? 'none' : `1px solid ${theme.color.primary}`};
   background: ${({ transparent }) => transparent ? 'none' : '#FFFFFF'};
   cursor: pointer;

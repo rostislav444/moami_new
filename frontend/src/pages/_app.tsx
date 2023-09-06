@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {Provider, useDispatch} from 'react-redux'
+import {Provider} from 'react-redux'
 import '@/styles/globals.css'
 import App, {AppContext, AppProps} from 'next/app'
 import ThemeProvider from "@/styles/ThemeProvider";
@@ -14,7 +14,7 @@ import {API_BASE_URL} from "@/local";
 import fetchWithLocale from "@/utils/fetchWrapper";
 import {variantState} from "@/interfaces/catalogue";
 import {setViewedProductsData} from "@/state/reducers/user";
-
+import {SessionProvider} from "next-auth/react";
 
 const useStore = (initialState: any) => {
     const store = useState(() => initializeStore(initialState))[0]
@@ -31,13 +31,13 @@ interface MyAppProps extends AppProps {
 const getDataFromLocalStorage = () => {
     if (typeof window !== 'undefined') {
         const cart: any = JSON.parse(localStorage.getItem('user.cart') || 'null')
-        const viewedIds: number[]= JSON.parse(localStorage.getItem('user.viewedProductsIds') || '[]')
+        const viewedIds: number[] = JSON.parse(localStorage.getItem('user.viewedProductsIds') || '[]')
         return {cart, viewedIds}
     }
     return {cart: null, viewedIds: null}
 }
 
-function MyApp({Component, pageProps, initialReduxState}: MyAppProps) {
+function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState}: MyAppProps) {
     const {cart, viewedIds} = getDataFromLocalStorage()
     const preparedState = {
         ...initialReduxState,
@@ -60,7 +60,8 @@ function MyApp({Component, pageProps, initialReduxState}: MyAppProps) {
                .then(response => {
                    if (response.ok) {
                        const data: variantState[] = response.data;
-                       const orderedVariants = viewedIds.map(id => data.find(variant => variant.id === id)).filter(Boolean);
+                       const orderedVariants = viewedIds.map(id => data.find(variant => variant.id === id))
+                                                        .filter(Boolean);
                        store.dispatch(setViewedProductsData(orderedVariants));
                    }
                });
@@ -72,12 +73,14 @@ function MyApp({Component, pageProps, initialReduxState}: MyAppProps) {
     }, []);
 
     return (
-        <Provider store={store}>
-            <ThemeProvider>
-                <Global styles={globalStyles}/>
-                <Component {...pageProps} />
-            </ThemeProvider>
-        </Provider>
+        <SessionProvider session={session}>
+            <Provider store={store}>
+                <ThemeProvider>
+                    <Global styles={globalStyles}/>
+                    <Component {...pageProps} />
+                </ThemeProvider>
+            </Provider>
+        </SessionProvider>
     )
 }
 

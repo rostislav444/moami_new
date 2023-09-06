@@ -90,34 +90,52 @@ export const DropdownSelect = ({
     const displayValue = selectedOption ? selectedOption.label : placeholder;
 
     const handleBlur = (e: any) => {
-        // if (e.target.name === name + '__search' && (e.type === 'blur')) {
-        //     setIsOpen(false);
-        // } else {
-        //     setIsOpen(true);
-        // }
+
     }
 
 
-    return <div style={{position: 'relative', display: "grid"}}>
-        <DropdownWrapper ref={dropdownRef}>
-            {register && <select
-                style={{position: 'absolute', opacity: 0, height: 0, width: 0}}
-                {...register(name, {required: required})}
-                onFocus={handleBlur}
-                onBlur={handleBlur}
-            >
-                <option value="" disabled selected={!value}>Выберите область</option>
-                {options.map(option => (
-                    <option key={option.value} value={option.value}
-                            selected={option.value === value}>{option.label}</option>
-                ))}
-            </select>}
-            <Value isOpen={isOpen} setIsOpen={setIsOpen} displayValue={displayValue} placeholder={placeholder} pd={pd}
-                   transparent={transparent}/>
-            <ValueList isOpen={isOpen} name={name} search={search} options={options}
-                       handleOptionClick={handleOptionClick}
-                       searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleBlur={handleBlur}/>
-        </DropdownWrapper>
-        {errorMessage && <UIError mt={2}>{errorMessage}</UIError>}
-    </div>;
+    return (
+        <div style={{position: 'relative', display: 'grid'}}>
+            <DropdownWrapper ref={dropdownRef}>
+                {register && (
+                    <select
+                        style={{position: 'absolute', opacity: 0, height: 0, width: 0}}
+                        {...register(name, {required: required})}
+                        onFocus={handleBlur}
+                        onBlur={handleBlur}
+                        value={value}
+                    >
+                        <option value="" disabled>
+                            Выберите область
+                        </option>
+                        {options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                )}
+                <Value
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    displayValue={displayValue}
+                    placeholder={placeholder}
+                    pd={pd}
+                    transparent={transparent}
+                />
+                <ValueList
+                    isOpen={isOpen}
+                    name={name}
+                    search={search}
+                    options={options}
+                    handleOptionClick={handleOptionClick}
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    handleBlur={handleBlur}
+                />
+            </DropdownWrapper>
+            {errorMessage && <UIError mt={2}>{errorMessage}</UIError>}
+        </div>
+    );
+
 }

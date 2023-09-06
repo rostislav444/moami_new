@@ -1,10 +1,10 @@
+from adminsortable2.admin import SortableTabularInline, SortableAdminMixin
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from apps.product.admin.admin_variant_size import VariantSizeInline
 from apps.product.models import Variant, VariantImage, VariantImageThumbnail, VariantVideo
-from adminsortable2.admin import SortableTabularInline, SortableAdminMixin
 
 
 class VariantInline(admin.TabularInline):
@@ -61,12 +61,16 @@ class VariantImageInline(SortableTabularInline):
 
     def get_image(self, obj):
         if obj.image:
-            return mark_safe(f'<img src="{obj.image.url}" width="100" height="150" />')
+            thumbnail = obj.thumbnails.filter(size='small').first()
+            if thumbnail:
+                return mark_safe(
+                    f'<img src="{thumbnail.image.url}" style="object-fit: cover" width="100" height="150" />'
+                )
         return '-'
 
-    get_image.short_description = 'Image'
+    get_image.short_description = 'Изображение'
 
-    fields = ('get_image', 'image',)
+    fields = ('get_image', 'exclude_at_marketplace', 'image',)
     readonly_fields = ('get_image',)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):

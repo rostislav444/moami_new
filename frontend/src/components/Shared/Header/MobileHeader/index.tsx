@@ -1,10 +1,13 @@
-import * as s from "./style";
-import React, {useState} from "react";
 import {BurgerIcon, HeaderWrapper} from "./style";
+import React, {useState} from "react";
 import {MobileMenuPopup} from "@/components/Shared/Header/MobileHeader/NavMenu";
 import {Logo} from "@/components/Shared/Header/components/Logo";
 import {CartIcon} from "@/components/Shared/Header/DesktopHeader/CartIcon";
 import Link from "next/link";
+import {Icon} from "@/components/Shared/Icons";
+import {useSession} from "next-auth/react";
+import {AuthenticationForm} from "@/components/Shared/Authentication/Form";
+import {Modal} from "@/components/Shared/UI/Modal";
 
 
 interface MobileHeaderProps {
@@ -12,7 +15,9 @@ interface MobileHeaderProps {
 }
 
 export const MobileHeader = ({data}: MobileHeaderProps) => {
+    const {data: session} = useSession();
     const [isOpen, setIsOpen] = useState(false);
+    const [authModalOpen, setAuthModalOpen] = useState(false)
 
     const toggleMenu = (e: React.SyntheticEvent) => {
         setIsOpen(!isOpen);
@@ -30,10 +35,16 @@ export const MobileHeader = ({data}: MobileHeaderProps) => {
             </BurgerIcon>
             <Logo mobile/>
             <div></div>
+            <div onClick={() => setAuthModalOpen(true)}>
+                <Icon title={session?.user?.name || undefined} src='/icons/user.svg' ml={0}/>
+            </div>
             <Link href={`/cart`}>
                 <CartIcon/>
             </Link>
         </HeaderWrapper>
-        {isOpen && <MobileMenuPopup toggleMenu={toggleMenu} data={data} />}
+        {isOpen && <MobileMenuPopup toggleMenu={toggleMenu} data={data}/>}
+        <Modal title={'Вход в личный кабинет'} isOpen={authModalOpen} onClose={setAuthModalOpen}>
+            <AuthenticationForm onAuthenticated={() => setAuthModalOpen(false)}/>
+        </Modal>
     </>
 }

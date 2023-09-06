@@ -1,5 +1,5 @@
-import {Input, InputWrapper, Textarea} from "@/components/App/Order/OrderForm/style";
-import {Error}                         from "@/components/Shared/Typograpy";
+import {Error} from "@/components/Shared/Typograpy";
+import {Input, InputWrapper, Textarea} from "@/components/Shared/Form";
 
 
 interface PersonalInfoProps {

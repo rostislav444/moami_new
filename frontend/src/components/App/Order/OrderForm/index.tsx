@@ -1,11 +1,8 @@
 import {H3} from "@/components/Shared/Typograpy";
-import {Form, Textarea} from "@/components/App/Order/OrderForm/style";
-
+import {Form, Textarea} from "@/components/Shared/Form";
 import {useForm} from "react-hook-form";
-
 import {selectCart} from "@/state/reducers/cart";
 import {useAppSelector} from "@/state/hooks";
-
 import {useRouter} from "next/navigation";
 import {Button} from "@/components/Shared/Buttons";
 import {Grid} from "@/components/Shared/Blocks";

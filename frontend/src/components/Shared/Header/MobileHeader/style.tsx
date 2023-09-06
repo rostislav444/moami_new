@@ -4,11 +4,10 @@ import styled from "@emotion/styled";
 export const HeaderWrapper = styled.div`
   position: fixed;
   display: grid;
-  grid-template-columns: 24px auto 1fr auto;
+  grid-template-columns: 24px auto 1fr auto 24px;
   grid-gap: 24px;
   width: calc(100% - 48px);
   height: 54px;
-  color: white;
   align-items: center;
   justify-items: center;
   padding: 0 24px;

@@ -1,5 +1,5 @@
-import styled            from '@emotion/styled'
-import {theme}           from "@/styles/Theme";
+import styled from '@emotion/styled'
+import {theme} from "@/styles/Theme";
 import {h1, h2, p, span} from "@/components/Shared/Abstract";
 
 export const H1 = styled(h1)`

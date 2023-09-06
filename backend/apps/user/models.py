@@ -1,8 +1,9 @@
-from django.db import models
+import uuid
+
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
-import uuid
+from django.db import models
 
 
 class UserManager(BaseUserManager):
@@ -30,8 +31,9 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(max_length=255, unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    username = models.EmailField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=30, blank=True, null=True)
     first_name = models.CharField(max_length=30, blank=True, null=True)
     last_name = models.CharField(max_length=30, blank=True, null=True)
@@ -42,11 +44,15 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name']
 
     def __str__(self):
         return self.email
+
+    def save(self, *args, **kwargs):
+        self.username = self.email
+        return super().save(*args, **kwargs)
 
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"

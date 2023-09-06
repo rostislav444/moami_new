@@ -1,23 +1,29 @@
 import styled from '@emotion/styled'
 import dynamic from "next/dynamic";
+import {Span} from "@/components/Shared/Typograpy";
 
 interface IconWrapperProps {
     ml?: number;
     mr?: number;
+    count?: number;
 }
 
 interface IconProps extends IconWrapperProps {
     src: string;
-    count?: number;
+    title?: string;
     grey?: boolean;
+    onClick?: any;
 }
 
 
 const IconWrapper = styled.div<IconWrapperProps>`
   position: relative;
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-right: ${props => props.mr && `${8 * props.mr}px`};
   margin-left: ${props => props.ml && `${8 * props.ml}px`};
+  cursor: pointer;
 `
 
 const IconCounterStyle = styled.span`
@@ -28,7 +34,7 @@ const IconCounterStyle = styled.span`
   width: 18px;
   height: 18px;
   background-color: ${props => props.theme.color.primary};
-  bottom: 0;
+  bottom: -4px;
   right: -8px;
   color: white;
   font-size: 12px;
@@ -55,10 +61,11 @@ const DynamicIconCounter = dynamic(() => Promise.resolve(IconCounter), {
 })
 
 
-export const Icon = ({src, count, ml, mr, grey}: IconProps) => {
+export const Icon = ({src, onClick, count, title, ml, mr, grey}: IconProps) => {
     return (
-        <IconWrapper ml={ml} mr={mr}>
+        <IconWrapper ml={ml} mr={mr} onClick={onClick}>
             <IconImg src={src} grey={grey}/>
+            {!!title && <Span capitalize ml={2}>{title}</Span>}
             {!!count && <DynamicIconCounter>{count}</DynamicIconCounter>}
         </IconWrapper>
     )

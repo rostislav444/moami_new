@@ -50,19 +50,7 @@ export const StyledInputMask = styled(InputMask)<InputMaskProps>`
 `;
 
 
-export const Form = styled.form`
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-gap: 12px;
-  width: 100%;
-  height: auto;
-`
 
-export const InputWrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-gap: 12px;
-`
 
 export const Label = styled.label`
   display: block;
@@ -73,36 +61,4 @@ export const Label = styled.label`
 `
 
 
-export const inputStyles = {
-    display: 'block',
-    width: 'calc(100% - 32px)',
 
-
-    border: `1px solid ${theme.color.primary}`,
-    '&:focus': {
-        outline: 'none',
-        border: `1px solid ${theme.color.primary}`,
-    },
-    '::placeholder': {
-        color: `${theme.color.primary}`,
-        fontFamily: `'Lora', serif`,
-    },
-}
-
-
-export const Input = styled.input<{ error?: boolean | undefined }>`
-  ${inputStyles};
-  border-radius: 0;
-  border-color: ${props => props.error ? props.theme.color.error : props.theme.color.primary};
-  height: 48px;
-  padding: 0 16px;
-  
-`
-
-export const Textarea = styled.textarea<{ error?: boolean | undefined }>`
-  ${inputStyles};
-  font-family: 'Open Sans', sans-serif;
-  border-color: ${props => props.error ? props.theme.color.error : props.theme.color.primary};
-  height: 96px;
-  padding: 16px;
-`

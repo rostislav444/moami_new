@@ -55,11 +55,12 @@ export const CatalogueImage = ({link, images, alt}: CatalogueImageProps) => {
                             <Link href={link}>
                                 <Image
                                     fill
+                                    loading={key > 0 ? "lazy" : undefined}
+                                    priority={key === 0}
                                     placeholder='empty'
                                     style={{objectFit: 'cover'}}
                                     src={imageOptimized.l}
                                     quality={100}
-                                    blurDataURL={imageOptimized.s}
                                     alt={'alt-' + key}
                                     unoptimized
                                 />

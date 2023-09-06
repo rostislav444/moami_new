@@ -1,8 +1,5 @@
-import {API_BASE_URL} from "@/local";
-
-interface FetchOptions extends RequestInit {
-  headers: { [key: string]: string };
-}
+import axios from 'axios';
+import { API_BASE_URL } from "@/local";
 
 interface FetchResponse {
     ok: boolean;
@@ -17,38 +14,34 @@ export interface FetchWrapper {
     delete: (url: string) => Promise<FetchResponse>;
 }
 
-const fetchWithLocale = (locale: string|undefined = undefined): FetchWrapper => {
-    const baseUrl = API_BASE_URL
+const fetchWithLocale = (locale: string | undefined = undefined): FetchWrapper => {
+    const baseUrl = API_BASE_URL;
 
-    const request = async (url: string, method: string, body?: any): Promise<FetchResponse> => {
+    const request = async (url: string, method: 'get' | 'post' | 'put' | 'delete', body?: any): Promise<FetchResponse> => {
         if (!url.startsWith('/')) {
             url = '/' + url;
         }
 
-        const headers: { [key: string]: string } = {
+        const headers = {
             'Content-Type': 'application/json',
             'Accept-Language': locale || 'uk',
             "X-CSRFToken": ''
         };
 
-        const options: FetchOptions = {
-            method,
-            headers,
-            // mode: 'cors',
-            body: JSON.stringify(body),
-        };
-
         try {
-            const response = await fetch(baseUrl + url, options);
-            const responseData = await response.json();
+            const response = await axios({
+                url: baseUrl + url,
+                method,
+                headers,
+                data: body,
+            });
 
             return {
-                ok: response.ok,
+                ok: response.status >= 200 && response.status < 300,
                 status: response.status,
-                data: response.ok ? responseData : null,
+                data: response.data,
             };
         } catch (error) {
-            console.log(error)
             console.error('Request error:', error);
             return {
                 ok: false,
@@ -58,12 +51,12 @@ const fetchWithLocale = (locale: string|undefined = undefined): FetchWrapper => 
         }
     };
 
-    const get = (url: string): Promise<FetchResponse> => request(url, 'GET');
-    const post = (url: string, body: any): Promise<FetchResponse> => request(url, 'POST', body);
-    const put = (url: string, body: any): Promise<FetchResponse> => request(url, 'PUT', body);
-    const del = (url: string): Promise<FetchResponse> => request(url, 'DELETE');
+    const get = (url: string): Promise<FetchResponse> => request(url, 'get');
+    const post = (url: string, body: any): Promise<FetchResponse> => request(url, 'post', body);
+    const put = (url: string, body: any): Promise<FetchResponse> => request(url, 'put', body);
+    const del = (url: string): Promise<FetchResponse> => request(url, 'delete');
 
-    return {get, post, put, delete: del};
+    return { get, post, put, delete: del };
 };
 
 export default fetchWithLocale;

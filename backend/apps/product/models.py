@@ -251,8 +251,9 @@ class VariantVideo(models.Model):
 class VariantImage(SortableMixin):
     index = models.PositiveIntegerField(default=0)
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='images')
-    image = DeletableImageField(upload_to='variant_images', get_parent='variant')
+    image = DeletableImageField(upload_to='variant_images', get_parent='variant', verbose_name="Файл")
     slug = models.SlugField(max_length=255, blank=True)
+    exclude_at_marketplace = models.BooleanField(default=False, verbose_name='Исключить на площадках')
 
     objects = VariantImageManager()
 
@@ -262,12 +263,20 @@ class VariantImage(SortableMixin):
         ordering = ['index']
 
     def save(self, *args, **kwargs):
+        # If the object exists, get the current image value from the database
+        image_changed = False
+        if self.pk:
+            orig = VariantImage.objects.get(pk=self.pk)
+            if orig.image != self.image:
+                image_changed = True
+
         if not self.pk:
-            # if this is a new instance, generate a slug based on the variant's name and the current timestamp
             self.slug = slugify(f'{self.variant.code}-{timezone.now().timestamp()}')
         super().save(*args, **kwargs)
 
-        self.create_thumbnails()
+        # Call create_thumbnails() if the image has changed
+        if image_changed:
+            self.create_thumbnails()
 
     def create_thumbnails(self):
         image = Image.open(self.image)

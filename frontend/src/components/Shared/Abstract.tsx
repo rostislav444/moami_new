@@ -10,6 +10,7 @@ interface MarginProps {
     grey?: boolean;
     white?: boolean;
     upper?: boolean;
+    capitalize?: boolean;
 }
 
 const margins = (props: any) => `
@@ -21,13 +22,12 @@ const margins = (props: any) => `
     margin-bottom: ${props.mb ? props.mb * 4 : 0}px;
     text-align: ${props.center ? 'center' : 'left'};
     font-weight: ${props.bold ? '500' : '400'};
-    
     color: ${
         props.grey ? 'grey' :
             props.white ? 'white !important' :
                 'inherit'
     };
-    text-transform: ${props.upper ? 'uppercase' : 'none'};
+    text-transform: ${props.upper ? 'uppercase' : props.capitalize ? 'capitalize' : 'none'};
 `;
 
 export const div = styled.div<MarginProps>`${margins}`;

@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from unidecode import unidecode
-from apps.abstract.fields import DeletableImageField
+
 
 class NameSlug(models.Model):
     name = models.CharField(max_length=255)
@@ -16,7 +16,6 @@ class NameSlug(models.Model):
 
     def __str__(self):
         return self.name
-
 
 # class ParentImageThumbnails(models.Model):
 #     image = DeletableImageField()

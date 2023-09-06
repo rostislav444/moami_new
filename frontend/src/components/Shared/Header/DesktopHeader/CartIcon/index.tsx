@@ -5,5 +5,5 @@ import {selectCart} from "@/state/reducers/cart";
 
 export const CartIcon  = () => {
     const {quantity} = useAppSelector(selectCart);
-    return <Icon src='/icons/cart.svg' ml={3} count={quantity}/>;
+    return <Icon src='/icons/cart.svg' count={quantity}/>;
 };
