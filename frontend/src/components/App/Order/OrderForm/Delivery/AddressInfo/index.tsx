@@ -1,6 +1,6 @@
-import {Input, InputWrapper} from "@/components/App/Order/OrderForm/style";
 import {Error, H3} from "@/components/Shared/Typograpy";
 import {Grid} from "@/components/Shared/Blocks";
+import {Input, InputWrapper} from "@/components/Shared/Form";
 
 
 interface AddressInfoProps {
