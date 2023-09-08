@@ -95,7 +95,12 @@ export const MobileProductGallery = ({hasWindow, product_video, video, images}: 
                 )}
                 {images.map((image, key) => (
                     <div key={key} className="keen-slider__slide">
-                        <ThumbnailImageWrapper active={currentSlide === key} onClick={() => goToSlide(key)}>
+                        <ThumbnailImageWrapper active={currentSlide === key} onClick={() => goToSlide(
+                            product_video && video ? key + 2 :
+                                product_video ? key + 1 :
+                                video ? key + 1 :
+                                key
+                        )}>
                             <img src={image.thumbnails[0].image} alt={`Thumbnail ${key}`}/>
                         </ThumbnailImageWrapper>
                     </div>
