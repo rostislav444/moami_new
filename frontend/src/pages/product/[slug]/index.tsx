@@ -19,7 +19,7 @@ export default function Product({variant, locale}: VariantPageProps) {
     const {slug} = router.query
     const categoriesBreadcrumbs = variant.product.breadcrumbs
     const api = fetchWithLocale()
-    let isMounted = true
+
 
 
     const variantViewed = async (id: number) => {
@@ -27,9 +27,12 @@ export default function Product({variant, locale}: VariantPageProps) {
     }
 
     useEffect(() => {
+        let isMounted = true
+
         if (session && session.user && session.user.name === 'admin') {
             return
         }
+
         if (isMounted) {
             pageView()
             store.dispatch(addViewedProductData(variant))
