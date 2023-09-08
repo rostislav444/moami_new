@@ -17,7 +17,24 @@ export const ViewedProducts = () => {
     const router = useRouter();
     const {asPath} = router;
 
-    const [sliderRef, instanceRef] = useKeenSlider({
+    useEffect(() => {
+        if (window !== undefined) {
+            setScreenWidth(window.innerWidth);
+
+            const handleResize = () => {
+                setScreenWidth(window.innerWidth);
+            }
+
+            window.addEventListener('resize', handleResize);
+            return () => {
+                window.removeEventListener('resize', handleResize);
+            }
+        }
+
+    }, []);
+
+
+        const [sliderRef, instanceRef] = useKeenSlider({
         initial: 0,
         slides: {
             perView: 2,
@@ -36,22 +53,6 @@ export const ViewedProducts = () => {
             setLoaded(true);
         },
     });
-
-    useEffect(() => {
-        if (window !== undefined) {
-            setScreenWidth(window.innerWidth);
-
-            const handleResize = () => {
-                setScreenWidth(window.innerWidth);
-            }
-
-            window.addEventListener('resize', handleResize);
-            return () => {
-                window.removeEventListener('resize', handleResize);
-            }
-        }
-
-    }, []);
 
 
     if (viewedData.length === 0 || asPath.startsWith('/cart') || asPath.startsWith('/order')) return null;

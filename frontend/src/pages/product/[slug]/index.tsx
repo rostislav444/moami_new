@@ -21,11 +21,6 @@ export default function Product({variant, locale}: VariantPageProps) {
     const api = fetchWithLocale()
 
 
-
-    const variantViewed = async (id: number) => {
-        api.get('/product/variants/views?variant_id=' + id)
-    }
-
     useEffect(() => {
         let isMounted = true
 
@@ -36,12 +31,12 @@ export default function Product({variant, locale}: VariantPageProps) {
         if (isMounted) {
             pageView()
             store.dispatch(addViewedProductData(variant))
-            variantViewed(variant.id)
+            api.get('/product/variants/views?variant_id=' + variant.id)
         }
         return () => {
             isMounted = false
         }
-    }, [variant.id]);
+    }, [session, store, api, variant]);
 
     const breadcrumbs = [
         {title: 'Главная', link: '/'},
@@ -68,7 +63,7 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
             variant: response.data,
             locale
         },
-        revalidate: 60 * 60 * 24 // 1 day
+        revalidate: 60 * 60 * 24 // 24 hours
     } : {
         notFound: true
     }
