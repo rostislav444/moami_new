@@ -35,7 +35,6 @@ export const userSlice = createSlice({
         },
         addViewedProductData: (state, action: PayloadAction<any>) => {
             const index = state.viewedProductsIds.findIndex(id => id === action.payload.id);
-            console.log(index)
 
             if (index === -1) {
                 state.viewedProductsIds.unshift(action.payload.id)

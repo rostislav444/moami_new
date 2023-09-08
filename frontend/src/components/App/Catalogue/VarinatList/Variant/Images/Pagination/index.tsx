@@ -1,4 +1,4 @@
-import {Dot, Wrapper} from "@/components/App/Catalogue/VarinatList/Variant/Image/Pagination/style";
+import {Dot, Wrapper} from "@/components/App/Catalogue/VarinatList/Variant/Images/Pagination/style";
 
 
 interface PaginationProps {

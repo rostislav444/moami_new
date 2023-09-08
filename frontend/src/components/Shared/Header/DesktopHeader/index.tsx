@@ -42,18 +42,6 @@ export const DesktopHeader = ({data}: DesktopHeaderProps) => {
         router.push(asPath, asPath, {locale: value})
     }
 
-    const handleCredentialsSignIn = (data: any) => {
-        console.log(data)
-        // signIn("credentials", {redirect: false, username, password})
-        //     .then(data => {
-        //         console.log(data)
-        //     })
-        // signIn('google').then(data => {
-        //      console.log(data)
-        // })
-
-
-    }
 
     return <>
         <s.HeaderWrapper>

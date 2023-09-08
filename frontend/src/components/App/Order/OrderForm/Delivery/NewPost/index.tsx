@@ -27,7 +27,6 @@ export const NewPostForm = ({formData, setValue, register, errors}: NewPostFormP
     useEffect(() => {
         api.get('newpost/areas')
            .then((data: any) => {
-               console.log(data)
                setAreas([...data.data]);
            })
     }, [])

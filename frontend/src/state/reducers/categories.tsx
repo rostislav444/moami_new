@@ -14,10 +14,20 @@ export const categoriesSlice = createSlice({
         setCategories: (state, action) => {
             state.categories = action.payload
         },
+        setSelectSizeGrid: (state, action) => {
+            const {parenId, id, sizeGrid} = action.payload
+            const parentCategory = state.categories.find(category => category.id === parenId)
+            if (parentCategory) {
+                const category = parentCategory.children.find(category => category.id === id)
+                if (category) {
+                    category.selected_size_grid = sizeGrid
+                }
+            }
+        }
     },
 })
 
-export const {setCategories} = categoriesSlice.actions
+export const {setCategories, setSelectSizeGrid} = categoriesSlice.actions
 
 export const selectCategories = (state: any) => state.categories.categories
 

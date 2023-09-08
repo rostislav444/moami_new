@@ -40,14 +40,14 @@ class VariantInline(admin.TabularInline):
         li_style = ' '.join([f'{k}: {v};' for k, v in li_style.items()])
         return mark_safe(f'''
             <ul style="{ul_style}">
-                {"".join([f'<li style="{li_style}">{size.get_size_name}</li>' for size in obj.sizes.all()])}
+                {"".join([f'<li style="{li_style}">{size.get_size}</li>' for size in obj.sizes.all()])}
             </ul>
         ''')
 
     get_image.short_description = 'Image'
     get_already_set_sizes_ul.short_description = 'Sizes'
-    readonly_fields = ('get_image', 'get_already_set_sizes_ul', 'slug')
-    fields = ('get_image', 'get_already_set_sizes_ul', 'code', 'color')
+    readonly_fields = ('get_image', 'get_total_views', 'get_already_set_sizes_ul', 'slug')
+    fields = ('get_image', 'get_already_set_sizes_ul', 'get_total_views', 'code', 'color')
 
 
 class VariantImageThumbnailInline(admin.TabularInline):
@@ -106,7 +106,7 @@ class VariantAdmin(SortableAdminMixin, admin.ModelAdmin):
     def product_link(self, obj):
         style = {
             'display': 'inline-block',
-            'border': '1px solid #ccc',
+            'border': '2px solid #417690',
             'border-radius': '4px',
             'padding': '8px 16px',
         }
@@ -118,7 +118,7 @@ class VariantAdmin(SortableAdminMixin, admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('product_link', 'product', 'code', 'color', 'slug')
+            'fields': ('product_link', 'product', 'code', 'color', 'slug', 'get_total_views')
         }),
     )
 
@@ -130,9 +130,9 @@ class VariantAdmin(SortableAdminMixin, admin.ModelAdmin):
 
     get_image.short_description = 'Image'
 
-    list_display = ('get_image', 'code', 'color')
+    list_display = ('get_image', 'get_total_views', 'code', 'color')
 
-    readonly_fields = ('get_image', 'product_link', 'slug',)
+    readonly_fields = ('get_image', 'product_link', 'slug','get_total_views',)
     inlines = (VariantVideoInline, VariantImageInline, VariantSizeInline,)
 
 

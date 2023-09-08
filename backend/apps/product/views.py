@@ -1,10 +1,11 @@
+import datetime
 import json
 
 from django.http import HttpResponse
 from rest_framework import mixins, viewsets
 from unidecode import unidecode
 
-from apps.product.models import Product, Variant
+from apps.product.models import Product, Variant, VariantViews
 from apps.product.serializers import ProductSerializer, VariantSerializer
 
 
@@ -43,3 +44,18 @@ def variant_slug_list_json(request):
 
     response = json.dumps(variant_slug_list)
     return HttpResponse(response, content_type='application/json')
+
+
+def variant_views(request):
+    today = datetime.date.today()
+    variant_id = request.GET.get('variant_id')
+    variant = Variant.objects.get(id=variant_id)
+    try:
+        today_views = VariantViews.objects.get(variant=variant, day=today)
+    except VariantViews.DoesNotExist:
+        today_views = VariantViews(variant=variant, day=today, views=0)
+
+    today_views.views += 1
+    today_views.save()
+
+    return HttpResponse(today_views.views, content_type='application/json')

@@ -1,140 +1,33 @@
-import {
-    Actions,
-    AddToWishlistWrapper,
-    BuyButton,
-    DescriptionColumn,
-    OldPrice,
-    Price,
-    PriceBlock,
-    ProductContainer,
-    ProductPreview,
-    SizeItem,
-    SizeList
-} from "@/components/App/Product/style";
-import {useEffect, useRef, useState} from "react";
+import {ProductContainer} from "@/components/App/Product/Galery/DesktopGalery/style";
+import {useEffect, useRef} from "react";
 import {VariantPageProps} from "@/interfaces/variant";
-import {Caption, Error, H2, Span} from "@/components/Shared/Typograpy";
-import {FlexSpaceBetween} from "@/components/Shared/Blocks";
-import {Icon} from "@/components/Shared/Icons";
-import {useAppSelector} from "@/state/hooks";
-import {selectGrid, selectSelectedGrid} from "@/state/reducers/sizes";
-import {useRouter} from 'next/navigation';
-import {CartItemState} from "@/interfaces/cart";
-import {addItemToCart} from "@/state/reducers/cart";
-import {VariantsLinks} from "@/components/App/Product/VariantsLinks";
-import {ProductDescription} from "@/components/App/Product/Description";
+
 import {ProductImageGallery} from "@/components/App/Product/Galery";
-import {event} from "@/lib/FacebookPixel";
 import {useStore} from "react-redux";
-import {DropdownSelect} from "@/components/Shared/UI/DropdownSelect";
 import {addViewedProductData} from "@/state/reducers/user";
+import {DescriptionBlock} from "@/components/App/Product/Description";
+import fetchWithLocale from "@/utils/fetchWrapper";
 
 
 export const ProductPage = ({variant}: VariantPageProps) => {
+    const ref = useRef(null)
     const store = useStore()
     const descriptionColumnRef = useRef<HTMLDivElement>(null)
-    const [selectedSize, setSelectedSize] = useState<number | null>(null)
-    const [sizeNotSelected, setSizeNotSelected] = useState<boolean>(false)
-    const {push} = useRouter();
-    const sizeGrids = variant.product.size_grids
-    const productPreferredSizeGrid = variant.product.product_preferred_size_grid
-    const selected = useAppSelector(selectSelectedGrid)
-    const [selectedGrid, setSelectedGrid] = useState<string>(sizeGrids.find(grid => grid.slug === selected)?.slug || productPreferredSizeGrid || sizeGrids[0].slug);
 
-    useEffect(() => {
-        store.dispatch(addViewedProductData(variant))
-    }, [variant])
 
 
     useEffect(() => {
         if (descriptionColumnRef.current) {
             descriptionColumnRef.current.style.height = `${descriptionColumnRef.current.scrollHeight + 8}px`
         }
+        store.dispatch(addViewedProductData(variant))
     }, [descriptionColumnRef.current])
 
 
-    const handleSelectSize = (id: number) => {
-        setSelectedSize(id)
-        setSizeNotSelected(false)
-    }
-
-    const handleGridChange = (slug: string) => {
-        setSelectedGrid(slug)
-        store.dispatch(selectGrid(slug))
-    }
-
-    const handleAddToCart = () => {
-        const size = variant.sizes.find(size => size.id === selectedSize)
-        if (size) {
-            const data: CartItemState = {
-                id: size.id,
-                image: variant.images[0].image,
-                stock: size.stock,
-                size: size.size,
-                quantity: 1,
-                name: variant.product.name,
-                slug: variant.slug,
-                price: variant.product.price,
-                old_price: variant.product.old_price,
-                selectedGrid: selectedGrid,
-            }
-            store.dispatch(addItemToCart(data))
-            event('AddToCart', {
-                content_name: variant.name,
-                content_ids: [variant.id],
-                content_type: 'product',
-                value: variant.product.price,
-                currency: 'UAH'
-            })
-            push('/cart')
-        } else {
-            setSizeNotSelected(true)
-        }
-    }
-
     return (
-        <ProductContainer>
+        <ProductContainer ref={ref}>
             <ProductImageGallery product_video={variant.product_video} video={variant.video} images={variant.images}/>
-            <DescriptionColumn ref={descriptionColumnRef}>
-                <FlexSpaceBetween mb={2}>
-                    <Caption>Код: {variant.code}</Caption>
-                    <DropdownSelect transparent value={selectedGrid}
-                                    options={sizeGrids.map(grid => ({label: grid.name, value: grid.slug,}))}
-                                    onChange={handleGridChange}/>
-                </FlexSpaceBetween>
-                <H2 mb={2}>{variant.name}</H2>
-                <PriceBlock>
-                    <Price>{variant.product.price} ₴</Price>
-                    {variant.product.old_price > variant.product.price &&
-                        <OldPrice>{variant.product.old_price} ₴</OldPrice>}
-                </PriceBlock>
-                <ProductDescription description={variant.product.description} parent={descriptionColumnRef}/>
-                <VariantsLinks variants={variant.product.variants} selected={variant.id}/>
-                <SizeList>
-                    {variant.sizes.map((size, key) => {
-                            return <SizeItem active={size.stock !== 0} selected={size.id === selectedSize} key={key}
-                                             onClick={() => size.stock !== 0 && handleSelectSize(size.id)}>
-                                {selectedGrid && <span>{size.size[selectedGrid]}</span>}
-                            </SizeItem>
-                        }
-                    )}
-                </SizeList>
-                {sizeNotSelected && <Error mt={4}>Выберите размер</Error>}
-                <ProductPreview>
-                    {variant.product.properties.map((property, key) =>
-                        <li key={key}>
-                            <Span mr={1}>{property.key}:</Span>
-                            <Span>{property.value}</Span>
-                        </li>
-                    )}
-                </ProductPreview>
-                <Actions>
-                    <BuyButton onClick={handleAddToCart}>Купить</BuyButton>
-                    <AddToWishlistWrapper>
-                        <Icon src={'/icons/heart.svg'}/>
-                    </AddToWishlistWrapper>
-                </Actions>
-            </DescriptionColumn>
+            <DescriptionBlock variant={variant}/>
         </ProductContainer>
     )
 }

@@ -1,0 +1,1 @@
+scp -r moami:/var/www/moami/backend/media/ /Users/rostislavnikolaev/Desktop/Sites/moami/backend/

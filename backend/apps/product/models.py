@@ -1,23 +1,23 @@
 import os
 from io import BytesIO
+
+from PIL import Image
+from adminsortable.models import SortableMixin
 from colorfield.fields import ColorField
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.text import slugify
-from PIL import Image
 from unidecode import unidecode
 
-from adminsortable.models import SortableMixin
 from apps.abstract.fields import DeletableImageField, DeletableVideoField
 from apps.attributes.models import Attribute, AttributeGroup, Composition
 from apps.categories.models import Collections
-from apps.sizes.models import Size, SizeGrid
+from apps.sizes.models import Size
 from apps.translation.models import Translatable
-from django.core.validators import RegexValidator
-
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Разрешенные символы 0-9, a-z, A-Z, -')
 
@@ -101,6 +101,11 @@ class Product(Translatable):
     @property
     def get_preferred_size_grid(self):
         return self.category.preferred_size_grid.name if self.category.preferred_size_grid else 'ua'
+
+    def get_total_variant_views(self):
+        return self.variants.aggregate(models.Sum('views__views'))['views__views__sum']
+
+    get_total_variant_views.short_description = 'Просмотры'
 
 
 class ProductVideo(models.Model):
@@ -193,10 +198,19 @@ class Variant(models.Model):
     def get_slug(self):
         return slugify(unidecode(f'{self.product.slug}-code-{self.code}'))
 
-    def save(self, *args, **kwargs):
-        self.code = self.code.replace(' ', '-').upper()
-        self.slug = self.get_slug
-        super().save(*args, **kwargs)
+    def get_total_views(self):
+        count = self.views.aggregate(models.Sum('views'))['views__sum']
+        if count:
+            return count
+        return '-'
+
+    get_total_views.short_description = 'Просмотры'
+
+
+def save(self, *args, **kwargs):
+    self.code = self.code.replace(' ', '-').upper()
+    self.slug = self.get_slug
+    super().save(*args, **kwargs)
 
 
 class VariantSize(models.Model):
@@ -228,7 +242,7 @@ class VariantSize(models.Model):
             return sizes[key]
 
     def __str__(self):
-        return self.size.__str__()
+        return self.get_size
 
 
 class VariantImageManager(models.Manager):
@@ -346,6 +360,19 @@ class VariantImageThumbnail(models.Model):
 
     def __str__(self):
         return f'{self.variant_image.variant.code} ({self.size})'
+
+
+class VariantViews(models.Model):
+    variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='views')
+    day = models.DateField(auto_now_add=True)
+    views = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name = 'Просмотры'
+        verbose_name_plural = 'Просмотры'
+
+    def __str__(self):
+        return f'{self.variant.code} - {self.day} - {self.views}'
 
 
 # If Product slug changed rewrite Variant slug

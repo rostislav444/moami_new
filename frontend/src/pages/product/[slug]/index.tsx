@@ -5,22 +5,40 @@ import {ProductPage} from "@/components/App/Product";
 import {GetStaticProps} from "next";
 import {VariantPageProps} from "@/interfaces/variant";
 import fetchWithLocale from "@/utils/fetchWrapper";
-import {useEffect} from "react";
+import {useEffect, useRef} from "react";
 import {pageView} from "@/lib/FacebookPixel";
 import {useStore} from "react-redux";
 import {addViewedProductData} from "@/state/reducers/user";
+import {useSession} from "next-auth/react";
 
 
 export default function Product({variant, locale}: VariantPageProps) {
+    const {data: session} = useSession();
     const router = useRouter()
     const store = useStore()
     const {slug} = router.query
     const categoriesBreadcrumbs = variant.product.breadcrumbs
+    const api = fetchWithLocale()
+    let isMounted = true
+
+
+    const variantViewed = async (id: number) => {
+        api.get('/product/variants/views?variant_id=' + id)
+    }
 
     useEffect(() => {
-        store.dispatch(addViewedProductData(variant))
-        pageView()
-    }, []);
+        if (session && session.user && session.user.name === 'admin') {
+            return
+        }
+        if (isMounted) {
+            pageView()
+            store.dispatch(addViewedProductData(variant))
+            variantViewed(variant.id)
+        }
+        return () => {
+            isMounted = false
+        }
+    }, [variant.id]);
 
     const breadcrumbs = [
         {title: 'Главная', link: '/'},

@@ -7,7 +7,7 @@ interface Color {
 }
 
 
-interface VariantSize {
+export interface VariantSize {
     id: number;
     size: { [key: string]: number | string };
     stock: number;
@@ -50,9 +50,17 @@ interface Product {
     breadcrumbs: { title: string; link: string }[];
     size_grids: SizeGrid[]
     product_preferred_size_grid: string
+    category: {
+        id: number;
+        parent: number;
+    }
+    compositions: {
+        composition: string;
+        value: string;
+    }[]
 }
 
-interface VariantState {
+export interface VariantState {
     id: number;
     code: string;
     name: string;
@@ -67,7 +75,7 @@ interface VariantState {
 
 export interface VariantPageProps {
     variant: VariantState;
-    locale: string;
+    locale?: string;
 }
 
 export interface PaginatedVariants {

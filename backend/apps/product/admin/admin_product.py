@@ -12,6 +12,7 @@ from apps.product.models import Brand, Color, Country, CustomProperty, Product, 
     ProductVideo
 from django.utils.safestring import mark_safe
 
+
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -83,7 +84,6 @@ class ProductVideoInline(admin.TabularInline):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-
 class CustomPropertyInline(admin.TabularInline):
     model = CustomProperty
     extra = 0
@@ -131,7 +131,7 @@ class CategoryFilter(SimpleListFilter):
 
 @admin.register(Product)
 class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
-    list_display = ('index', 'name', 'get_varinats_images', 'category', 'brand', 'price', 'old_price',)
+    list_display = ('index', 'name', 'get_varinats_images', 'get_total_variant_views', 'category', 'brand', 'price', 'old_price',)
     list_filter = (CategoryFilter,)
     search_fields = ('name', 'category__name', 'brand__name', 'price', 'old_price',)
     readonly_fields = ('slug', 'get_varinats_images',)

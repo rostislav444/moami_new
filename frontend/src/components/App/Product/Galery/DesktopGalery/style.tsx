@@ -11,16 +11,10 @@ export const ProductContainer = styled.div`
 `;
 
 
-
-
-
-
 export const DescriptionColumn = styled.div`
   display: block;
-  position: -webkit-sticky;
-  position: sticky;
-  top: 10px;
-  width: 400px;
+  position: relative;
+  width: 420px;
   height: 320px;
   padding-left: 24px;
 
@@ -31,26 +25,6 @@ export const DescriptionColumn = styled.div`
     position: relative;
     margin-top: 24px;
   }
-`;
-
-
-export const PriceBlock = styled.div`
-  display: block;
-  margin-bottom: 24px;
-`;
-
-export const Price = styled.span`
-  font-size: 24px;
-  font-weight: 500;
-  color: #000;
-  margin-right: 16px;
-`;
-
-export const OldPrice = styled.span`
-  font-size: 18px;
-  font-weight: 400;
-  color: ${props => props.theme.color.grey};
-  text-decoration: line-through;
 `;
 
 

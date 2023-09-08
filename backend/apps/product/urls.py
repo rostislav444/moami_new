@@ -9,5 +9,6 @@ router.register(r'variants', views.VariantViewSet, basename='variants')
 
 urlpatterns = [
     path('variants/slug-list/', views.variant_slug_list_json, name='variant_slug_list_json'),
+    path('variants/views/', views.variant_views, name='variant_views'),
 ]
 urlpatterns += router.urls

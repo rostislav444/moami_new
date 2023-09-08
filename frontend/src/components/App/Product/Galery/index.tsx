@@ -1,8 +1,9 @@
 import {VariantImage} from "@/interfaces/variant";
-
-import {Image, ImageColumn, ImageWrapper} from "@/components/App/Product/Galery/style";
 import {useEffect, useState} from "react";
-import {Video} from "@/components/Shared/Video";
+import {useIsMobile} from "@/components/Shared/Header/hooks";
+import {MobileProductGallery} from "@/components/App/Product/Galery/MobileGalery";
+import {DesktopProductGallery} from "@/components/App/Product/Galery/DesktopGalery";
+
 
 interface ProductImageGalleryProps {
     images: VariantImage[];
@@ -13,6 +14,7 @@ interface ProductImageGalleryProps {
 
 export const ProductImageGallery = ({product_video, video, images}: ProductImageGalleryProps) => {
     const [hasWindow, setHasWindow] = useState(false);
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -21,23 +23,8 @@ export const ProductImageGallery = ({product_video, video, images}: ProductImage
     }, []);
 
 
-    return (
-        <ImageColumn>
-            {hasWindow && product_video &&
-                <ImageWrapper>
-                    <Video url={product_video}/>
-                </ImageWrapper>
-            }
-            {hasWindow && video &&
-                <ImageWrapper>
-                    <Video url={video}/>
-                </ImageWrapper>
-            }
-            {images.map((image, key) =>
-                <ImageWrapper key={key}>
-                    <Image src={image.thumbnails[0].image} alt={'alt' + key}/>
-                </ImageWrapper>
-            )}
-        </ImageColumn>
-    )
+    return isMobile ? <MobileProductGallery hasWindow={hasWindow} product_video={product_video} video={video} images={images}/> :
+        <DesktopProductGallery hasWindow={hasWindow} product_video={product_video} video={video} images={images}/>
+
+
 }

@@ -15,7 +15,7 @@ export const SlidesWrapper = styled.div`
 `;
 
 
-export const ImageWrapper = styled.div`
+export const ImageWrapper = styled.div<{pointer?: boolean}>`
   position: relative;
   display: block;
   width: 100%;
@@ -23,6 +23,7 @@ export const ImageWrapper = styled.div`
   top: 0;
   left: 0;
   padding-top: 150%;
+  cursor: ${props => props.pointer ? 'pointer' : 'unset'};
 `;
 
 export const Slide = styled.div`

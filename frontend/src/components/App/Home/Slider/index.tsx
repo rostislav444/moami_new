@@ -9,7 +9,7 @@ import {HomeSliderProps}        from "@/interfaces/home/silder";
 export const HomeSlider = ({slides}: HomeSliderProps) => {
     const [sliderRef, instanceRef] = useKeenSlider({
             slideChanged() {
-                console.log('slide changed')
+
             },
         },
         [

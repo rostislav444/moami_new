@@ -32,9 +32,6 @@ export const AuthenticationForm: React.FC<AuthenticationFormProps> = ({onAuthent
 
     const handleGoogleLogin = () => {
         signIn('google')
-            .then(data => {
-                console.log(data)
-            })
     }
 
 

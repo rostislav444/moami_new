@@ -81,7 +81,6 @@ export const authOptions = {
                         data: credentials,
                     });
                     const data = response.data;
-                    console.log(data)
                     if (data) return data;
                 } catch (error) {
                     console.error(error);
@@ -105,7 +104,6 @@ export const authOptions = {
         // @ts-ignore
         async signIn({user, account, profile, email, credentials}) {
             const {provider} = account
-            console.log(provider)
             // @ts-ignore
             if (account.provider && SIGN_IN_HANDLERS[provider]) {
                 // @ts-ignore

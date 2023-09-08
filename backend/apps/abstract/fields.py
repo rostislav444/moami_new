@@ -24,7 +24,10 @@ class DeletableMediaField(models.FileField):
         file_instance = getattr(model_instance, self.name)
         if not file_instance:
             old_file = getattr(model_instance.__class__.objects.get(pk=model_instance.pk), self.name, None)
-            default_storage.delete(old_file.name)
+            try:
+                default_storage.delete(old_file.name)
+            except:
+                pass
             self._prune_empty_app_directories(model_instance)
             return None
         if file_instance:

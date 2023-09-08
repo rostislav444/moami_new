@@ -1,7 +1,10 @@
 from django.core.files.images import get_image_dimensions
 from rest_framework import serializers
 
-from apps.product.models import Product, Variant, Color, VariantSize, VariantImage, CustomProperty
+from apps.attributes.serializer import AttributeSerializer
+from apps.categories.serializers import CategoryIdSerializer
+from apps.product.models import Product, Variant, Color, VariantSize, VariantImage, CustomProperty, ProductComposition, \
+    ProductAttribute
 from apps.sizes.serializers import SizeGridSerializer
 
 
@@ -48,17 +51,39 @@ class CustomPropertySerializer(serializers.ModelSerializer):
         fields = ('key', 'value')
 
 
+class ProductCompositionSerializer(serializers.ModelSerializer):
+    composition = serializers.CharField(source='composition.name')
+
+    class Meta:
+        model = ProductComposition
+        fields = ('composition', 'value')
+
+
+class ProductAttributeSerializer(serializers.ModelSerializer):
+    attribute_group = serializers.CharField(source='attribute_group.name')
+    attributes = AttributeSerializer(many=True)
+
+    class Meta:
+        model = ProductAttribute
+        fields = ('attribute_group', 'attributes')
+
+
 class ProductSerializer(serializers.ModelSerializer):
     variants = VariantWithImagesSerializer(many=True)
     breadcrumbs = serializers.SerializerMethodField()
-    properties = CustomPropertySerializer(many=True)
     size_grids = SizeGridSerializer(source='category.size_group.grids', many=True)
     preferred_size_grid = serializers.CharField(source='get_preferred_size_grid')
+    category = CategoryIdSerializer()
+
+    # Properties
+    compositions = ProductCompositionSerializer(many=True)
+    properties = CustomPropertySerializer(many=True)
+    attributes = ProductAttributeSerializer(many=True)
 
     class Meta:
         model = Product
         fields = ('name', 'slug', 'price', 'old_price', 'description', 'properties', 'variants', 'breadcrumbs',
-                  'size_grids', 'preferred_size_grid')
+                  'size_grids', 'preferred_size_grid', 'category', 'compositions', 'properties', 'attributes',)
 
     def get_breadcrumbs(self, obj):
         breadcrumbs = []
@@ -134,4 +159,3 @@ class VariantSerializer(serializers.ModelSerializer):
             except Product.video.RelatedObjectDoesNotExist:
                 return None
         return None
-

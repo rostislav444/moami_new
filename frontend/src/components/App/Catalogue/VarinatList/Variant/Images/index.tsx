@@ -5,8 +5,8 @@ import {useKeenSlider} from "keen-slider/react";
 import Link from "next/link";
 import {useState} from "react";
 import {Arrow} from "./Arrows";
-import {Pagination} from "@/components/App/Catalogue/VarinatList/Variant/Image/Pagination";
-import Image from "next/image";
+import {Pagination} from "@/components/App/Catalogue/VarinatList/Variant/Images/Pagination";
+import {ImageLoad} from "@/components/App/Catalogue/VarinatList/Variant/Images/ImageLoad";
 
 interface CatalogueImageProps {
     link: string;
@@ -14,9 +14,9 @@ interface CatalogueImageProps {
     alt: string;
 }
 
-export const CatalogueImage = ({link, images, alt}: CatalogueImageProps) => {
+export const CataloguesImages = ({link, images, alt}: CatalogueImageProps) => {
     const [imagesOptimized, setImagesOptimized] = useState(images.map((image, index) => ({
-            l: image.thumbnails[1].image,
+            l: image.thumbnails[1]?.image,
             s: image.thumbnails[3]?.image,
             activated: index === 0,
             alt: alt
@@ -44,6 +44,7 @@ export const CatalogueImage = ({link, images, alt}: CatalogueImageProps) => {
         },
     })
 
+
     const slidesLength = instanceRef.current?.track.details.slides.length || 0
 
     return <>
@@ -53,17 +54,7 @@ export const CatalogueImage = ({link, images, alt}: CatalogueImageProps) => {
                     <ImageWrapper key={key} className="keen-slider__slide">
                         <Slide>
                             <Link href={link}>
-                                <Image
-                                    fill
-                                    loading={key > 0 ? "lazy" : undefined}
-                                    priority={key === 0}
-                                    placeholder='empty'
-                                    style={{objectFit: 'cover'}}
-                                    src={imageOptimized.l}
-                                    quality={100}
-                                    alt={'alt-' + key}
-                                    unoptimized
-                                />
+                                <ImageLoad index={key} src={imageOptimized.l} />
                             </Link>
                         </Slide>
                     </ImageWrapper>
