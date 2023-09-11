@@ -1,14 +1,15 @@
-import Layout                            from '@/components/Shared/Layout'
-import {GetStaticProps}                  from "next";
-import {selectCollections}               from "@/state/reducers/collections";
-import Error                             from 'next/error';
-import {Catalogue}                       from "@/components/App/Catalogue";
-import fetchWithLocale                   from "@/utils/fetchWrapper";
-import {useStore}                        from "react-redux";
-import {CollectionsState}                from "@/interfaces/collections";
+import Layout from '@/components/Shared/Layout'
+import {GetStaticProps} from "next";
+import {selectCollections} from "@/state/reducers/collections";
+import Error from 'next/error';
+import {Catalogue} from "@/components/App/Catalogue";
+import fetchWithLocale from "@/utils/fetchWrapper";
+import {useStore} from "react-redux";
+import {CollectionsState} from "@/interfaces/collections";
 import {CatalogueCategoryProps, perPage} from "@/pages/[...params]";
-import {getCategoriesAndPage}            from "@/utils/categories";
-import {API_BASE_URL}                    from "@/local";
+import {getCategoriesAndPage} from "@/utils/categories";
+import {API_BASE_URL} from "@/local";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 export const baseUrl = API_BASE_URL
 
@@ -16,7 +17,7 @@ export default function Collection({paginatedVariants, statusCode, params, page}
     const store = useStore()
     const collections: CollectionsState[] = selectCollections(store.getState())
     const slug = params[0]
-    const collection = collections.find(collection  => collection.slug === slug)
+    const collection = collections.find(collection => collection.slug === slug)
 
     if (statusCode) {
         return <Error statusCode={statusCode}/>
@@ -35,14 +36,16 @@ export default function Collection({paginatedVariants, statusCode, params, page}
             key={page}
             breadcrumbs={breadcrumbs}
         >
-            <Catalogue initialVariants={results} count={count} url={params.join('/')} page={page} />
+            <Catalogue initialVariants={results} count={count} url={params.join('/')} page={page}/>
         </Layout>
     )
 }
 
 
 export const getStaticProps: GetStaticProps = async ({params, locale}) => {
-    if (!params) {return {props: {statusCode: 404}}}
+    if (!params) {
+        return {props: {statusCode: 404}}
+    }
 
     const paramsArray = Array.isArray(params.params) ? params.params : params.params ? [params.params] : [];
     const {page, categories} = getCategoriesAndPage(paramsArray);
@@ -61,6 +64,8 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
                 paginatedVariants: response.data,
                 params: categories,
                 page,
+                // translation
+                ...(await serverSideTranslations(locale || 'uk', ['common',]))
             },
             revalidate: 60 * 5
         }

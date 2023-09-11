@@ -15,6 +15,7 @@ import fetchWithLocale from "@/utils/fetchWrapper";
 import {variantState} from "@/interfaces/catalogue";
 import {setViewedProductsData} from "@/state/reducers/user";
 import {SessionProvider} from "next-auth/react";
+import { appWithTranslation } from 'next-i18next'
 
 const useStore = (initialState: any) => {
     const store = useState(() => initializeStore(initialState))[0]
@@ -135,4 +136,4 @@ MyApp.getInitialProps = async (context: AppContext) => {
     };
 };
 
-export default MyApp;
+export default appWithTranslation(MyApp);

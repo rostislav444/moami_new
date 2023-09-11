@@ -1,15 +1,16 @@
-import Layout                                       from '@/components/Shared/Layout'
-import {GetStaticProps}                             from 'next'
-import {Catalogue}                                  from "@/components/App/Catalogue";
-import Error                                        from 'next/error';
-import {PaginatedVariants}                          from "@/interfaces/variant";
-import fetchWithLocale                              from "@/utils/fetchWrapper";
-import {BaseProps}                                  from "@/interfaces/_base";
-import {useStore}                                   from "react-redux";
-import {selectCategories}                           from "@/state/reducers/categories";
+import Layout from '@/components/Shared/Layout'
+import {GetStaticProps} from 'next'
+import {Catalogue} from "@/components/App/Catalogue";
+import Error from 'next/error';
+import {PaginatedVariants} from "@/interfaces/variant";
+import fetchWithLocale from "@/utils/fetchWrapper";
+import {BaseProps} from "@/interfaces/_base";
+import {useStore} from "react-redux";
+import {selectCategories} from "@/state/reducers/categories";
 import {categoriesBySlugList, getCategoriesAndPage} from "@/utils/categories";
-import {CategoryState}                              from "@/interfaces/categories";
-import {API_BASE_URL}                               from "@/local";
+import {CategoryState} from "@/interfaces/categories";
+import {API_BASE_URL} from "@/local";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 const baseUrl = API_BASE_URL
 
@@ -17,16 +18,18 @@ export interface CatalogueCategoryProps extends BaseProps {
     paginatedVariants: PaginatedVariants,
     statusCode?: number,
     params: string[],
+    locale: string,
     context: any,
     page: number,
 }
 
 export const perPage = 24;
 
-export default function CatalogueCategory({paginatedVariants, statusCode, params, page}: CatalogueCategoryProps) {
+export default function CatalogueCategory({paginatedVariants, statusCode, locale, params, page}: CatalogueCategoryProps) {
     const store = useStore();
     const categories = selectCategories(store.getState())
     const path = params.join('/') + (page > 1 ? `/page/${page}` : '')
+    const key = locale + '/' + path
 
     if (statusCode) {
         return <Error statusCode={statusCode}/>
@@ -36,10 +39,7 @@ export default function CatalogueCategory({paginatedVariants, statusCode, params
     const breadcrumbsCategories = categoriesBySlugList(categories, params, [])
 
     return (
-        <Layout
-            breadcrumbs={[{title: 'Главная', link: '/'}, ...breadcrumbsCategories]}
-            key={path}
-        >
+        <Layout key={key} breadcrumbs={[{title: 'Главная', link: '/'}, ...breadcrumbsCategories]}>
             <Catalogue initialVariants={results} count={count} url={params.join('/')} page={page}/>
         </Layout>
     )
@@ -70,7 +70,10 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
             props: {
                 paginatedVariants: response.data,
                 params: categories,
+                locale,
                 page,
+                // Translate
+                ...(await serverSideTranslations(locale || 'uk', ['common',])),
             },
             revalidate: 60 * 5
         }

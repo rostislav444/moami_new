@@ -4,16 +4,16 @@ import styled from "@emotion/styled";
 export const HeaderWrapper = styled.div`
   position: fixed;
   display: grid;
-  grid-template-columns: 24px auto 1fr auto 24px;
-  grid-gap: 24px;
+  grid-template-columns: 24px auto 1fr 24px;
+  grid-gap: 16px;
   width: calc(100% - 48px);
   height: 54px;
   align-items: center;
   justify-items: center;
   padding: 0 24px;
   border-bottom: 2px solid #333;
-    background-color: ${props => props.theme.colors.background};
-    z-index: 1000;
+  background-color: ${props => props.theme.colors.background};
+  z-index: 1000;
 `;
 
 
@@ -45,6 +45,11 @@ export const BurgerIcon = styled.div<{ isOpen: boolean }>`
     height: 2px;
     background-color: #333;
   }
-
-
 `;
+export const ProfileIconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: auto;
+  overflow-x: hidden;
+`

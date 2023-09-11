@@ -1,10 +1,14 @@
 import styled from "@emotion/styled";
 
-interface MarginProps {
+export interface MarginProps {
     ml?: number;
     mr?: number;
     mt?: number;
     mb?: number;
+    pl?: number;
+    pr?: number;
+    pt?: number;
+    pb?: number;
     center?: boolean;
     bold?: boolean;
     grey?: boolean;
@@ -20,6 +24,10 @@ const margins = (props: any) => `
     margin-right: ${props.mr ? props.mr * 4 : 0}px;
     margin-top: ${props.mt ? props.mt * 4 : 0}px;
     margin-bottom: ${props.mb ? props.mb * 4 : 0}px;
+    padding-left: ${props.pl ? props.pl * 4 : 0}px;
+    padding-right: ${props.pr ? props.pr * 4 : 0}px;
+    padding-top: ${props.pt ? props.pt * 4 : 0}px;
+    padding-bottom: ${props.pb ? props.pb * 4 : 0}px;
     text-align: ${props.center ? 'center' : 'left'};
     font-weight: ${props.bold ? '500' : '400'};
     color: ${
@@ -30,7 +38,7 @@ const margins = (props: any) => `
     text-transform: ${props.upper ? 'uppercase' : props.capitalize ? 'capitalize' : 'none'};
 `;
 
-export const div = styled.div<MarginProps>`${margins}`;
+export const Div = styled.div<MarginProps>`${margins}`;
 export const img = styled.img<MarginProps>`${margins}`;
 export const p = styled.p<MarginProps>`${margins}`;
 export const span = styled.span<MarginProps>`${margins}`;

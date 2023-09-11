@@ -10,6 +10,7 @@ import {pageView} from "@/lib/FacebookPixel";
 import {useStore} from "react-redux";
 import {addViewedProductData} from "@/state/reducers/user";
 import {useSession} from "next-auth/react";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 
 export default function Product({variant, locale}: VariantPageProps) {
@@ -61,13 +62,16 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
     return response.ok ? {
         props: {
             variant: response.data,
-            locale
+            locale,
+            // translation
+            ...(await serverSideTranslations(locale || 'uk', ['common',]))
         },
         revalidate: 60 * 60 * 24 // 24 hours
     } : {
         notFound: true
     }
 }
+
 
 
 export const getStaticPaths = async () => {

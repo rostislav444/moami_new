@@ -3,6 +3,7 @@ import {DropdownWrapper} from "./style";
 import {ValueList} from "@/components/Shared/UI/DropdownSelect/ValueList";
 import {Value} from "@/components/Shared/UI/DropdownSelect/Value";
 import {Error as UIError} from "@/components/Shared/Typograpy";
+import {Div, MarginProps} from "@/components/Shared/Abstract";
 
 interface OptionState {
     label: string;
@@ -10,7 +11,7 @@ interface OptionState {
     value: string;
 }
 
-interface DropdownSelectProps {
+interface DropdownSelectProps extends MarginProps {
     register?: any;
     errors?: any;
     setValue?: any;
@@ -48,7 +49,15 @@ export const DropdownSelect = ({
     transparent = false,
     search = false,
     pd = 0,
-    defaultValue = null
+    defaultValue = null,
+    pt,
+    pb,
+    pl,
+    pr,
+    mt,
+    mb,
+    ml,
+    mr,
 }: DropdownSelectProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string | null>(null);
@@ -95,7 +104,7 @@ export const DropdownSelect = ({
 
 
     return (
-        <div style={{position: 'relative', display: 'grid'}}>
+        <Div {...{pt, pb, pl, pr, mt, mb, ml, mr,}} style={{position: 'relative', display: 'grid'}}>
             <DropdownWrapper ref={dropdownRef}>
                 {register && (
                     <select
@@ -135,7 +144,7 @@ export const DropdownSelect = ({
                 />
             </DropdownWrapper>
             {errorMessage && <UIError mt={2}>{errorMessage}</UIError>}
-        </div>
+        </Div>
     );
 
 }

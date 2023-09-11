@@ -3,6 +3,7 @@ from django.db import models
 from apps.abstract.fields import DeletableImageField
 from apps.abstract.models import NameSlug
 from apps.translation.models import Translatable
+from ckeditor.fields import RichTextField
 
 
 class HomeSlider(Translatable):
@@ -40,7 +41,7 @@ class HomeSlider(Translatable):
 
 
 class Pages(NameSlug, Translatable):
-    description = models.TextField()
+    description = RichTextField()
 
     class Meta:
         verbose_name = 'Текстовая страница'

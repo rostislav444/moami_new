@@ -34,6 +34,28 @@ export const ChildCategory = styled.li<{bg?: string}>`
   display: block;
   padding-top: 100%;
   background-color: ${props => props.theme.color.light};
+  
+  :hover {
+    * {
+      color: black !important;
+    }
+    .overlay {
+        opacity: 0;
+    }
+    img {
+        opacity: 1;
+    }
+  }
+  
+  .overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: ${props => props.theme.color.primary};
+    opacity: 0.2;
+    z-index: 0;
+    
+  }
 
   > div {
     position: absolute;
@@ -60,8 +82,8 @@ export const CategoryImage = styled(Image)`
   width: 100%;
   height: 100%;
   z-index: 0;
-  opacity: 0.55;
   cursor: pointer;
+  opacity: 0.65;
   
   :hover {
     opacity: 1;

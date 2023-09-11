@@ -6,15 +6,12 @@ import {ProductImageGallery} from "@/components/App/Product/Galery";
 import {useStore} from "react-redux";
 import {addViewedProductData} from "@/state/reducers/user";
 import {DescriptionBlock} from "@/components/App/Product/Description";
-import fetchWithLocale from "@/utils/fetchWrapper";
 
 
 export const ProductPage = ({variant}: VariantPageProps) => {
     const ref = useRef(null)
     const store = useStore()
     const descriptionColumnRef = useRef<HTMLDivElement>(null)
-
-
 
     useEffect(() => {
         if (descriptionColumnRef.current) {
@@ -26,7 +23,7 @@ export const ProductPage = ({variant}: VariantPageProps) => {
 
     return (
         <ProductContainer ref={ref}>
-            <ProductImageGallery product_video={variant.product_video} video={variant.video} images={variant.images}/>
+            <ProductImageGallery key={variant.id} product_video={variant.product_video} video={variant.video} images={variant.images}/>
             <DescriptionBlock variant={variant}/>
         </ProductContainer>
     )

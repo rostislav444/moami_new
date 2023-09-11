@@ -4,14 +4,12 @@ from pathlib import Path
 
 import environ
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 STATICFILE_DIR = os.path.join(BASE_DIR, 'static')
 
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
-print('PRODUCTION', env('PRODUCTION'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -68,6 +66,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'nested_inline',
     'mptt',
+    'ckeditor',
     # Allauth
     'allauth',
     'allauth.account',

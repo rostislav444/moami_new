@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
-import {div} from "@/components/Shared/Abstract";
+import {Div} from "@/components/Shared/Abstract";
 
 
-export const FlexSpaceBetween = styled(div)`
+export const FlexSpaceBetween = styled(Div)`
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -12,6 +12,12 @@ export const Block = styled.div`
     position: relative;
     display: block;
     width: 100%;
+    height: auto;
+`
+
+export const Flex = styled.div`
+    display: flex;
+    width: auto;
     height: auto;
 `
 

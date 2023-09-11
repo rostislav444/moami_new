@@ -121,6 +121,10 @@ class DeletableImageField(DeletableMediaField):
 class DeletableVideoField(DeletableMediaField):
     valid_extensions = ['.mp4', '.mkv', '.flv', '.avi', '.mov', '.wmv']
 
+    def __init_subclass__(cls, **kwargs):
+        print(cls)
+        super().__init_subclass__(**kwargs)
+
     def formfield(self, **kwargs):
         return super().formfield(form_class=CustomVideoInput, **kwargs)
 

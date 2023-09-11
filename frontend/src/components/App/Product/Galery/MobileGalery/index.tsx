@@ -1,6 +1,6 @@
 import {VariantImage} from "@/interfaces/variant";
 
-import {Image, ImageColumn, ImageWrapper, ThumbnailImageWrapper, ThumbnailWrapper, Wrapper} from "./style";
+import {Image, ImageColumn, ImageWrapper, ThumbnailImageWrapper, ThumbnailVideoWrapper, ThumbnailWrapper, Wrapper} from "./style";
 import {useEffect, useState} from "react";
 import {useKeenSlider} from "keen-slider/react";
 import {Video} from "@/components/Shared/Video";
@@ -47,6 +47,7 @@ export const MobileProductGallery = ({hasWindow, product_video, video, images}: 
     }, [currentSlide]);
 
     const goToSlide = (index: number) => {
+        console.log(index, images.length + 1)
         if (instanceRef.current) {
             instanceRef.current.moveToIdx(index);
         }
@@ -80,31 +81,35 @@ export const MobileProductGallery = ({hasWindow, product_video, video, images}: 
             </ImageColumn>
             <ThumbnailWrapper ref={thumbnailRef} className="keen-slider">
                 {product_video && (
-                    <div className="keen-slider__slide">
-                        <ThumbnailImageWrapper active={currentSlide === 0} className="keen-slider__slide">
-                            <img src="" alt="Video Thumbnail"/>
-                        </ThumbnailImageWrapper>
+                    <div onClick={() => goToSlide(0)}>
+                        <ThumbnailVideoWrapper active={currentSlide === 0} className="keen-slider__slide">
+                            <img src="/icons/video.png" alt="Video Thumbnail"/>
+                        </ThumbnailVideoWrapper>
                     </div>
                 )}
                 {video && (
-                    <div className="keen-slider__slide">
-                        <ThumbnailImageWrapper active={product_video ? currentSlide === 1 : currentSlide === 0} className="keen-slider__slide">
-                            <img src="" alt="Video Thumbnail"/>
-                        </ThumbnailImageWrapper>
+                    <div onClick={() => goToSlide(!product_video ? 0 : 1)}>
+                        <ThumbnailVideoWrapper active={product_video ? currentSlide === 1 : currentSlide === 0} className="keen-slider__slide">
+                            <img src="/icons/video.png" alt="Video Thumbnail"/>
+                        </ThumbnailVideoWrapper>
                     </div>
                 )}
-                {images.map((image, key) => (
-                    <div key={key} className="keen-slider__slide">
-                        <ThumbnailImageWrapper active={currentSlide === key} onClick={() => goToSlide(
-                            product_video && video ? key + 2 :
-                                product_video ? key + 1 :
-                                video ? key + 1 :
-                                key
-                        )}>
-                            <img src={image.thumbnails[0].image} alt={`Thumbnail ${key}`}/>
-                        </ThumbnailImageWrapper>
-                    </div>
-                ))}
+                {images.map((image, key) => {
+                    const slideIndex = (product_video && video ? key + 2 : product_video ? key + 1 : video ? key + 1 : key);
+                    const isActive = currentSlide === slideIndex;
+
+                    return (
+                        <div key={key}>
+                            <ThumbnailImageWrapper
+                                active={isActive}
+                                onClick={() => goToSlide(slideIndex)}
+                                className="keen-slider__slide"
+                            >
+                                <img src={image.thumbnails[0].image} alt={`Thumbnail ${key}`}/>
+                            </ThumbnailImageWrapper>
+                        </div>
+                    );
+                })}
             </ThumbnailWrapper>
         </Wrapper>
 

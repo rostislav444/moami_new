@@ -1,7 +1,6 @@
 import {VariantImage} from "@/interfaces/variant";
 
 import {Image, ImageColumn, ImageWrapper} from "@/components/App/Product/Galery/style";
-import {useEffect, useState} from "react";
 import {Video} from "@/components/Shared/Video";
 
 interface ProductImageGalleryProps {

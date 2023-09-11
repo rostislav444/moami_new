@@ -1,6 +1,6 @@
-import {Caption} from "@/components/Shared/Typograpy";
+import {Caption, Span} from "@/components/Shared/Typograpy";
 import {DropdownSelect} from "@/components/Shared/UI/DropdownSelect";
-import {FlexSpaceBetween} from "@/components/Shared/Blocks";
+import {Flex, FlexSpaceBetween} from "@/components/Shared/Blocks";
 import {useStore} from "react-redux";
 import {VariantState} from "@/interfaces/variant";
 import {CategoryState} from "@/interfaces/categories";
@@ -29,11 +29,15 @@ export const TopBlock = ({variant, currentSizeGrid, category, categoryIds}: TopB
     }
 
     return (
-        <FlexSpaceBetween mb={2}>
+        <FlexSpaceBetween mb={4}>
             <Caption>Код: {variant.code}</Caption>
-            {currentSizeGrid && <DropdownSelect transparent value={currentSizeGrid}
-                                                options={sizeGrids.map(grid => ({label: grid, value: grid}))}
-                                                onChange={handleGridChange}/>}
+            <Flex>
+                <Span mr={2}>Размерная сетка:</Span>
+                {currentSizeGrid && <DropdownSelect pt={0.5} transparent value={currentSizeGrid}
+                                                    options={sizeGrids.map(grid => ({label: grid, value: grid}))}
+                                                    onChange={handleGridChange}/>}
+            </Flex>
+
         </FlexSpaceBetween>
     )
 }

@@ -1,4 +1,4 @@
-import {BurgerIcon, HeaderWrapper} from "./style";
+import {BurgerIcon, HeaderWrapper, ProfileIconWrapper} from "./style";
 import React, {useState} from "react";
 import {MobileMenuPopup} from "@/components/Shared/Header/MobileHeader/NavMenu";
 import {Logo} from "@/components/Shared/Header/components/Logo";
@@ -34,10 +34,11 @@ export const MobileHeader = ({data}: MobileHeaderProps) => {
                 <div/>
             </BurgerIcon>
             <Logo mobile/>
-            <div></div>
-            <div onClick={() => setAuthModalOpen(true)}>
-                <Icon title={session?.user?.name || undefined} src='/icons/user.svg' ml={0}/>
-            </div>
+            <ProfileIconWrapper>
+                <div onClick={() => setAuthModalOpen(true)}>
+                    <Icon title={session?.user?.name || 'Ростислав'} src='/icons/user.svg' ml={0}/>
+                </div>
+            </ProfileIconWrapper>
             <Link href={`/cart`}>
                 <CartIcon/>
             </Link>

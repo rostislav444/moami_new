@@ -2,42 +2,47 @@ import {FooterWrapper, MainLine, PagesBlock, PagesBlockList, SloganBlock,} from 
 import {Content} from "@/styles/Blocks/Content";
 import {H3, P} from "@/components/Shared/Typograpy";
 import React from "react";
+import {useSelector} from "react-redux";
+import {RootState} from "@/state/store";
+import Link from "next/link";
+import {useRouter} from "next/router";
+import { useTranslation } from "next-i18next";
+
 
 
 export const Footer = () => {
+    const pages = useSelector((state: RootState) => state.pages.pages)
+    const router = useRouter()
+    const locale = router.locale || 'ru'
+    const { t } = useTranslation('common', { useSuspense: false })
 
     return <FooterWrapper>
         <Content>
             <MainLine>
                 <SloganBlock>
-                    <H3 color='white'>Moami - искусство быть Собой</H3>
-                    <P mt={2}>В Moami, мы ценим индивидуальность каждой женщины. Наша тщательно подобранная коллекция
-                        представляет из себя симбиоз высокого качества и элегантного дизайна, способного подчеркнуть
-                        вашу уникальную сущность. С Moami вы найдете гармонию стиля, которая отражает вас. Добро
-                        пожаловать в мир изысканной моды.</P>
+                    <H3 color='white'>{t('footer.slogan.title')}</H3>
+                    <P mt={2}>{t('footer.slogan.text')}</P>
                 </SloganBlock>
                 <PagesBlock>
                     <div>
-                        <H3 mb={2}>Покупателю</H3>
+                        <H3 mb={2}>{t('footer.titles.buyerInfo')}</H3>
                         <PagesBlockList>
-                            {/*{pages.map((page, index) => <li key={index}>*/}
-                            {/*    <a color='white'>{page.name}</a>*/}
-                            {/*</li>)}*/}
-
+                            {pages.map((page, index) => <li key={index}>
+                                <Link locale={locale} href={'/info/' + page.slug}>{page.name}</Link>
+                            </li>)}
                             <li>
-                                <a color='white'>Коллекции</a>
+                                <a color='white'>{t('footer.titles.collections')}</a>
                             </li>
                         </PagesBlockList>
                     </div>
                     <div>
-                        <H3 mb={2}>Мы в социальных сетях</H3>
+                        <H3 mb={2}>{t('footer.titles.weInSocial')}</H3>
                         <PagesBlockList>
                             <li>
-                                <a color='white'>instagram</a>
+                                <a href={'https://www.instagram.com/moami.com.ua/'} color='white'>Instagram</a>
                             </li>
                         </PagesBlockList>
                     </div>
-
                 </PagesBlock>
             </MainLine>
         </Content>

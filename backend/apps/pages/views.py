@@ -13,9 +13,10 @@ class HomeSliderViewSet(generics.GenericAPIView, mixins.ListModelMixin, viewsets
         return HomeSlider.objects.filter(is_active=True)
 
 
-class PagesViewSet(generics.GenericAPIView, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.ViewSet):
+class PagesViewSet(generics.GenericAPIView, mixins.RetrieveModelMixin, viewsets.ViewSet):
     queryset = Pages
     serializer_class = PagesSerializer
+    lookup_field = 'slug'
 
     def get_queryset(self):
         return Pages.objects.all()

@@ -32,7 +32,7 @@ export const HomeCategories = () => {
                                         alt={''} src={child.image ? child.image : '/images/no_image.png'}
                                         unoptimized
                                     />
-
+                                    <div className={'overlay'}></div>
                                 </div>
                             </ChildCategory>
                         </Link>

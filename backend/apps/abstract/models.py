@@ -16,9 +16,3 @@ class NameSlug(models.Model):
 
     def __str__(self):
         return self.name
-
-# class ParentImageThumbnails(models.Model):
-#     image = DeletableImageField()
-#
-#     class Meta:
-#         abstract = True

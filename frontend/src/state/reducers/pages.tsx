@@ -24,6 +24,6 @@ export const pagesSlice = createSlice({
 
 export const {setPages} = pagesSlice.actions
 
-export const selectPages = (state: RootState) => state.pages
+export const selectPages = (state: RootState) => state.pages.pages
 
 export default pagesSlice.reducer

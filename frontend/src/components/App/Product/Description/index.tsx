@@ -34,9 +34,6 @@ export const DescriptionBlock = ({variant}: VariantPageProps) => {
     const categories = useAppSelector(selectCategories)
     const category = getCategory(categories, variant.product.category.parent, variant.product.category.id)
     const currentSizeGrid = category?.selected_size_grid || category?.preferred_size_grid
-
-    const descriptionColumnRef = useRef<HTMLDivElement>(null)
-
     const [selectedSize, setSelectedSize] = useState<number | null>(null)
     const [sizeNotSelectedError, setSizeNotSelectedError] = useState<boolean>(false)
     const {push} = useRouter();

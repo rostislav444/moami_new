@@ -75,9 +75,9 @@ export const ThumbnailImageWrapper = styled.div<{active: boolean}>`
   padding-top: 150%;
   cursor: pointer;
   opacity: ${props => props.active ? '1' : '0.5'};
+  border: 1px solid ${props => props.active ? props.theme.color.primary : 'transparent'};
   transition: opacity 0.5s ease;
-
-
+  
   img {
     position: absolute;
     top: 0;
@@ -89,3 +89,23 @@ export const ThumbnailImageWrapper = styled.div<{active: boolean}>`
   }
 `
 
+export const ThumbnailVideoWrapper = styled.div<{active: boolean}>`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  padding-top: 150%;
+  cursor: pointer;
+  opacity: ${props => props.active ? '1' : '0.5'};
+  transition: opacity 0.5s ease;
+  background-color: ${props => props.theme.color.light};
+
+  img {
+    position: absolute;
+    top: calc(50% - 24px);
+    width: 48px;
+    height: 48px;
+  }
+`
