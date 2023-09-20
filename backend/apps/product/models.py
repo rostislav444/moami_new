@@ -12,12 +12,17 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.text import slugify
 from unidecode import unidecode
-
+from mptt.models import MPTTModel, TreeForeignKey
 from apps.abstract.fields import DeletableImageField, DeletableVideoField
 from apps.attributes.models import Attribute, AttributeGroup, Composition
 from apps.categories.models import Collections
 from apps.sizes.models import Size
 from apps.translation.models import Translatable
+
+from django.core.exceptions import ValidationError
+from django.utils.safestring import mark_safe
+
+
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Разрешенные символы 0-9, a-z, A-Z, -')
 
@@ -148,6 +153,35 @@ class ProductAttribute(models.Model):
     #     return f'{str(self.product)} ({self.attribute_group.name})'
 
 
+class ProductComment(MPTTModel):
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, related_name='answers', blank=True, null=True)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='comments')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
+    comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
+    rate = models.PositiveIntegerField(default=0, verbose_name='Оценка')
+    buy_approved = models.BooleanField(default=False, verbose_name='Купил товар')
+    active = models.BooleanField(default=True, verbose_name='Активный')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.product.name} - {str(self.created_at)}'
+
+
+class ProductCommentImage(models.Model):
+    comment = models.ForeignKey(ProductComment, on_delete=models.CASCADE, related_name='images')
+    image = DeletableImageField(upload_to='comment_images', get_parent='comment', verbose_name="Файл")
+
+    class Meta:
+        verbose_name = 'Изображение'
+        verbose_name_plural = 'Изображения'
+
+
 class CustomProperty(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='properties')
     key = models.CharField(max_length=255)
@@ -187,6 +221,11 @@ class Variant(models.Model):
         path = f'/product/{self.product.slug}-code-{self.code}'
         return domain + path
 
+    def get_admin_url(self):
+        domain = 'https://moami.com.ua'
+        path = f'/admin/product/variant/{self.id}/change/'
+        return domain + path
+
     @property
     def get_first_image_url(self):
         image = self.images.first()
@@ -204,13 +243,20 @@ class Variant(models.Model):
             return count
         return '-'
 
+    def clean(self):
+        if self.code:
+            self.code = self.code.replace(' ', '-').upper()
+            variant = Variant.objects.filter(code=self.code)
+            if variant.exists():
+                admin_url = variant.first().get_admin_url()
+                if self.id != variant.first().id:
+                    raise ValidationError(mark_safe(f'''
+                        <span>Код варианта {self.code} уже существует.</span></br> 
+                        <a href="{admin_url}" target="_blank">Ссылка на admin варианта {self.code}</a>
+                    '''))
+        self.slug = self.get_slug
+
     get_total_views.short_description = 'Просмотры'
-
-
-def save(self, *args, **kwargs):
-    self.code = self.code.replace(' ', '-').upper()
-    self.slug = self.get_slug
-    super().save(*args, **kwargs)
 
 
 class VariantSize(models.Model):

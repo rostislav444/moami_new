@@ -5,8 +5,8 @@ from django.http import HttpResponse
 from rest_framework import mixins, viewsets
 from unidecode import unidecode
 
-from apps.product.models import Product, Variant, VariantViews
-from apps.product.serializers import ProductSerializer, VariantSerializer
+from apps.product.models import Product, ProductComment, Variant, VariantViews
+from apps.product.serializers import ProductSerializer, VariantSerializer, ProductCommentSerializer
 
 
 class ProductList(viewsets.ModelViewSet):
@@ -59,3 +59,25 @@ def variant_views(request):
     today_views.save()
 
     return HttpResponse(today_views.views, content_type='application/json')
+
+
+class ProductCommentsView(mixins.RetrieveModelMixin, mixins.CreateModelMixin, mixins.ListModelMixin,
+                               viewsets.GenericViewSet):
+    serializer_class = ProductCommentSerializer
+    queryset = ProductComment.objects.all()
+
+    def get_queryset(self):
+        if self.request.GET.get('product_id'):
+            product_id = self.request.GET.get('product_id')
+            return ProductComment.objects.filter(product__id=product_id)
+        return ProductComment.objects.none()
+
+    def perform_create(self, serializer):
+        print(self.request.user)
+        serializer.save(user=self.request.user)
+
+    def get_object(self):
+        if self.request.GET.get('product_id'):
+            product_id = self.request.GET.get('product_id')
+            return ProductComment.objects.filter(product__id=product_id)
+        return ProductComment.objects.none()

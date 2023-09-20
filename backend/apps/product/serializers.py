@@ -4,8 +4,9 @@ from rest_framework import serializers
 from apps.attributes.serializer import AttributeSerializer
 from apps.categories.serializers import CategoryIdSerializer
 from apps.product.models import Product, Variant, Color, VariantSize, VariantImage, CustomProperty, ProductComposition, \
-    ProductAttribute
+    ProductAttribute, ProductComment, ProductCommentImage
 from apps.sizes.serializers import SizeGridSerializer
+from apps.user.serializers import UserSerializer
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -82,7 +83,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('name', 'slug', 'price', 'old_price', 'description', 'properties', 'variants', 'breadcrumbs',
+        fields = ('id', 'name', 'slug', 'price', 'old_price', 'description', 'properties', 'variants', 'breadcrumbs',
                   'size_grids', 'preferred_size_grid', 'category', 'compositions', 'properties', 'attributes',)
 
     def get_breadcrumbs(self, obj):
@@ -159,3 +160,19 @@ class VariantSerializer(serializers.ModelSerializer):
             except Product.video.RelatedObjectDoesNotExist:
                 return None
         return None
+
+
+class ProductCommentImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductCommentImage
+        fields = ('image',)
+
+
+class ProductCommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    images = ProductCommentImageSerializer(many=True, required=False)
+    created_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M", read_only=True)
+
+    class Meta:
+        model = ProductComment
+        fields = ('id', 'user', 'parent', 'product', 'rate', 'comment', 'images', 'created_at')

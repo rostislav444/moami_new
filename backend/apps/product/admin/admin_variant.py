@@ -131,8 +131,8 @@ class VariantAdmin(SortableAdminMixin, admin.ModelAdmin):
     get_image.short_description = 'Image'
 
     list_display = ('get_image', 'get_total_views', 'code', 'color')
-
-    readonly_fields = ('get_image', 'product_link', 'slug','get_total_views',)
+    readonly_fields = ('get_image', 'product_link', 'slug', 'get_total_views',)
+    search_fields = ('code', 'product__name')
     inlines = (VariantVideoInline, VariantImageInline, VariantSizeInline,)
 
 

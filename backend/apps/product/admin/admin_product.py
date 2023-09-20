@@ -3,14 +3,14 @@ from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.urls import reverse
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from apps.categories.models import Category, CategoryAttributeGroup
 from apps.product.admin.admin_variant import VariantInline
 from apps.product.forms import ProductAttributeFormSet
 from apps.product.models import Brand, Color, Country, CustomProperty, Product, ProductAttribute, ProductComposition, \
-    ProductVideo
-from django.utils.safestring import mark_safe
+    ProductVideo, ProductComment
 
 
 @admin.register(Brand)
@@ -129,14 +129,23 @@ class CategoryFilter(SimpleListFilter):
             }
 
 
+class ProductCommentInline(admin.StackedInline):
+    model = ProductComment
+    extra = 0
+    readonly_fields = ('created_at', 'updated_at',)
+    fields = ('user', 'comment', 'created_at', 'active',)
+
+
 @admin.register(Product)
 class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
-    list_display = ('index', 'name', 'get_varinats_images', 'get_total_variant_views', 'category', 'brand', 'price', 'old_price',)
+    list_display = (
+        'index', 'name', 'get_varinats_images', 'get_total_variant_views', 'category', 'brand', 'price', 'old_price',)
     list_filter = (CategoryFilter,)
-    search_fields = ('name', 'category__name', 'brand__name', 'price', 'old_price',)
+    search_fields = ('name', 'variants__code',)
     readonly_fields = ('slug', 'get_varinats_images',)
     ordering = ['index']
-    inlines = (ProductVideoInline, ProductCompositionInline, ProductAttributeInline, CustomPropertyInline, VariantInline,)
+    inlines = (ProductVideoInline, ProductCompositionInline, ProductAttributeInline, CustomPropertyInline,
+               VariantInline, ProductCommentInline)
 
     def get_list_filter(self, request):
         filters = super().get_list_filter(request)
