@@ -109,9 +109,9 @@ export const DescriptionBlock = ({variant}: VariantPageProps) => {
         {sizeNotSelectedError && <Error mt={4}>Выберите размер</Error>}
         <Actions>
             <BuyButton onClick={handleAddToCart}>Купить</BuyButton>
-            <AddToWishlistWrapper>
-                <Icon src={'/icons/heart.svg'}/>
-            </AddToWishlistWrapper>
+            {/*<AddToWishlistWrapper>*/}
+            {/*    <Icon src={'/icons/heart.svg'}/>*/}
+            {/*</AddToWishlistWrapper>*/}
         </Actions>
     </DescriptionColumn>
 }

@@ -95,17 +95,16 @@ export const BuyButton = styled.button`
   display: block;
   width: 100%;
   height: 48px;
-  background: black;
+  background: ${props => props.theme.color.primaryDark};
   color: #fff;
   font-size: 16px;
   font-weight: 500;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  margin-right: 8px;
 
   &:hover {
-    background: ${props => props.theme.color.primaryDark};
+    background: ${props => props.theme.color.primary};
   }
 `;
 

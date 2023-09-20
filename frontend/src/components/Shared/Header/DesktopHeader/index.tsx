@@ -11,8 +11,6 @@ import {DesktopNavMenu} from "@/components/Shared/Header/DesktopHeader/NavMenu";
 import {DropdownSelect} from "@/components/Shared/UI/DropdownSelect";
 import {Modal} from "@/components/Shared/UI/Modal";
 import {useSession} from "next-auth/react";
-import {Form, Input, InputWrapper} from "@/components/Shared/Form";
-import {Button} from "@/components/Shared/Buttons";
 import {AuthenticationForm} from "@/components/Shared/Authentication/Form";
 
 interface DesktopHeaderProps {
@@ -61,7 +59,7 @@ export const DesktopHeader = ({data}: DesktopHeaderProps) => {
                             options={localeOptions}
                         />
                         <div>
-                            <Icon mr={2} ml={1} title={session?.user?.name || undefined} onClick={() => setAuthModalOpen(true)} src='/icons/user.svg' />
+                            <Icon mr={2} ml={1} title={session?.user?.name || undefined} onClick={() => setAuthModalOpen(true)} src='/icons/user.svg'/>
                         </div>
                         {/*<Icon src='/icons/heart.svg' ml={3} count={0}/>*/}
                         <Link href={`/cart`}>
@@ -73,7 +71,7 @@ export const DesktopHeader = ({data}: DesktopHeaderProps) => {
             </Content>
         </s.HeaderWrapper>
         <Modal title={'Вход в личный кабинет'} isOpen={authModalOpen} onClose={setAuthModalOpen}>
-            <AuthenticationForm onAuthenticated={() => setAuthModalOpen(false)} />
+            <AuthenticationForm onAuthenticated={() => setAuthModalOpen(false)}/>
         </Modal>
     </>
 }

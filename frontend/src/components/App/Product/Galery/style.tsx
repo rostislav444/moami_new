@@ -22,6 +22,11 @@ export const ImageWrapper = styled.div`
   margin: 0 10px 10px 0;
   height: auto;
   padding-top: calc(150% / 2);
+  
+  @media (min-width: 1800px) {
+    width: calc(33.33% - 10px);
+    padding-top: calc(150% / 3);
+  }
 
   @media (max-width: 1154px) {
     width: 100%;

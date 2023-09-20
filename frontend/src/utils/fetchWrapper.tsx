@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { API_BASE_URL } from "@/local";
 
+
 interface FetchResponse {
     ok: boolean;
     status: number;
@@ -14,7 +15,13 @@ export interface FetchWrapper {
     delete: (url: string) => Promise<FetchResponse>;
 }
 
-const fetchWithLocale = (locale: string | undefined = undefined): FetchWrapper => {
+interface FetchWithLocale {
+    locale?: string;
+    token?: string;
+}
+
+
+const fetchWithLocale = (locale: string | undefined = undefined, token: string | undefined = undefined): FetchWrapper => {
     const baseUrl = API_BASE_URL;
 
     const request = async (url: string, method: 'get' | 'post' | 'put' | 'delete', body?: any): Promise<FetchResponse> => {
@@ -25,7 +32,7 @@ const fetchWithLocale = (locale: string | undefined = undefined): FetchWrapper =
         const headers = {
             'Content-Type': 'application/json',
             'Accept-Language': locale || 'uk',
-            "X-CSRFToken": ''
+            'Authorization': token ? `Bearer ${token}` : undefined,
         };
 
         try {
@@ -41,12 +48,12 @@ const fetchWithLocale = (locale: string | undefined = undefined): FetchWrapper =
                 status: response.status,
                 data: response.data,
             };
-        } catch (error) {
-            console.error('Request error:', error);
+        } catch (error: any) {
+            console.error(error);
             return {
                 ok: false,
-                status: 500,
-                data: null,
+                status: error?.response?.status || 500,
+                data: error?.response?.data || null,
             };
         }
     };

@@ -75,7 +75,6 @@ export const ThumbnailImageWrapper = styled.div<{active: boolean}>`
   padding-top: 150%;
   cursor: pointer;
   opacity: ${props => props.active ? '1' : '0.5'};
-  border: 1px solid ${props => props.active ? props.theme.color.primary : 'transparent'};
   transition: opacity 0.5s ease;
   
   img {

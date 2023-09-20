@@ -4,7 +4,7 @@ import json
 from django.http import HttpResponse
 from rest_framework import mixins, viewsets
 from unidecode import unidecode
-
+from rest_framework.exceptions import NotFound
 from apps.product.models import Product, ProductComment, Variant, VariantViews
 from apps.product.serializers import ProductSerializer, VariantSerializer, ProductCommentSerializer
 
@@ -23,17 +23,21 @@ class VariantViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.
         if self.request.GET.get('ids'):
             ids = self.request.GET.get('ids').split(',')
             return Variant.objects.filter(id__in=ids)
-        return Variant.objects.none()
+        else:
+            return Variant.objects.all()
 
     def get_object(self):
         split_slug = self.kwargs['slug'].split('-code-')
+        if len(split_slug) != 2:
+            raise NotFound(detail="Variant not found.")
+
         product_slug = split_slug[0]
         code = split_slug[1]
 
         try:
             return Variant.objects.get(product__slug__iexact=product_slug, code__iexact=code)
         except Variant.DoesNotExist:
-            return Variant.objects.none()
+            raise NotFound(detail="Variant not found.")
 
 
 def variant_slug_list_json(request):

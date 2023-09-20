@@ -12,7 +12,14 @@ import {Delivery} from "@/components/App/Order/OrderForm/Delivery";
 
 
 export const OrderForm = () => {
-    const {register, handleSubmit, formState: {errors}, watch, setValue, unregister} = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: {errors},
+        watch,
+        setValue,
+        unregister
+    } = useForm();
     const api = fetchWithLocale()
     const {items} = useAppSelector(selectCart)
     const {push} = useRouter();

@@ -36,7 +36,7 @@ export const MobileHeader = ({data}: MobileHeaderProps) => {
             <Logo mobile/>
             <ProfileIconWrapper>
                 <div onClick={() => setAuthModalOpen(true)}>
-                    <Icon title={session?.user?.name || 'Ростислав'} src='/icons/user.svg' ml={0}/>
+                    <Icon title={session?.user?.name || undefined} src='/icons/user.svg' ml={0}/>
                 </div>
             </ProfileIconWrapper>
             <Link href={`/cart`}>

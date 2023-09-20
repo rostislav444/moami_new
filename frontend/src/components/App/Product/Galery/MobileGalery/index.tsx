@@ -47,7 +47,6 @@ export const MobileProductGallery = ({hasWindow, product_video, video, images}: 
     }, [currentSlide]);
 
     const goToSlide = (index: number) => {
-        console.log(index, images.length + 1)
         if (instanceRef.current) {
             instanceRef.current.moveToIdx(index);
         }

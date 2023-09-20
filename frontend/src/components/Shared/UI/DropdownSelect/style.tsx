@@ -10,7 +10,7 @@ export const DropdownValueWrapper = styled.div<{ transparent: boolean, pd: numbe
   display: grid;
   grid-template-columns: 1fr 32px;
   align-items: center;
-  width: ${({ pd }) => pd ? `calc(100% - ${pd * 2 * 2}px)` : 'calc(100% - 8px)'};
+  width: ${({ pd }) => pd ? `calc(100% - ${pd * 2 * 2}px -2px)` : 'calc(100% - 8px - 2px)'};
   min-height: 16px;
   padding: ${({ pd }) => pd ? `${pd * 2}px` : '0'};
   border: ${({ transparent, theme }) => transparent ? 'none' : `1px solid ${theme.color.primary}`};

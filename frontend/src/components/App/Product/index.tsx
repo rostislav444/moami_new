@@ -6,6 +6,7 @@ import {ProductImageGallery} from "@/components/App/Product/Galery";
 import {useStore} from "react-redux";
 import {addViewedProductData} from "@/state/reducers/user";
 import {DescriptionBlock} from "@/components/App/Product/Description";
+import {Comments} from "@/components/App/Product/Comments";
 
 
 export const ProductPage = ({variant}: VariantPageProps) => {
@@ -21,10 +22,14 @@ export const ProductPage = ({variant}: VariantPageProps) => {
     }, [descriptionColumnRef.current])
 
 
-    return (
-        <ProductContainer ref={ref}>
-            <ProductImageGallery key={variant.id} product_video={variant.product_video} video={variant.video} images={variant.images}/>
-            <DescriptionBlock variant={variant}/>
-        </ProductContainer>
+    return (<div>
+            <ProductContainer ref={ref}>
+                <ProductImageGallery key={variant.id} product_video={variant.product_video} video={variant.video} images={variant.images}/>
+                <DescriptionBlock variant={variant}/>
+
+            </ProductContainer>
+            <Comments productId={variant.product.id}/>
+        </div>
+
     )
 }
