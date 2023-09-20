@@ -44,7 +44,8 @@ def variant_slug_list_json(request):
     variants = Variant.objects.all()
     variant_slug_list = []
     for variant in variants:
-        variant_slug_list.append(unidecode(variant.slug))
+        if len(variant.slug) > 1:
+            variant_slug_list.append(unidecode(variant.slug))
 
     response = json.dumps(variant_slug_list)
     return HttpResponse(response, content_type='application/json')

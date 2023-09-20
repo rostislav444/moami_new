@@ -15,7 +15,7 @@ export const VariantsLinks = ({variants, selected}: VariantsLinksProps) => {
     return (
         <VariantsLinksContainer>
             {variants.map(variant =>
-                <Link href={`/product/${variant.slug}`} passHref key={variant.id}>
+                <Link href={`/p-${variant.slug}`} passHref key={variant.id}>
                     <VariantLink selected={variant.id === selected}>
                         <Image fill style={{objectFit: "cover"}} src={variant.image ? variant.image : '/images/no_image.png'} alt={variant.color} key={variant.id} unoptimized />
                     </VariantLink>

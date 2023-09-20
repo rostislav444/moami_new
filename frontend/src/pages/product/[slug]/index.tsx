@@ -42,7 +42,7 @@ export default function Product({variant, locale}: VariantPageProps) {
     const breadcrumbs = [
         {title: 'Главная', link: '/'},
         ...categoriesBreadcrumbs,
-        {title: variant.name, link: `/product/${slug}/`}
+        {title: variant.name, link: `/p-${slug}/`}
     ]
 
     return (

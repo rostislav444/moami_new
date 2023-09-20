@@ -19,11 +19,11 @@ export const Variant = ({variant, slider = true}: VariantProps) => {
     return (
         <div>
             {slider ?
-                <CataloguesImages link={`/product/${variant.slug}`} images={variant.images} alt={'alt'}/> :
-                <SingleImage link={`/product/${variant.slug}`} image={variant.images[0]} alt={'alt'}/>
+                <CataloguesImages link={`/p-${variant.slug}`} images={variant.images} alt={'alt'}/> :
+                <SingleImage link={`/p-${variant.slug}`} image={variant.images[0]} alt={'alt'}/>
             }
             <P bold mt={2}>
-                <Link href={`/product/${variant.slug}`}>{variant.product.name}</Link>
+                <Link href={`/p-${variant.slug}`}>{variant.product.name}</Link>
             </P>
             <P>
                 <SpanBig mr={2}>{variant.product.price} ₴</SpanBig>
