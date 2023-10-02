@@ -8,6 +8,7 @@ cryptography==41.0.3
 defusedxml==0.7.1
 dj-rest-auth==4.0.1
 Django==4.2.4
+django-admin-autocomplete-filter==0.7.1
 django-admin-sortable==2.3
 django-admin-sortable2==2.1.8
 django-allauth==0.52.0
@@ -24,6 +25,7 @@ django-non-dark-admin==2.0.2
 django-redis==4.12.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
+djangorestframework-xml==2.0.0
 drf-writable-nested==0.7.0
 et-xmlfile==1.1.0
 factory-boy==3.2.1
