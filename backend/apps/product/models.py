@@ -72,14 +72,9 @@ class ProductManager(models.Manager):
 class Product(Translatable):
     index = models.PositiveIntegerField(default=0, blank=False, null=False, verbose_name='Индекс')
     name = models.CharField(max_length=255, verbose_name='Название')
+
     category = models.ForeignKey('categories.Category', on_delete=models.CASCADE, related_name='products',
                                  verbose_name='Категория')
-
-    rozetka_category = models.ForeignKey('integrations.RozetkaCategories', on_delete=models.CASCADE,
-                                         related_name='products', verbose_name='Категория Rozetka', blank=True,
-                                         null=True)
-    taxonomy = models.ForeignKey('integrations.GoogleTaxonomy', on_delete=models.CASCADE, related_name='products',
-                                 verbose_name='Категория Google Taxonomy', blank=True, null=True)
     collections = models.ManyToManyField(Collections, blank=True, related_name='products', verbose_name='Коллекции')
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='products', verbose_name='Бренд')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='products', verbose_name='Страна')
@@ -90,6 +85,11 @@ class Product(Translatable):
     old_price = models.PositiveIntegerField(default=0, verbose_name='Старая цена')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    rozetka_name = models.CharField(max_length=255, blank=True, null=True, verbose_name='Название Rozetka')
+    rozetka_category = models.ForeignKey('integrations.RozetkaCategories', on_delete=models.CASCADE,
+                                         related_name='products', verbose_name='Категория Rozetka', blank=True,
+                                         null=True)
 
     class Meta:
         verbose_name = 'Товар'
@@ -102,6 +102,12 @@ class Product(Translatable):
 
     def __str__(self):
         return f'{self.name} id: {str(self.id)}'
+
+    @property
+    def get_rozetka_name(self):
+        if self.rozetka_name:
+            return self.rozetka_name
+        return self.name
 
     @property
     def get_preferred_size_grid(self):
@@ -205,6 +211,7 @@ class Variant(models.Model):
     slug = models.SlugField(max_length=512, unique=True, blank=True)
     color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='variants')
     code = models.CharField(max_length=255, validators=[alphanumeric])
+    rozetka_code = models.CharField(max_length=255, blank=True, null=True)
 
     objects = VariantManager()
 
@@ -215,6 +222,12 @@ class Variant(models.Model):
 
     def __str__(self):
         return f'{self.product.name} - {self.code}'
+
+    @property
+    def get_rozetka_code(self):
+        if self.rozetka_code:
+            return self.rozetka_code
+        return self.code
 
     def get_absolute_url(self):
         domain = 'https://moami.com.ua'

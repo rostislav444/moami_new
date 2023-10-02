@@ -2,11 +2,13 @@ import os
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from mptt.models import MPTTModel, TreeForeignKey
-from openpyxl import load_workbook
 
+from apps.abstract.fields import DeletableFileField
 from apps.abstract.models import NameSlug
-from apps.sizes.models import SizeGrid
+from apps.integrations.utils import rozetka_adaptation_util
 
 
 class RozetkaCategories(NameSlug, MPTTModel):
@@ -18,7 +20,7 @@ class RozetkaCategories(NameSlug, MPTTModel):
 
     class Meta:
         verbose_name = 'Категория Rozetka'
-        verbose_name_plural = 'Категории Rozetka'
+        verbose_name_plural = '1. Категории Rozetka'
 
     def __str__(self):
         categories = self.get_ancestors(include_self=True)
@@ -27,96 +29,92 @@ class RozetkaCategories(NameSlug, MPTTModel):
         return self.name
 
 
+class RozetkaAdaptation(models.Model):
+    table = DeletableFileField(upload_to='rozetka_adaptation')
+
+    class Meta:
+        verbose_name = 'Адаптация Rozetka'
+        verbose_name_plural = '2. Адаптация Rozetka'
+
+    def __str__(self):
+        return 'RozetkaAdaptation'
+
+
 class GoogleTaxonomy(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=1000)
-    name_ru = models.CharField(max_length=1000)
+    name_ru = models.CharField(max_length=1000, blank=True, null=True)
 
     class Meta:
         ordering = ['name']
         verbose_name = 'Категории: категория Google Taxonomy'
-        verbose_name_plural = 'Категории: категории Google Taxonomy'
+        verbose_name_plural = '3. Категории: категории Google Taxonomy'
 
     def __str__(self):
         if self.name_ru:
-            return ' - '.join([str(self.id), self.name_ru])
-        else:
-            return ' - '.join([str(self.id), self.name])
+            return self.name_ru.split(' > ')[-1]
+        return self.name
 
-    def save(self):
-        super(GoogleTaxonomy, self).save()
+    def save(self, *args, **kwargs):
+        super(GoogleTaxonomy, self).save(*args, **kwargs)
 
 
-def validate_xlsx(value):
-    ext = os.path.splitext(value.name)[1]  # [0] returns path+filename
-    valid_extensions = ['.xlsx']
+def validate_txt(value):
+    ext = os.path.splitext(value.name)[1]
+    valid_extensions = ['.txt']
     if not ext.lower() in valid_extensions:
-        raise ValidationError(u'Загрузите таблицу EXCEL в формате .xlsx')
-
-
-def validate_rar(value):
-    ext = os.path.splitext(value.name)[1]  # [0] returns path+filename
-    valid_extensions = ['.rar']
-    if not ext.lower() in valid_extensions:
-        raise ValidationError(u'Загрузите архив в формате .rar')
+        raise ValidationError(u'Требуется файл с расширением .txt')
 
 
 class GoogleTaxonomyUplaoder(models.Model):
-    table = models.FileField(upload_to='google_taxonomy', validators=[validate_xlsx], help_text='.xlsx')
-    table_ru = models.FileField(upload_to='google_taxonomy', validators=[validate_xlsx], help_text='.xlsx')
-    delate_all = models.BooleanField(default=False)
+    table = models.FileField(upload_to='google_taxonomy', help_text='.txt', validators=[validate_txt],
+                             verbose_name='Таблица на английском (.txt)')
+    table_ru = models.FileField(upload_to='google_taxonomy', help_text='.txt', validators=[validate_txt],
+                                verbose_name='Таблица на русском (.txt)')
+    filter_root = models.CharField(max_length=1000, blank=True, null=True, default='Apparel & Accessories')
+    delete_all = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Загрузчик: категория Google Taxonomy'
-        verbose_name_plural = 'Загрузчик: категории Google Taxonomy'
+        verbose_name_plural = '4. Загрузчик: категории Google Taxonomy'
 
     def save(self):
-        if self.delate_all == True:
+        if self.delete_all == True:
             GoogleTaxonomy.objects.all().delete()
 
         super(GoogleTaxonomyUplaoder, self).save()
-        # OPEN TABLE EN
-        xlsx_table = load_workbook(self.table)
-        sheets = xlsx_table.sheetnames
-        sheet = xlsx_table[sheets[0]]
-        # ITER
-        for num, row in enumerate(sheet.values):
-            name = ''
-            columns = [col for col in row if col != None]
-            id = columns[0]
-            columns = columns[1:]
-            for n, column in enumerate(columns):
-                name += column
-                if n < len(columns) - 1:
-                    name += ' > '
-            # SAVE
-            try:
-                taxonomy = GoogleTaxonomy.objects.get(id=id)
-            except:
-                taxonomy = GoogleTaxonomy(id=id, name=name)
-            taxonomy.save()
-        xlsx_table.close()
 
-        # OPEN TABLE RU
-        xlsx_table_ru = load_workbook(self.table_ru)
-        sheets_ru = xlsx_table_ru.sheetnames
-        sheet_ru = xlsx_table_ru[sheets_ru[0]]
-        # ITER
-        for num, row in enumerate(sheet_ru.values):
-            name = ''
-            columns = [col for col in row if col != None]
-            print(columns)
-            id = columns[0]
-            columns = columns[1:]
-            for n, column in enumerate(columns):
-                name += column
-                if n < len(columns) - 1:
-                    name += ' > '
-            # SAVE
-            try:
-                taxonomy = GoogleTaxonomy.objects.get(id=id)
-                taxonomy.name_ru = name
+        with open(self.table.path) as taxonomy_en, open(self.table_ru.path) as taxonomy_ru:
+            for line_en in taxonomy_en:
+                if line_en.startswith('#'):
+                    continue
+
+                line_en = line_en.replace('\n', '')
+                taxonomy_id, taxonomy_name_en = line_en.split(' - ')
+
+                if self.filter_root:
+                    if not taxonomy_name_en.startswith(self.filter_root):
+                        continue
+
+                obj, _ = GoogleTaxonomy.objects.get_or_create(id=taxonomy_id, name=taxonomy_name_en)
+                print(obj)
+
+            for line_ru in taxonomy_ru:
+                if line_ru.startswith('#'):
+                    continue
+                line_ru = line_ru.replace('\n', '')
+                taxonomy_id, taxonomy_name_ru = line_ru.split(' - ')
+                try:
+                    taxonomy = GoogleTaxonomy.objects.get(id=taxonomy_id)
+                except GoogleTaxonomy.DoesNotExist:
+                    continue
+                taxonomy.name_ru = taxonomy_name_ru
                 taxonomy.save()
-            except:
-                pass
-        xlsx_table_ru.close()
+                print(taxonomy)
+
+
+@receiver(post_save, sender=RozetkaAdaptation)
+def post_save_rozetka_adaptation(sender, instance, created, **kwargs):
+    if instance:
+        rozetka_adaptation_util(instance.table)
+

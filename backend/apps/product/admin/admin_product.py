@@ -139,7 +139,7 @@ class ProductCommentInline(admin.StackedInline):
 @admin.register(Product)
 class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display = (
-        'index', 'name', 'get_varinats_images', 'get_total_variant_views', 'category', 'brand', 'price', 'old_price',)
+        'index', 'name', 'rozetka_name', 'get_varinats_images', 'get_total_variant_views', 'price', 'old_price',)
     list_filter = (CategoryFilter,)
     search_fields = ('name', 'variants__code',)
     readonly_fields = ('slug', 'get_varinats_images',)
@@ -158,8 +158,8 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
         (None, {
             'fields': ('name', 'slug', 'category', 'brand', 'country', 'collections')
         }),
-        ('Интеграции', {
-            'fields': ('rozetka_category', 'taxonomy',)
+        ('Rozetka', {
+            'fields': ('rozetka_category', 'rozetka_name',)
         }),
         ('Цена', {
             'fields': (('price', 'old_price'),)

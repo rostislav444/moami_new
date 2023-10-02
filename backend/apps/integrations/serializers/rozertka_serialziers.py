@@ -12,7 +12,7 @@ class RozetkaCategoriesSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'parent_id', 'rozetka_id')
 
 
-class ProductCompositionSerializer(serializers.ModelSerializer):
+class RozetkaProductCompositionSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='composition.name')
 
     class Meta:
@@ -20,7 +20,7 @@ class ProductCompositionSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'value')
 
 
-class FeedVariantSizeSerializer(serializers.ModelSerializer):
+class RozetkaVariantSizeSerializer(serializers.ModelSerializer):
     size = serializers.CharField(source='get_size')
     full_id = serializers.SerializerMethodField()
     full_id_slugified = serializers.SerializerMethodField()
@@ -40,15 +40,15 @@ class FeedVariantSizeSerializer(serializers.ModelSerializer):
         return slugify(full_id)
 
 
-class FeedVariantImageSerializer(serializers.ModelSerializer):
+class RozetkaVariantImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = VariantImage
         fields = ('id', 'image')
 
 
-class FeedVariantSerializer(serializers.ModelSerializer):
-    sizes = FeedVariantSizeSerializer(many=True)
-    images = FeedVariantImageSerializer(many=True)
+class RozetkaVariantSerializer(serializers.ModelSerializer):
+    sizes = RozetkaVariantSizeSerializer(many=True)
+    images = RozetkaVariantImageSerializer(many=True)
     color = serializers.CharField(source='color.name')
     color_uk = serializers.SerializerMethodField()
 
@@ -63,7 +63,7 @@ class FeedVariantSerializer(serializers.ModelSerializer):
             return obj.color.name
 
 
-class FeedProductAttributeSerializer(serializers.ModelSerializer):
+class RozetkaFeedProductSerializer(serializers.ModelSerializer):
     attribute_group = serializers.CharField(source='attribute_group.name')
     attribute_group_uk = serializers.SerializerMethodField()
     attributes = serializers.SerializerMethodField()
@@ -95,7 +95,7 @@ class FeedProductAttributeSerializer(serializers.ModelSerializer):
         return ', '.join(attributes)
 
 
-class FeedProductSerializer(serializers.ModelSerializer):
+class RozetkaProductSerializer(serializers.ModelSerializer):
     brand = serializers.CharField(source='brand.name')
     country = serializers.CharField(source='country.name')
     country_uk = serializers.SerializerMethodField()
@@ -106,10 +106,10 @@ class FeedProductSerializer(serializers.ModelSerializer):
     description_uk = serializers.SerializerMethodField()
     # Nested fields
     rozetka_category = RozetkaCategoriesSerializer()
-    variants = FeedVariantSerializer(many=True)
+    variants = RozetkaVariantSerializer(many=True)
     composition = serializers.SerializerMethodField()
     composition_uk = serializers.SerializerMethodField()
-    attributes = FeedProductAttributeSerializer(many=True)
+    attributes = RozetkaFeedProductSerializer(many=True)
 
     preferred_size_grid = serializers.CharField(source='get_preferred_size_grid')
 
@@ -165,3 +165,15 @@ class FeedProductSerializer(serializers.ModelSerializer):
             except ObjectDoesNotExist:
                 compositions.append(str(item.value) + '% ' + item.composition.name)
         return ', '.join(compositions)
+
+
+
+__all__ = [
+    'RozetkaCategoriesSerializer',
+    'RozetkaProductCompositionSerializer',
+    'RozetkaVariantSizeSerializer',
+    'RozetkaVariantImageSerializer',
+    'RozetkaVariantSerializer',
+    'RozetkaFeedProductSerializer',
+    'RozetkaProductSerializer'
+]

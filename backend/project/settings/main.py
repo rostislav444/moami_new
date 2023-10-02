@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'nested_inline',
     'mptt',
     'ckeditor',
+    'admin_auto_filters',
     # Allauth
     'allauth',
     'allauth.account',

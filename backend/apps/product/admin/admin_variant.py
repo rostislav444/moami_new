@@ -46,8 +46,8 @@ class VariantInline(admin.TabularInline):
 
     get_image.short_description = 'Image'
     get_already_set_sizes_ul.short_description = 'Sizes'
-    readonly_fields = ('get_image', 'get_total_views', 'get_already_set_sizes_ul', 'slug')
-    fields = ('get_image', 'get_already_set_sizes_ul', 'get_total_views', 'code', 'color')
+    readonly_fields = ('get_image', 'get_total_views', 'get_already_set_sizes_ul', 'rozetka_code', 'slug')
+    fields = ('get_image', 'get_already_set_sizes_ul', 'get_total_views', 'code', 'rozetka_code', 'color')
 
 
 class VariantImageThumbnailInline(admin.TabularInline):
@@ -130,7 +130,7 @@ class VariantAdmin(SortableAdminMixin, admin.ModelAdmin):
 
     get_image.short_description = 'Image'
 
-    list_display = ('get_image', 'get_total_views', 'code', 'color')
+    list_display = ('get_image', 'get_total_views', 'code', 'rozetka_code', 'color')
     readonly_fields = ('get_image', 'product_link', 'slug', 'get_total_views',)
     search_fields = ('code', 'product__name')
     inlines = (VariantVideoInline, VariantImageInline, VariantSizeInline,)

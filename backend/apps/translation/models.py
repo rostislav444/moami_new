@@ -41,6 +41,21 @@ class Translatable(models.Model):
                     fields.append(field.name)
         return fields
 
+    def get_translation(self, field):
+        translations = {}
+        for lang in settings.LANGUAGES:
+            try:
+                translations[lang[0]] = getattr(self.translations.get(language_code=lang[0]), field)
+            except ObjectDoesNotExist:
+                translations[lang[0]] = getattr(self, field)
+        return translations
+
+    def __getattr__(self, item):
+        if item.startswith('get_translation'):
+            field = item.split('__')[1]
+            return self.get_translation(field)
+        return super().__getattribute__(item)
+
     def __getattribute__(self, name):
         exclude_fields = [
             '_meta',

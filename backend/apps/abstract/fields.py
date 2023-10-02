@@ -5,11 +5,12 @@ from functools import reduce
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.forms.widgets import FileInput
-from django.core.validators import FileExtensionValidator
+
 from project.settings import MEDIA_ROOT
 
 
@@ -41,6 +42,8 @@ class DeletableMediaField(models.FileField):
         self._prune_empty_app_directories(instance)
 
     def _validate_file_extension(self, file_instance):
+        if not self.valid_extensions or len(self.valid_extensions) == 0:
+            return
         ext = os.path.splitext(file_instance.name)[1].lower()
         if ext not in self.valid_extensions:
             raise ValidationError(f"Invalid file extension. Allowed extensions are: {', '.join(self.valid_extensions)}")
@@ -92,7 +95,7 @@ class DeletableMediaField(models.FileField):
 
 class CustomFileInput(forms.fields.FileField):
     default_validators = []
-    default_accept = ""
+    default_accept = "*/*"
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
@@ -102,7 +105,8 @@ class CustomFileInput(forms.fields.FileField):
 
 
 class CustomImageInput(CustomFileInput):
-    default_validators = [FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'png', 'gif', 'bmp', 'webp', 'tiff'])]
+    default_validators = [
+        FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'png', 'gif', 'bmp', 'webp', 'tiff'])]
     default_accept = "image/*"
 
 
@@ -121,18 +125,20 @@ class DeletableImageField(DeletableMediaField):
 class DeletableVideoField(DeletableMediaField):
     valid_extensions = ['.mp4', '.mkv', '.flv', '.avi', '.mov', '.wmv']
 
-    def __init_subclass__(cls, **kwargs):
-        print(cls)
-        super().__init_subclass__(**kwargs)
-
     def formfield(self, **kwargs):
         return super().formfield(form_class=CustomVideoInput, **kwargs)
+
+
+class DeletableFileField(DeletableMediaField):
+    def formfield(self, **kwargs):
+        return super().formfield(form_class=CustomFileInput, **kwargs)
 
 
 @receiver(pre_delete)
 def delete_file_on_delete(sender, instance, **kwargs):
     for field in instance._meta.fields:
-        if isinstance(field, DeletableImageField) or isinstance(field, DeletableVideoField):
+        if isinstance(field, DeletableImageField) or isinstance(field, DeletableVideoField) or isinstance(field,
+                                                                                                          DeletableFileField):
             field.delete(instance)
             file_field = getattr(instance, field.name)
 

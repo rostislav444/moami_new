@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+    <channel>
+        <title>Momai</title>
+        <link>http://www.moami.com.ua</link>
+        <description>Moami - искусство быть Собой</description>
+        {% for product in products %}
+            {% for variant in product.variants %}
+                <item>
+                    <g:id>{{ variant.code }}</g:id>
+                    <g:title>{{ product.name }}</g:title>
+                    <g:description>{{ product.description }}</g:description>
+                    <g:link>https://moami.com.ua/p-{{ variant.slug }}</g:link>
+                    {% for image in variant.images %}
+                        {% if forloop.counter == 1 %}
+                            <g:image_link>{{ image }}</g:image_link>
+                        {% else %}
+                            <g:additional_image_link>{{ image }}</g:additional_image_link>
+                        {% endif %}
+                    {% endfor %}
+                    <g:condition>new</g:condition>
+                    <g:availability>in stock</g:availability>
+                    <g:price>{{ product.price }} UAH</g:price>
+                    <g:brand>{{ product.brand }}</g:brand>
+                    <g:google_product_category>{{ product.google_product_category }}</g:google_product_category>
+                    <g:shipping>
+                        <g:country>UA</g:country>
+                        <g:service>Стандартная доставка</g:service>
+                        <g:price>100 UAH</g:price>
+                    </g:shipping>
+                    <g:gtin>{{ variant.code }}</g:gtin>
+                </item>
+            {% endfor %}
+        {% endfor %}
+    </channel>
+</rss>
