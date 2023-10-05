@@ -23,21 +23,14 @@ class RozetkaProductCompositionSerializer(serializers.ModelSerializer):
 class RozetkaVariantSizeSerializer(serializers.ModelSerializer):
     size = serializers.CharField(source='get_size')
     full_id = serializers.SerializerMethodField()
-    full_id_slugified = serializers.SerializerMethodField()
 
     class Meta:
         model = VariantSize
-        fields = ('id', 'full_id', 'full_id_slugified', 'size', 'stock')
+        fields = ('id', 'full_id', 'size', 'stock')
 
     @staticmethod
     def get_full_id(obj):
-        full_id = obj.variant.code + ' ' + obj.get_size
-        return full_id.upper()
-
-    @staticmethod
-    def get_full_id_slugified(obj):
-        full_id = obj.variant.code + '-' + obj.get_size
-        return slugify(full_id)
+        return ' '.join([obj.variant.code, obj.get_size]).upper()
 
 
 class RozetkaVariantImageSerializer(serializers.ModelSerializer):
@@ -96,15 +89,18 @@ class RozetkaFeedProductSerializer(serializers.ModelSerializer):
 
 
 class RozetkaProductSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    name_uk = serializers.SerializerMethodField()
+
     brand = serializers.CharField(source='brand.name')
     country = serializers.CharField(source='country.name')
-    country_uk = serializers.SerializerMethodField()
+    country_uk = serializers.CharField(source='country.get_translation__name__uk')
 
     category = serializers.CharField(source='category.name')
-    # Method fields
-    name_uk = serializers.SerializerMethodField()
-    description_uk = serializers.SerializerMethodField()
+
+    description_uk = serializers.CharField(source='get_translation__description__uk')
     # Nested fields
+    rozetka_name_uk = serializers.CharField(source='get_translation__rozetka_name__uk')
     rozetka_category = RozetkaCategoriesSerializer()
     variants = RozetkaVariantSerializer(many=True)
     composition = serializers.SerializerMethodField()
@@ -120,36 +116,29 @@ class RozetkaProductSerializer(serializers.ModelSerializer):
             'name', 'name_uk',
             'category',
             'brand',
-            'country', 'country_uk',
-            'description', 'description_uk',
+            'country',
+            'country_uk',
+            'description',
+            'description_uk',
+            'rozetka_name',
+            'rozetka_name_uk',
             'variants',
             'category',
             'price',
             'promo_price',
             'old_price',
-            'composition', 'composition_uk',
+            'composition',
+            'composition_uk',
             'attributes',
             'preferred_size_grid',
             'rozetka_category'
         )
 
-    def get_country_uk(self, obj):
-        try:
-            return obj.country.translations.get(language_code='uk').name
-        except ObjectDoesNotExist:
-            return obj.country.name
+    def get_name(self, obj):
+        return obj.get_rozetka_name(lang_code='ru')
 
     def get_name_uk(self, obj):
-        try:
-            return obj.translations.get(language_code='uk').name
-        except ObjectDoesNotExist:
-            return obj.name
-
-    def get_description_uk(self, obj):
-        try:
-            return obj.translations.get(language_code='uk').description
-        except ObjectDoesNotExist:
-            return obj.description
+        return obj.get_rozetka_name(lang_code='uk')
 
     def get_composition(self, obj):
         compositions = []

@@ -1,8 +1,6 @@
 from django.http import HttpResponse, Http404
 from django.shortcuts import render
 from django.template.loader import render_to_string
-from rest_framework import mixins, viewsets
-from rest_framework_xml.renderers import XMLRenderer
 
 from apps.integrations.models import RozetkaCategories
 from apps.integrations.serializers import RozetkaProductSerializer, RozetkaCategoriesSerializer, \

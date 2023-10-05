@@ -41,19 +41,32 @@ class Translatable(models.Model):
                     fields.append(field.name)
         return fields
 
-    def get_translation(self, field):
-        translations = {}
-        for lang in settings.LANGUAGES:
+    def get_translation(self, field, lang=None):
+        if lang is None:
+            translations = {}
+            for lang in settings.LANGUAGES:
+                try:
+                    translations[lang[0]] = getattr(self.translations.get(language_code=lang[0]), field)
+                except ObjectDoesNotExist:
+                    translations[lang[0]] = getattr(self, field)
+            return translations
+        else:
             try:
-                translations[lang[0]] = getattr(self.translations.get(language_code=lang[0]), field)
+                return getattr(self.translations.get(language_code=lang), field)
             except ObjectDoesNotExist:
-                translations[lang[0]] = getattr(self, field)
-        return translations
+                return getattr(self, field)
+
 
     def __getattr__(self, item):
         if item.startswith('get_translation'):
-            field = item.split('__')[1]
-            return self.get_translation(field)
+            item_split = item.split('__')
+            if len(item_split) == 2:
+                field = item_split[1]
+                return self.get_translation(field)
+            elif len(item_split) == 3:
+                field = item_split[1]
+                lang = item_split[2]
+                return self.get_translation(field, lang)
         return super().__getattribute__(item)
 
     def __getattribute__(self, name):

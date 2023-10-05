@@ -103,11 +103,13 @@ class Product(Translatable):
     def __str__(self):
         return f'{self.name} id: {str(self.id)}'
 
-    @property
-    def get_rozetka_name(self):
-        if self.rozetka_name:
-            return self.rozetka_name
-        return self.name
+    def get_rozetka_name(self, lang_code='ru'):
+        attr_name = 'get_translation__rozetka_name__' + lang_code
+        value = getattr(self, attr_name)
+        if value:
+            return value
+        attr_name = 'get_translation__name__' + lang_code
+        return getattr(self, attr_name)
 
     @property
     def get_preferred_size_grid(self):
