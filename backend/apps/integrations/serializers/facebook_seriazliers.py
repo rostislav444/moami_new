@@ -36,6 +36,7 @@ class FacebookProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = (
+            'id',
             'collections',
             'google_product_category',
             'facebook_product_category',
