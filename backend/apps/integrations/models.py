@@ -108,9 +108,9 @@ class GoogleTaxonomyUplaoder(models.Model):
                 print(obj)
 
             for line_ru in taxonomy_ru:
-                line_ru = line_ru.encode('latin1').decode('utf-8')
                 if line_ru.startswith('#'):
                     continue
+                line_ru = line_ru.encode('cp1251').decode('utf-8')
                 line_ru = line_ru.replace('\n', '')
                 taxonomy_id, taxonomy_name_ru = line_ru.split(' - ')
                 try:
