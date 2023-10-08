@@ -8,7 +8,9 @@
             {% for variant in product.variants %}
                 <item>
                     <g:id>{{ variant.code_slug }}</g:id>
-                    <g:item_group_id>{{ product.id }}</g:item_group_id>
+                    {% if product.variants|length > 1 %}
+                        <g:item_group_id>{{ product.id }}</g:item_group_id>
+                    {% endif %}
                     <g:title>{{ product.name }}</g:title>
                     <g:description>{{ product.description }}</g:description>
                     <g:link>https://moami.com.ua/p-{{ variant.slug }}</g:link>
