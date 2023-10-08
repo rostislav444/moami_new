@@ -112,6 +112,9 @@ class GoogleTaxonomyUplaoder(models.Model):
                     continue
 
                 taxonomy_id, taxonomy_name_ru = line_ru.split(' - ')
+
+                taxonomy_name_ru = taxonomy_name_ru.encode('windows-1251').decode('utf-8')
+
                 try:
                     taxonomy = GoogleTaxonomy.objects.get(id=taxonomy_id)
                 except GoogleTaxonomy.DoesNotExist:
