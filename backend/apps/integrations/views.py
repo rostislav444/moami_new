@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 
 from apps.integrations.models import RozetkaCategories
 from apps.integrations.serializers import RozetkaProductSerializer, RozetkaCategoriesSerializer, \
-    GoogleProductSerializer, GoogleProductByLanguageSerializer
+    GoogleProductSerializer, GoogleProductByLanguageSerializer, FacebookProductByLanguageSerializer
 from apps.product.models import Product
 from project import settings
 
@@ -52,6 +52,21 @@ def google(request, lang_code):
 def google_multilang(request):
     products = Product.objects.filter(category__google_taxonomy__isnull=False)
     serializer = GoogleProductByLanguageSerializer(products, many=True)
-    serializer.context.update({})
+    serializer.context.update({
+        'request': request,
+    })
     content = render_to_string('feed/google_multilang.xml', {'products': serializer.data})
+    return HttpResponse(content, content_type='application/xml')
+
+
+def facebook_multilang(request):
+    products = Product.objects.filter(
+        category__google_taxonomy__isnull=False,
+        category__facebook_category__isnull=False
+    )
+    serializer = FacebookProductByLanguageSerializer(products, many=True)
+    serializer.context.update({
+        'request': request,
+    })
+    content = render_to_string('feed/facebook_multilang.xml', {'products': serializer.data})
     return HttpResponse(content, content_type='application/xml')

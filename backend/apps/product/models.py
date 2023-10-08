@@ -226,6 +226,10 @@ class Variant(models.Model):
         return f'{self.product.name} - {self.code}'
 
     @property
+    def get_code_slug(self):
+        return slugify(unidecode(f'{self.code}'))
+
+    @property
     def get_rozetka_code(self):
         if self.rozetka_code:
             return self.rozetka_code

@@ -22,7 +22,12 @@
                         {% endfor %}
                         <g:condition>new</g:condition>
                         <g:availability>in stock</g:availability>
-                        <g:price>{{ language.product.price }} UAH</g:price>
+                        {% if product.price < product.old_price %}
+                            <g:price>{{ product.price }} UAH</g:price>
+                            <g:sale_price>{{ product.old_price }} UAH</g:sale_price>
+                        {% else %}
+                            <g:price>{{ product.price }} UAH</g:price>
+                        {% endif %}
                         <g:brand>{{ language.product.brand }}</g:brand>
                         <g:google_product_category>{{ language.product.google_product_category }}</g:google_product_category>
                         <g:shipping>
@@ -30,6 +35,8 @@
                             <g:service>Стандартная доставка</g:service>
                             <g:price>100 UAH</g:price>
                         </g:shipping>
+
+                        <g:color>{{ language.product.color }}</g:color>
                     </item>
                 {% endfor %}
             {% endfor %}

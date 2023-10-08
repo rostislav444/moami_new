@@ -1,32 +1,9 @@
 from rest_framework import serializers
 
-from apps.product.models import Product, Variant
+from apps.integrations.serializers.variant_serializer import FeedVariantSerializer
+from apps.product.models import Product
+from apps.translation.serialziers import TranslationFiled
 from project import settings
-
-
-class TranslationFiled(serializers.Field):
-    def bind(self, field_name, parent):
-        super().bind(field_name, parent)
-
-    def to_representation(self, value):
-        language = self.context.get('language')
-        if language is None:
-            language = settings.LANGUAGE_CODE
-        return value[language]
-
-
-class GoogleVariantSerializer(serializers.ModelSerializer):
-    images = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Variant
-        fields = ('id', 'code', 'slug', 'images')
-
-    def get_images(self, obj):
-        request = self.context.get('request')
-        if request:
-            return [request.build_absolute_uri(image.image.url) for image in obj.images.all()]
-        return [image.image.url for image in obj.images.all()]
 
 
 class GoogleProductSerializer(serializers.ModelSerializer):
@@ -35,7 +12,7 @@ class GoogleProductSerializer(serializers.ModelSerializer):
     description = TranslationFiled(source='get_translation__description')
     google_product_category = serializers.CharField(source='category.google_taxonomy.name')
 
-    variants = GoogleVariantSerializer(many=True)
+    variants = FeedVariantSerializer(many=True)
 
     class Meta:
         model = Product

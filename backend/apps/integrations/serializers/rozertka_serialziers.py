@@ -12,7 +12,7 @@ class RozetkaCategoriesSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'parent_id', 'rozetka_id')
 
 
-class RozetkaProductCompositionSerializer(serializers.ModelSerializer):
+class ProductCompositionSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='composition.name')
 
     class Meta:
@@ -159,7 +159,7 @@ class RozetkaProductSerializer(serializers.ModelSerializer):
 
 __all__ = [
     'RozetkaCategoriesSerializer',
-    'RozetkaProductCompositionSerializer',
+    'ProductCompositionSerializer',
     'RozetkaVariantSizeSerializer',
     'RozetkaVariantImageSerializer',
     'RozetkaVariantSerializer',

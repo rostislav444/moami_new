@@ -14,6 +14,8 @@ class Category(NameSlug, MPTTModel, Translatable):
     parent = TreeForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
     google_taxonomy = models.ForeignKey('integrations.GoogleTaxonomy', null=True, blank=True, on_delete=models.SET_NULL,
                                          verbose_name='Google Taxonomy')
+    facebook_category = models.ForeignKey('integrations.FacebookCategories', null=True, blank=True,
+                                           on_delete=models.SET_NULL, verbose_name='Facebook Category')
     size_group = models.ForeignKey(SizeGroup, null=True, blank=True, on_delete=models.PROTECT,
                                    related_name='categories')
     preferred_size_grid = models.ForeignKey(SizeGrid, null=True, blank=True, on_delete=models.SET_NULL,

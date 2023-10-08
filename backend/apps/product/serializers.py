@@ -52,7 +52,7 @@ class CustomPropertySerializer(serializers.ModelSerializer):
         fields = ('key', 'value')
 
 
-class RozetkaProductCompositionSerializer(serializers.ModelSerializer):
+class ProductCompositionSerializer(serializers.ModelSerializer):
     composition = serializers.CharField(source='composition.name')
 
     class Meta:
@@ -77,7 +77,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category = CategoryIdSerializer()
 
     # Properties
-    compositions = RozetkaProductCompositionSerializer(many=True)
+    compositions = ProductCompositionSerializer(many=True)
     properties = CustomPropertySerializer(many=True)
     attributes = ProductAttributeSerializer(many=True)
 

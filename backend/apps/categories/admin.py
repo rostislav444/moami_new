@@ -1,10 +1,10 @@
+from admin_auto_filters.filters import AutocompleteFilter
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from mptt.admin import MPTTModelAdmin
 
 from apps.categories.forms import CategoryAttributeGroupForm
 from apps.categories.models import Category, CategoryAttributeGroup, Collections
-from admin_auto_filters.filters import AutocompleteFilter
 
 
 class CategoryAttributeGroupInline(admin.TabularInline):
@@ -21,12 +21,12 @@ class CategoryFilter(AutocompleteFilter):
 @admin.register(Category)
 class CategoryAdmin(MPTTModelAdmin):
     mptt_level_indent = 20
-    list_display = ('name', 'google_taxonomy', 'ordering', 'size_group')
+    list_display = ('name', 'google_taxonomy', 'facebook_category', 'ordering', 'size_group')
     list_filter = [CategoryFilter]
     sortable = 'ordering'
 
-    search_fields = ['google_taxonomy__name_ru']
-    autocomplete_fields = ['google_taxonomy']
+    search_fields = ['google_taxonomy__name_ru, facebook_category__name']
+    autocomplete_fields = ['google_taxonomy', 'facebook_category']
 
     def get_image(self, obj):
         style = 'border: 1px solid #ccc; object-fit: cover;'
@@ -36,7 +36,7 @@ class CategoryAdmin(MPTTModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'parent', 'size_group', 'preferred_size_grid', 'google_taxonomy', 'ordering')
+            'fields': ('name', 'parent', 'size_group', 'preferred_size_grid', 'google_taxonomy', 'facebook_category', 'ordering')
         }),
         ('Изображение', {
             'fields': ('get_image', 'image',)

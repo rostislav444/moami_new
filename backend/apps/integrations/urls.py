@@ -8,4 +8,5 @@ urlpatterns = [
     path('rozetka.xml', views.rozetka, name='rozetka'),
     path('google_multilang.xml', views.google_multilang, name='google_multilang'),
     path('<str:lang_code>/google.xml', views.google, name='google'),
+    path('facebook_multilang.xml', views.facebook_multilang, name='facebook_multilang'),
 ]

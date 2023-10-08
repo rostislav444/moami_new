@@ -35,6 +35,12 @@ class CategorySerializer(serializers.ModelSerializer):
         return None
 
 
+class CollectionsLiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collections
+        fields = ('id', 'name', 'slug', 'image')
+
+
 class CollectionsSerializer(serializers.ModelSerializer):
     products_count = serializers.IntegerField(source='get_products_count')
 
