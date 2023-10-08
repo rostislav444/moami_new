@@ -107,7 +107,6 @@ class GoogleTaxonomyUplaoder(models.Model):
                         continue
 
                 obj, _ = GoogleTaxonomy.objects.get_or_create(id=taxonomy_id, name=taxonomy_name_en)
-                print(obj)
 
             for line_ru in taxonomy_ru:
                 if line_ru.startswith('#'):
