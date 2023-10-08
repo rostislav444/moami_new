@@ -57,6 +57,7 @@ class GoogleTaxonomy(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        self.name_ru = self.name_ru.encode('iso-8859-1').decode('utf-8')
         super(GoogleTaxonomy, self).save(*args, **kwargs)
 
 
@@ -112,11 +113,6 @@ class GoogleTaxonomyUplaoder(models.Model):
                     continue
 
                 taxonomy_id, taxonomy_name_ru = line_ru.split(' - ')
-
-                try:
-                    taxonomy_name_ru = taxonomy_name_ru.encode('iso-8859-1').decode('utf-8')
-                except:
-                    continue
 
                 try:
                     taxonomy = GoogleTaxonomy.objects.get(id=taxonomy_id)
