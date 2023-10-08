@@ -73,5 +73,8 @@ def facebook(request, lang_code):
         'request': request,
         'language': lang_code
     })
-    content = render_to_string('feed/facebook.xml', {'products': serializer.data})
+    content = render_to_string('feed/facebook.xml', {
+        'products': serializer.data,
+        'language': lang_code
+    })
     return HttpResponse(content, content_type='application/xml')
