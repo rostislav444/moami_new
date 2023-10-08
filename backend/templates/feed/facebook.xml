@@ -13,7 +13,13 @@
                     {% endif %}
                     <g:title>{{ product.name }}</g:title>
                     <g:description>{{ product.description }}</g:description>
-                    <g:link>https://moami.com.ua/{{ language }}/p-{{ variant.slug }}</g:link>
+
+                    {# Link #}
+                    {% if language == 'uk' %}
+                        <g:link>https://moami.com.ua/p-{{ variant.slug }}</g:link>
+                    {% else %}
+                        <g:link>https://moami.com.ua/{{ language }}/p-{{ variant.slug }}</g:link>
+                    {% endif %}
 
                     {# Media #}
                     {% for image in variant.images %}
