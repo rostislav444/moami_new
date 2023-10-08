@@ -112,7 +112,7 @@ class GoogleTaxonomyUplaoder(models.Model):
                     continue
 
                 try:
-                    line_ru = line_ru.encode('windows-1251').decode('utf-8')
+                    line_ru = line_ru.encode('iso-8859-1').decode('utf-8')
                 except UnicodeDecodeError:
                     continue
 
