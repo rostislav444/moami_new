@@ -4,41 +4,39 @@
         <title>Momai</title>
         <link>http://www.moami.com.ua</link>
         <description>Moami - искусство быть Собой</description>
-        {% for item in products %}
-            {% for language in item.languages %}
-                {% for variant in language.product.variants %}
-                    <item>
-                        <g:language>{{ language.language }}</g:language>
-                        <g:id>{{ variant.code }}</g:id>
-                        <g:title>{{ language.product.name }}</g:title>
-                        <g:description>{{ language.product.description }}</g:description>
-                        <g:link>https://moami.com.ua/p-{{ variant.slug }}</g:link>
-                        {% for image in variant.images %}
-                            {% if forloop.counter == 1 %}
-                                <g:image_link>{{ image }}</g:image_link>
-                            {% else %}
-                                <g:additional_image_link>{{ image }}</g:additional_image_link>
-                            {% endif %}
-                        {% endfor %}
-                        <g:condition>new</g:condition>
-                        <g:availability>in stock</g:availability>
-                        {% if product.price < product.old_price %}
-                            <g:price>{{ product.price }} UAH</g:price>
-                            <g:sale_price>{{ product.old_price }} UAH</g:sale_price>
+        {% for product in products %}
+            {% for variant in product.variants %}
+                <item>
+                    <g:language>{{ language }}</g:language>
+                    <g:id>{{ variant.code }}</g:id>
+                    <g:title>{{ product.name }}</g:title>
+                    <g:description>{{ product.description }}</g:description>
+                    <g:link>https://moami.com.ua/p-{{ variant.slug }}</g:link>
+                    {% for image in variant.images %}
+                        {% if forloop.counter == 1 %}
+                            <g:image_link>{{ image }}</g:image_link>
                         {% else %}
-                            <g:price>{{ product.price }} UAH</g:price>
+                            <g:additional_image_link>{{ image }}</g:additional_image_link>
                         {% endif %}
-                        <g:brand>{{ language.product.brand }}</g:brand>
-                        <g:google_product_category>{{ language.product.google_product_category }}</g:google_product_category>
-                        <g:shipping>
-                            <g:country>UA</g:country>
-                            <g:service>Стандартная доставка</g:service>
-                            <g:price>100 UAH</g:price>
-                        </g:shipping>
+                    {% endfor %}
+                    <g:condition>new</g:condition>
+                    <g:availability>in stock</g:availability>
+                    {% if product.price < product.old_price %}
+                        <g:price>{{ product.price }} UAH</g:price>
+                        <g:sale_price>{{ product.old_price }} UAH</g:sale_price>
+                    {% else %}
+                        <g:price>{{ product.price }} UAH</g:price>
+                    {% endif %}
+                    <g:brand>{{ product.brand }}</g:brand>
+                    <g:google_product_category>{{ product.google_product_category }}</g:google_product_category>
+                    <g:shipping>
+                        <g:country>UA</g:country>
+                        <g:service>Стандартная доставка</g:service>
+                        <g:price>100 UAH</g:price>
+                    </g:shipping>
 
-                        <g:color>{{ language.product.color }}</g:color>
-                    </item>
-                {% endfor %}
+                    <g:color>{{ product.color }}</g:color>
+                </item>
             {% endfor %}
         {% endfor %}
     </channel>
