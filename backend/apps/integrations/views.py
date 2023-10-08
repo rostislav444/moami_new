@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 
 from apps.integrations.models import RozetkaCategories
 from apps.integrations.serializers import RozetkaProductSerializer, RozetkaCategoriesSerializer, \
-    GoogleProductSerializer, GoogleProductByLanguageSerializer, FacebookProductByLanguageSerializer
+    GoogleProductSerializer, GoogleProductByLanguageSerializer, FacebookProductSerializer
 from apps.product.models import Product
 from project import settings
 
@@ -59,14 +59,19 @@ def google_multilang(request):
     return HttpResponse(content, content_type='application/xml')
 
 
-def facebook_multilang(request):
+def facebook(request, lang_code):
+    language_codes = [language[0] for language in settings.LANGUAGES]
+    if lang_code not in language_codes:
+        raise Http404("This language is not supported.")
+
     products = Product.objects.filter(
         category__google_taxonomy__isnull=False,
         category__facebook_category__isnull=False
     )
-    serializer = FacebookProductByLanguageSerializer(products, many=True)
+    serializer = FacebookProductSerializer(products, many=True)
     serializer.context.update({
         'request': request,
+        'language': lang_code
     })
-    content = render_to_string('feed/facebook_multilang.xml', {'products': serializer.data})
+    content = render_to_string('feed/facebook.xml', {'products': serializer.data})
     return HttpResponse(content, content_type='application/xml')
