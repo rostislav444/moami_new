@@ -111,9 +111,12 @@ class GoogleTaxonomyUplaoder(models.Model):
                 if line_ru.startswith('#'):
                     continue
 
-                taxonomy_id, taxonomy_name_ru = line_ru.split(' - ')
+                try:
+                    line_ru = line_ru.encode('windows-1251').decode('utf-8')
+                except UnicodeDecodeError:
+                    continue
 
-                taxonomy_name_ru = taxonomy_name_ru.encode('windows-1251').decode('utf-8')
+                taxonomy_id, taxonomy_name_ru = line_ru.split(' - ')
 
                 try:
                     taxonomy = GoogleTaxonomy.objects.get(id=taxonomy_id)
