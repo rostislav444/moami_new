@@ -57,7 +57,8 @@ class GoogleTaxonomy(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.name_ru = self.name_ru.encode('iso-8859-1').decode('utf-8')
+        if self.name_ru:
+            self.name_ru = self.name_ru.encode('iso-8859-1').decode('utf-8')
         super(GoogleTaxonomy, self).save(*args, **kwargs)
 
 
