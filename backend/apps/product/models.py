@@ -429,8 +429,8 @@ class VariantImageThumbnail(models.Model):
 
 class VariantViews(models.Model):
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='views')
-    day = models.DateField(auto_now_add=True)
-    views = models.PositiveIntegerField(default=0)
+    day = models.DateField(auto_now_add=True, verbose_name='Дата')
+    views = models.PositiveIntegerField(default=0, verbose_name='Просмотры')
 
     class Meta:
         verbose_name = 'Просмотры'
