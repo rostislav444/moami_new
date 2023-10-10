@@ -25,7 +25,7 @@ export default function Product({variant, locale}: VariantPageProps) {
     useEffect(() => {
         let isMounted = true
 
-        if (session && session.user && session.user.name === 'admin') {
+        if (session === undefined || (session && session.user && session.user.name === 'admin')) {
             return
         }
 
