@@ -435,6 +435,7 @@ class VariantViews(models.Model):
     class Meta:
         verbose_name = 'Просмотры'
         verbose_name_plural = 'Просмотры'
+        ordering = ['day', 'variant']
 
     def __str__(self):
         return f'{self.variant.code} - {self.day} - {self.views}'
