@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+
 from apps.product.models import VariantViews
 
 
@@ -21,5 +22,5 @@ class VariantViewsAdmin(admin.ModelAdmin):
     list_display = ('get_image', 'get_code', 'views', 'day')
     list_filter = ('day',)
     search_fields = ('variant', 'day')
-    ordering = ('variant', 'day')
+    ordering = ('-day', '-views',)
     readonly_fields = ('get_image', 'get_code', 'variant', 'views', 'day')
