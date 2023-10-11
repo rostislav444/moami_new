@@ -2,10 +2,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+
 from apps.integrations.views import rozetka
 
 api = [
-    path('ru/rozetka/', rozetka),
     path('authentication/', include('apps.authentication.urls')),
     path('order/', include('apps.order.urls')),
     path('category/', include('apps.categories.urls')),
@@ -19,6 +19,7 @@ api = [
 ]
 
 urlpatterns = [
+    path('ru/rozetka/', rozetka),
     path('admin/', admin.site.urls),
     path('api/', include(api)),
 ]
