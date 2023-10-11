@@ -441,6 +441,12 @@ class VariantViews(models.Model):
         return f'{self.variant.code} - {self.day} - {self.views}'
 
 
+class VarintViewSource(models.Model):
+    variant_view = models.ForeignKey(VariantViews, on_delete=models.CASCADE, related_name='view_sources')
+    utm_source = models.CharField(max_length=255, blank=True, null=True, verbose_name='UTM Source')
+    views = models.PositiveIntegerField(default=0, verbose_name='Просмотры')
+
+
 # If Product slug changed rewrite Variant slug
 @receiver(post_save, sender=Product)
 def rewrite_variant_slug(sender, instance, **kwargs):

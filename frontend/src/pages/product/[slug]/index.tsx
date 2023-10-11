@@ -32,7 +32,16 @@ export default function Product({variant, locale}: VariantPageProps) {
         if (isMounted) {
             pageView()
             store.dispatch(addViewedProductData(variant))
-            api.get('/product/variants/views?variant_id=' + variant.id)
+
+            let url = '/product/variants/views?variant_id=' + variant.id
+            if ('utm_source' in router.query) {
+                url += `&utm_source=${router.query.utm_source}`
+            }
+            if ('utm_medium' in router.query) {
+                url += `&utm_medium=${router.query.utm_medium}`
+            }
+
+            api.get(url)
         }
         return () => {
             isMounted = false

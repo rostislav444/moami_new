@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from apps.product.models import VariantViews
+from apps.product.models import VariantViews, VarintViewSource
+
+
+class VarintViewSourceInline(admin.TabularInline):
+    model = VarintViewSource
+    extra = 0
 
 
 @admin.register(VariantViews)
@@ -24,3 +29,4 @@ class VariantViewsAdmin(admin.ModelAdmin):
     search_fields = ('variant', 'day')
     ordering = ('-day', '-views',)
     readonly_fields = ('get_image', 'get_code', 'variant', 'views', 'day')
+    inlines = (VarintViewSourceInline,)

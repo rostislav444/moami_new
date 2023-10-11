@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from rest_framework import mixins, viewsets
 from unidecode import unidecode
 from rest_framework.exceptions import NotFound
-from apps.product.models import Product, ProductComment, Variant, VariantViews
+from apps.product.models import Product, ProductComment, Variant, VariantViews, VarintViewSource
 from apps.product.serializers import ProductSerializer, VariantSerializer, ProductCommentSerializer
 
 
@@ -54,6 +54,8 @@ def variant_slug_list_json(request):
 def variant_views(request):
     today = datetime.date.today()
     variant_id = request.GET.get('variant_id')
+    utm_source = request.GET.get('utm_source')
+
     variant = Variant.objects.get(id=variant_id)
     try:
         today_views = VariantViews.objects.get(variant=variant, day=today)
@@ -62,6 +64,14 @@ def variant_views(request):
 
     today_views.views += 1
     today_views.save()
+
+    if utm_source:
+        try:
+            source = VarintViewSource.objects.get(variant_view=today_views, utm_source=utm_source)
+        except VarintViewSource.DoesNotExist:
+            source = VarintViewSource(variant_view=today_views, utm_source=utm_source, views=0)
+        source.views += 1
+        source.save()
 
     return HttpResponse(today_views.views, content_type='application/json')
 
@@ -78,7 +88,6 @@ class ProductCommentsView(mixins.RetrieveModelMixin, mixins.CreateModelMixin, mi
         return ProductComment.objects.none()
 
     def perform_create(self, serializer):
-        print(self.request.user)
         serializer.save(user=self.request.user)
 
     def get_object(self):
