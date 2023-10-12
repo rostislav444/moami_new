@@ -12,11 +12,7 @@ interface VariantProps {
 }
 
 export const Variant = ({variant, slider = false}: VariantProps) => {
-    const imagesProps = {
-        link: `/product/${variant.slug}`,
-        images: variant.images,
-        alt: 'alt'
-    }
+    console.log(variant.images[0].thumbnails[3].image)
     return (
         <div>
             {slider ?

@@ -16,10 +16,9 @@ export const SingleImage = ({link, image, thumbnail, alt}: SingleImageProps) => 
             <Image
                 fill
                 loading='eager'
-                placeholder='blur'
-                blurDataURL={image}
+                placeholder='empty'
                 quality={90}
-                style={{objectFit: 'cover'}}
+                style={{objectFit: 'cover', backgroundColor: '#E1CFC6'}}
                 src={image}
                 alt='alt'
             />

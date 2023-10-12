@@ -30,11 +30,10 @@ export const DesktopProductGallery = ({hasWindow, product_video, video, images}:
                     <Image
                         fill
                         loading='eager'
-                        placeholder='blur'
+                        placeholder='empty'
                         quality={90}
-                        style={{objectFit: 'cover'}}
+                        style={{objectFit: 'cover', backgroundColor: '#E1CFC6'}}
                         src={image.image}
-                        blurDataURL={image.thumbnails[3].image}
                         alt={'alt' + key}
                     />
                 </ImageWrapper>
