@@ -14,7 +14,15 @@ interface SingleImageProps {
 export const SingleImage = ({link, image, alt}: SingleImageProps) => {
     return <ImageWrapper>
         <Link href={link}>
-            <Image fill style={{objectFit: 'cover'}} src={image} alt='alt' />
+            <Image
+                fill
+                loading='eager'
+                placeholder='blur'
+                quality={90}
+                style={{objectFit: 'cover'}}
+                src={image}
+                alt='alt'
+            />
         </Link>
     </ImageWrapper>
 }
