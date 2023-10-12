@@ -1,9 +1,17 @@
 import {VariantImage} from "@/interfaces/variant";
 
-import {Image, ImageColumn, ImageWrapper, ThumbnailImageWrapper, ThumbnailVideoWrapper, ThumbnailWrapper, Wrapper} from "./style";
+import {
+    ImageColumn,
+    ImageWrapper,
+    ThumbnailImageWrapper,
+    ThumbnailVideoWrapper,
+    ThumbnailWrapper,
+    Wrapper
+} from "./style";
 import {useEffect, useState} from "react";
 import {useKeenSlider} from "keen-slider/react";
 import {Video} from "@/components/Shared/Video";
+import Image from "next/image";
 
 interface ProductImageGalleryProps {
     images: VariantImage[];
@@ -73,7 +81,16 @@ export const MobileProductGallery = ({hasWindow, product_video, video, images}: 
                 {images.map((image, key) =>
                     <div key={key} className="keen-slider__slide">
                         <ImageWrapper>
-                            <Image src={image.thumbnails[0].image} alt={'alt' + key}/>
+                            <Image
+                                fill
+                                loading='eager'
+                                placeholder='blur'
+                                quality={90}
+                                style={{objectFit: 'cover'}}
+                                src={image.image}
+                                blurDataURL={image.thumbnails[3].image}
+                                alt={'alt' + key}
+                            />
                         </ImageWrapper>
                     </div>
                 )}
@@ -88,7 +105,8 @@ export const MobileProductGallery = ({hasWindow, product_video, video, images}: 
                 )}
                 {video && (
                     <div onClick={() => goToSlide(!product_video ? 0 : 1)}>
-                        <ThumbnailVideoWrapper active={product_video ? currentSlide === 1 : currentSlide === 0} className="keen-slider__slide">
+                        <ThumbnailVideoWrapper active={product_video ? currentSlide === 1 : currentSlide === 0}
+                                               className="keen-slider__slide">
                             <img src="/icons/video.png" alt="Video Thumbnail"/>
                         </ThumbnailVideoWrapper>
                     </div>
