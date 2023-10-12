@@ -1,7 +1,8 @@
 import {VariantImage} from "@/interfaces/variant";
 
-import {Image, ImageColumn, ImageWrapper} from "@/components/App/Product/Galery/style";
+import {ImageColumn, ImageWrapper} from "@/components/App/Product/Galery/style";
 import {Video} from "@/components/Shared/Video";
+import Image from "next/image";
 
 interface ProductImageGalleryProps {
     images: VariantImage[];
@@ -26,7 +27,16 @@ export const DesktopProductGallery = ({hasWindow, product_video, video, images}:
             }
             {images.map((image, key) =>
                 <ImageWrapper key={key}>
-                    <Image src={image.thumbnails[0].image} alt={'alt' + key}/>
+                    <Image
+                        fill
+                        loading='eager'
+                        placeholder='blur'
+                        quality={90}
+                        style={{objectFit: 'cover'}}
+                        src={image.image}
+                        blurDataURL={image.thumbnails[3].image}
+                        alt={'alt' + key}
+                    />
                 </ImageWrapper>
             )}
         </ImageColumn>

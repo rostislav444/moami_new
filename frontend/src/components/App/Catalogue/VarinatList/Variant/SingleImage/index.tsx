@@ -1,23 +1,23 @@
-import {ImageWrapper, Wrapper} from "@/components/App/Catalogue/VarinatList/Variant/style";
+import {ImageWrapper} from "@/components/App/Catalogue/VarinatList/Variant/style";
 import Link from "next/link";
-import {ImageLoad} from "@/components/App/Catalogue/VarinatList/Variant/Images/ImageLoad";
-import {VariantImage} from "@/interfaces/variant";
 import Image from "next/image";
 
 interface SingleImageProps {
     link: string;
     image: string;
+    thumbnail: string;
     alt: string
 }
 
 
-export const SingleImage = ({link, image, alt}: SingleImageProps) => {
+export const SingleImage = ({link, image, thumbnail, alt}: SingleImageProps) => {
     return <ImageWrapper>
         <Link href={link}>
             <Image
                 fill
                 loading='eager'
                 placeholder='blur'
+                blurDataURL={image}
                 quality={90}
                 style={{objectFit: 'cover'}}
                 src={image}
