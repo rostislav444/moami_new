@@ -2,10 +2,11 @@ import {ImageWrapper, Wrapper} from "@/components/App/Catalogue/VarinatList/Vari
 import Link from "next/link";
 import {ImageLoad} from "@/components/App/Catalogue/VarinatList/Variant/Images/ImageLoad";
 import {VariantImage} from "@/interfaces/variant";
+import Image from "next/image";
 
 interface SingleImageProps {
     link: string;
-    image: VariantImage;
+    image: string;
     alt: string
 }
 
@@ -13,8 +14,7 @@ interface SingleImageProps {
 export const SingleImage = ({link, image, alt}: SingleImageProps) => {
     return <ImageWrapper>
         <Link href={link}>
-            <ImageLoad src={image.thumbnails[2].image} />
+            <Image fill style={{objectFit: 'cover'}} src={image} alt='alt' />
         </Link>
-
     </ImageWrapper>
 }
