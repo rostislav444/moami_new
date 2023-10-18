@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import {Span} from "@/components/Shared/Typograpy";
 
 
 export const Wrapper = styled.div`
@@ -15,7 +16,7 @@ export const SlidesWrapper = styled.div`
 `;
 
 
-export const ImageWrapper = styled.div<{pointer?: boolean}>`
+export const ImageWrapper = styled.div<{ pointer?: boolean }>`
   position: relative;
   display: block;
   width: 100%;
@@ -25,6 +26,42 @@ export const ImageWrapper = styled.div<{pointer?: boolean}>`
   padding-top: 150%;
   cursor: ${props => props.pointer ? 'pointer' : 'unset'};
 `;
+
+
+export const VariantTitle = styled(Span)`
+  position: relative;
+  display: block;
+  font-size: 16px;
+  margin-top: 4px;
+  line-height: 1.5;
+  font-weight: 400;
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+`
+
+export const VariantPriceWrapper = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 8px;
+  line-height: 1.25;
+`
+
+export const VariantPrice = styled(Span)`
+  color: ${({theme}) => theme.color.primary};
+  font-size: 16px;
+  font-weight: 600;
+  font-weight: 600;
+  margin-right: 12px;
+`
+
+export const VariantOldPrice = styled(Span)`
+  text-decoration: line-through;
+  font-size: 15px;
+  color: ${({theme}) => theme.color.grey};
+`
 
 export const Slide = styled.div`
   position: absolute;

@@ -6,11 +6,11 @@ export const HeaderWrapper = styled.div`
   display: grid;
   grid-template-columns: 24px auto 1fr 24px;
   grid-gap: 16px;
-  width: calc(100% - 48px);
+  width: calc(100% - 32px);
   height: 54px;
   align-items: center;
   justify-items: center;
-  padding: 0 24px;
+  padding: 0 16px;
   border-bottom: 2px solid #333;
   background-color: ${props => props.theme.colors.background};
   z-index: 1000;

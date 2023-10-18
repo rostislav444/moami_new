@@ -16,7 +16,7 @@ export const ProductsList = ({variants, preloader}: variantListProps) => {
     }, [preloader]);
 
     return (
-        <s.VariantsList>
+        <s.VariantsList columns={false}>
             {variants.map((variant: variantState) =>
                 <Variant variant={variant} key={variant.id}/>
             )}

@@ -1,12 +1,20 @@
 import styled from '@emotion/styled'
 import {SpanBig} from "@/components/Shared/Typograpy";
 
-export const VariantsList = styled.div`
+export const VariantsList = styled.div<{ columns: boolean }>`
   position: relative;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
   grid-column-gap: 16px;
   grid-row-gap: 32px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: ${({columns}) => columns ? 'repeat(auto-fill, minmax(330px, 1fr))' : 'repeat(2, 1fr)'};
+    grid-column-gap: 16px;
+    grid-row-gap: 28px;
+  }
+
+
 `
 
 export const OldPrice = styled(SpanBig)`

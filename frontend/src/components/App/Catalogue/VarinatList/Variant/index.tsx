@@ -1,10 +1,16 @@
 import {variantState} from "@/interfaces/catalogue";
-import {P, SpanBig} from "@/components/Shared/Typograpy";
+import {P, Span, SpanBig} from "@/components/Shared/Typograpy";
 import Link from "next/link";
 import {OldPrice} from "@/components/App/Catalogue/VarinatList/style";
 import {CataloguesImages} from "@/components/App/Catalogue/VarinatList/Variant/Images";
 import {SingleImage} from "@/components/App/Catalogue/VarinatList/Variant/SingleImage";
 import Image from "next/image";
+import {
+    VariantOldPrice,
+    VariantPrice,
+    VariantPriceWrapper,
+    VariantTitle
+} from "@/components/App/Catalogue/VarinatList/Variant/style";
 
 interface VariantProps {
     variant: variantState;
@@ -12,7 +18,11 @@ interface VariantProps {
 }
 
 export const Variant = ({variant, slider = false}: VariantProps) => {
-    console.log(variant.images[0].thumbnails[3].image)
+    const transformPrice = (price: number) => {
+        return price.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ');
+    }
+
+
     return (
         <div>
             {slider ?
@@ -24,13 +34,13 @@ export const Variant = ({variant, slider = false}: VariantProps) => {
                     alt={'alt'}
                 />
             }
-            <P bold mt={2}>
+            <VariantPriceWrapper>
+                <VariantPrice>{transformPrice(variant.product.price)} ₴</VariantPrice>
+                {variant.product.old_price && <VariantOldPrice>{transformPrice(variant.product.old_price)} ₴</VariantOldPrice>}
+            </VariantPriceWrapper>
+            <VariantTitle>
                 <Link href={`/p-${variant.slug}`}>{variant.product.name}</Link>
-            </P>
-            <P>
-                <SpanBig mr={2}>{variant.product.price} ₴</SpanBig>
-                {variant.product.old_price && <OldPrice>{variant.product.old_price} ₴</OldPrice>}
-            </P>
+            </VariantTitle>
         </div>
     );
 };
