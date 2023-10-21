@@ -78,12 +78,11 @@ export const BoldBody = styled(Span)`
 `
 
 
-export const Caption = styled(span)`
+export const Caption = styled(Span)`
   font-size: 14px;
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   line-height: 1.75;
-  color: ${props => props.theme.color.primary};
 `
 
 export const Error = styled(span)`

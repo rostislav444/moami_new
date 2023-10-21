@@ -7,6 +7,11 @@ module.exports = {
                 source: '/p-:slug',
                 destination: '/product/:slug',
             },
+            {
+                source: '/lp-:slug',
+                destination: '/product_landing/:slug',
+            },
+
         ]
     },
 

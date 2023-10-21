@@ -13,8 +13,27 @@ export interface MarginProps {
     bold?: boolean;
     grey?: boolean;
     white?: boolean;
+    light?: boolean;
+    primary?: boolean;
     upper?: boolean;
     capitalize?: boolean;
+}
+
+
+const determineColor = (props: any) => {
+    if (props.primary) {
+        return props.theme.color.primary;
+    }
+    if (props.white) {
+        return 'white';
+    }
+    if (props.grey) {
+        return props.theme.color.grey;
+    }
+    if (props.light) {
+        return props.theme.color.light;
+    }
+    return 'inherit';
 }
 
 const margins = (props: any) => `
@@ -30,11 +49,7 @@ const margins = (props: any) => `
     padding-bottom: ${props.pb ? props.pb * 4 : 0}px;
     text-align: ${props.center ? 'center' : 'left'};
     font-weight: ${props.bold ? '500' : '400'};
-    color: ${
-        props.grey ? 'grey' :
-            props.white ? 'white !important' :
-                'inherit'
-    };
+    color: ${determineColor(props)};
     text-transform: ${props.upper ? 'uppercase' : props.capitalize ? 'capitalize' : 'none'};
 `;
 
