@@ -6,7 +6,7 @@ export const Gallery = ({images}: { images: string[] }) => {
     return <div>
         <GalleryWrapper>
             {images.map((image, index) => (
-                <GalleryImageWrapper>
+                <GalleryImageWrapper key={index}>
                     <img key={index} src={image} alt=""/>
                 </GalleryImageWrapper>
             ))}
