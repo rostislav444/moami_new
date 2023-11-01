@@ -75,7 +75,7 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
             // translation
             ...(await serverSideTranslations(locale || 'uk', ['common',]))
         },
-        revalidate: 60 * 60 * 24 // 24 hours
+        revalidate: 5 * 60 // once every 5 minutes
     } : {
         notFound: true
     }

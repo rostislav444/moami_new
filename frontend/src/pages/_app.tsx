@@ -15,7 +15,7 @@ import fetchWithLocale from "@/utils/fetchWrapper";
 import {variantState} from "@/interfaces/catalogue";
 import {setViewedProductsData} from "@/state/reducers/user";
 import {SessionProvider} from "next-auth/react";
-import { appWithTranslation } from 'next-i18next'
+import {appWithTranslation} from 'next-i18next'
 
 const useStore = (initialState: any) => {
     const store = useState(() => initializeStore(initialState))[0]
@@ -25,7 +25,8 @@ const useStore = (initialState: any) => {
 export const baseUrl = API_BASE_URL
 
 interface MyAppProps extends AppProps {
-    initialReduxState: any
+    initialReduxState: any,
+    locale: string
 }
 
 
@@ -38,7 +39,7 @@ const getDataFromLocalStorage = () => {
     return {cart: null, viewedIds: null}
 }
 
-function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState}: MyAppProps) {
+function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState, locale}: MyAppProps) {
     const {cart, viewedIds} = getDataFromLocalStorage()
     const preparedState = {
         ...initialReduxState,
@@ -58,14 +59,14 @@ function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState
     useEffect(() => {
         if (viewedIds && viewedIds.length > 0) {
             api.get('/product/variants?ids=' + viewedIds.join(','))
-               .then(response => {
-                   if (response.ok) {
-                       const data: variantState[] = response.data;
-                       const orderedVariants = viewedIds.map(id => data.find(variant => variant.id === id))
-                                                        .filter(Boolean);
-                       store.dispatch(setViewedProductsData(orderedVariants));
-                   }
-               });
+                .then(response => {
+                    if (response.ok) {
+                        const data: variantState[] = response.data;
+                        const orderedVariants = viewedIds.map(id => data.find(variant => variant.id === id))
+                            .filter(Boolean);
+                        store.dispatch(setViewedProductsData(orderedVariants));
+                    }
+                });
         }
         const jssStyles = document.querySelector('#jss-server-side');
         if (jssStyles) {
@@ -78,7 +79,7 @@ function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState
             <Provider store={store}>
                 <ThemeProvider>
                     <Global styles={globalStyles}/>
-                    <Component {...pageProps} />
+                    <Component key={locale} {...pageProps} />
                 </ThemeProvider>
             </Provider>
         </SessionProvider>
@@ -87,9 +88,9 @@ function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState
 
 MyApp.getInitialProps = async (context: AppContext) => {
     const ctx = await App.getInitialProps(context);
+    const {locale} = context.router;
 
     const getHeaders = (context: AppContext) => {
-        const {locale} = context.router;
         const isLocale = locale || 'uk'
         return {
             'Accept-Language': isLocale,
@@ -133,6 +134,7 @@ MyApp.getInitialProps = async (context: AppContext) => {
     return {
         ...ctx,
         initialReduxState: _reduxStore.getState(),
+        locale
     };
 };
 
