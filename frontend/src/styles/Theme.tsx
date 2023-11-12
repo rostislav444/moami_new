@@ -7,11 +7,12 @@ export const theme: Theme = {
         background: '#F0E4DE',
     },
     color: {
-        primary: '#843115',
-        primaryLight: '#cca090',
-        light: '#e4cabd',
-        primaryDark: '#5A1F0D',
+        primary: '#961e34',
+        primaryLight: '#f5e9eb',
+        light: '#e4bdc6',
+        primaryDark: '#770f22',
         grey: 'grey',
+        lightGray: '#ededed',
         positive: 'green',
         negative: 'red',
         error: 'red'

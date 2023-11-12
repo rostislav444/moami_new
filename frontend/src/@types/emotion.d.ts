@@ -12,6 +12,7 @@ declare module '@emotion/react' {
             primaryLight: string;
             light: string;
             grey: string;
+            lightGray: string;
             positive: string;
             negative: string;
             error: string;

@@ -3,6 +3,8 @@ import {VariantImage} from "@/interfaces/variant";
 import {ImageColumn, ImageWrapper} from "@/components/App/Product/Galery/style";
 import {Video} from "@/components/Shared/Video";
 import Image from "next/image";
+import {useState} from "react";
+import {GalleryModal} from "@/components/App/Product/Galery/Modal";
 
 interface ProductImageGalleryProps {
     images: VariantImage[];
@@ -13,7 +15,15 @@ interface ProductImageGalleryProps {
 
 
 export const DesktopProductGallery = ({hasWindow, product_video, video, images}: ProductImageGalleryProps) => {
-    return (
+    const [showModal, setShowModal] = useState(false)
+    const [initialSlide, setInitialSlide] = useState(0)
+
+    const handleImageClick = (index: number) => {
+        setShowModal(true)
+        setInitialSlide(index)
+    }
+
+    return <>
         <ImageColumn>
             {hasWindow && product_video &&
                 <ImageWrapper>
@@ -35,9 +45,11 @@ export const DesktopProductGallery = ({hasWindow, product_video, video, images}:
                         style={{objectFit: 'cover', backgroundColor: '#E1CFC6'}}
                         src={image.image}
                         alt={'alt' + key}
+                        onClick={() => handleImageClick(key)}
                     />
                 </ImageWrapper>
             )}
         </ImageColumn>
-    )
+        {showModal && <GalleryModal images={images} initialSlide={initialSlide} onClose={setShowModal}/>}
+    </>
 }

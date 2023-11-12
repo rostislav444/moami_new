@@ -39,7 +39,7 @@ const getDataFromLocalStorage = () => {
     return {cart: null, viewedIds: null}
 }
 
-function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState, locale}: MyAppProps) {
+function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState}: MyAppProps) {
     const {cart, viewedIds} = getDataFromLocalStorage()
     const preparedState = {
         ...initialReduxState,
@@ -55,6 +55,34 @@ function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState
 
     const store = useStore(preparedState);
     const api = fetchWithLocale('uk')
+
+    // useEffect(() => {
+    //     async function fetchData() {
+    //         const headers = {
+    //             'Accept-Language': locale,
+    //             'Content-Type': 'application/json',
+    //         }
+    //         const urls = [
+    //             '/category/categories/',
+    //             '/category/collections/',
+    //             '/pages/pages/'
+    //         ];
+    //
+    //         const [categories, collections, pages] = await Promise.all(
+    //             urls.map(url =>
+    //                 fetch(baseUrl + url, {headers})
+    //                     .then(res => res.json())
+    //             )
+    //         );
+    //
+    //         store.dispatch(setCategories(categories));
+    //         store.dispatch(setCollections(collections));
+    //         store.dispatch(setPages(pages));
+    //     }
+    //
+    //     fetchData()
+    //
+    // }, [locale]);
 
     useEffect(() => {
         if (viewedIds && viewedIds.length > 0) {
@@ -79,7 +107,7 @@ function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState
             <Provider store={store}>
                 <ThemeProvider>
                     <Global styles={globalStyles}/>
-                    <Component key={locale} {...pageProps} />
+                    <Component {...pageProps} />
                 </ThemeProvider>
             </Provider>
         </SessionProvider>

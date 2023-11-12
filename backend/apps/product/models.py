@@ -4,25 +4,23 @@ from io import BytesIO
 from PIL import Image
 from adminsortable.models import SortableMixin
 from colorfield.fields import ColorField
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django.utils.text import slugify
-from unidecode import unidecode
 from mptt.models import MPTTModel, TreeForeignKey
+from unidecode import unidecode
+
 from apps.abstract.fields import DeletableImageField, DeletableVideoField
 from apps.attributes.models import Attribute, AttributeGroup, Composition
 from apps.categories.models import Collections
 from apps.sizes.models import Size
 from apps.translation.models import Translatable
-
-from django.core.exceptions import ValidationError
-from django.utils.safestring import mark_safe
-
-
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Разрешенные символы 0-9, a-z, A-Z, -')
 

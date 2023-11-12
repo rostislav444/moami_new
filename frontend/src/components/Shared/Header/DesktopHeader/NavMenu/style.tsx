@@ -40,7 +40,7 @@ export const SubMenuWrapper = styled.div`
   border-top: 2px solid black;
   top: 127px;
   left: 0;
-  background-color: white;
+  background-color: ${props => props.theme.color.primaryLight};
   z-index: 10;
 `
 

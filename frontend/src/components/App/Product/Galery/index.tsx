@@ -22,7 +22,6 @@ export const ProductImageGallery = ({product_video, video, images}: ProductImage
         }
     }, []);
 
-
     return isMobile ? <MobileProductGallery hasWindow={hasWindow} product_video={product_video} video={video} images={images}/> :
         <DesktopProductGallery hasWindow={hasWindow} product_video={product_video} video={video} images={images}/>
 

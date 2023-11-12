@@ -11,9 +11,9 @@ export const HeaderWrapper = styled.div`
   align-items: center;
   justify-items: center;
   padding: 0 16px;
-  border-bottom: 2px solid #333;
-  background-color: ${props => props.theme.colors.background};
+  border-bottom: 2px solid  ${props => props.theme.color.primary};
   z-index: 1000;
+  background-color: white;
 `;
 
 
@@ -43,7 +43,7 @@ export const BurgerIcon = styled.div<{ isOpen: boolean }>`
   div {
     width: 100%;
     height: 2px;
-    background-color: #333;
+    background-color: ${props => props.theme.color.primary};;
   }
 `;
 export const ProfileIconWrapper = styled.div`

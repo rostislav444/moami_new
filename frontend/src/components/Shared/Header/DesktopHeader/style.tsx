@@ -5,7 +5,7 @@ import styled from '@emotion/styled'
 export const HeaderWrapper = styled.header`
   display: grid;
   width: 100%;
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid ${props => props.theme.color.primary};
 `
 
 export const HeaderfirstLine = styled.div`
