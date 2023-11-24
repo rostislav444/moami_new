@@ -1,82 +1,81 @@
-import { useEffect, useRef, useState } from "react";
-import { ImageStyled, ImageWrapper } from "@/components/App/Product/Galery/Modal/Slide/style";
+import {useEffect, useRef, useState} from "react";
+import {ImageSlide} from "@/components/App/Product/Galery/Modal/Slide/style";
+import {ReactZoomPanPinchRef, TransformWrapper} from "react-zoom-pan-pinch";
+import {ZoomComponent} from "@/components/App/Product/Galery/Modal/Slide/ZoomComponent";
 
-export const Slide = ({ image, index }: { image: string, index: number }) => {
-    const initialScale = useRef(0)
-    const [scale, setScale] = useState<number>(1);
-    const [isDragging, setIsDragging] = useState(false)
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+export const Slide = ({image, index, mobile}: { image: string, index: number, mobile: boolean }) => {
+    const [initialScale, setInitialScale] = useState<number>(0);
+    const initialPosition = useRef({x: 0, y: 0})
+    const previousScale = useRef<number | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const transformComponentRef = useRef<ReactZoomPanPinchRef | null>(null);
+    const [position, setPosition] = useState({x: 0, y: 0});
+    const [step, setStep] = useState(0)
+
 
     const handleImageOnLoad = (image: HTMLImageElement, rect: any) => {
-        const scaleValue = rect.height / image.naturalHeight
-        initialScale.current = scaleValue
-        setScale(scaleValue);
+        const scaleValue = mobile ? 390 / image.naturalWidth :  rect.height / image.naturalHeight
+        setStep(scaleValue)
+
+        const pos = mobile ?
+            {x: 0, y: (window.innerHeight - 120) / 2 - image.naturalHeight * scaleValue / 2} :
+            {x: (window.innerWidth - 120) / 2 - image.naturalWidth * scaleValue / 2, y: 0}
+        initialPosition.current = pos
+        setInitialScale(scaleValue);
     };
 
     useEffect(() => {
         if (containerRef.current) {
+            console.log(window)
             const rect = containerRef.current.getBoundingClientRect();
             const img = new Image();
             img.onload = () => handleImageOnLoad(img, rect);
             img.src = image;
         }
-    }, [image]);
+    }, [containerRef.current]);
 
-   const handleMouseDown = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-        setIsDragging(false); // Сбросить флаг перетаскивания при начале перетаскивания
-        setDragStart({
-            x: event.clientX - position.x,
-            y: event.clientY - position.y
-        });
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-        if (dragStart.x !== 0 || dragStart.y !== 0) {
-            setIsDragging(true); // Установить флаг перетаскивания
-            const newX = event.clientX - dragStart.x;
-            const newY = event.clientY - dragStart.y;
-            setPosition({ x: newX, y: newY });
+    const onZoomStop = (ref: ReactZoomPanPinchRef, event: any) => {
+        if (transformComponentRef.current && initialScale) {
+            const {instance: {transformState: {scale}}} = transformComponentRef.current
+            previousScale.current = scale
         }
-    };
+    }
 
-    const handleMouseUp = () => {
-        setDragStart({ x: 0, y: 0 });
-    };
-
-    const handleImageClick = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-        if (!isDragging) { // Увеличить только если не происходит перетаскивание
-            setScale(prevScale => {
-                if (prevScale >= initialScale.current * 4) {
-                    setPosition({ x: 0, y: 0 })
-                    return initialScale.current
-                } else {
-                    return prevScale + initialScale.current
-                }
-            })
+    const setTransform = (x: number, y: number, scale: number) => {
+        if (previousScale.current && transformComponentRef.current) {
+            const previous = Math.ceil(previousScale.current / initialScale * 10)
+            if (previous == 60) {
+                setStep(-initialScale * 6)
+            }
+            if (previous <= 12) {
+                setStep(initialScale)
+            }
         }
-        setIsDragging(false); // Сбросить флаг перетаскивания после клика
-    };
+        return `translate(${x}px, ${y}px) scale(${scale})`
+    }
 
-    useEffect(() => {
-        window.addEventListener("mousemove", handleMouseMove);
-        window.addEventListener("mouseup", handleMouseUp);
-        return () => {
-            window.removeEventListener("mousemove", handleMouseMove);
-            window.removeEventListener("mouseup", handleMouseUp);
-        };
-    }, [dragStart]);
 
     return (
-        <ImageWrapper ref={containerRef} className="keen-slider__slide">
-            <ImageStyled
-                src={image}
-                scale={scale}
-                position={position}
-                onClick={handleImageClick}
-                onMouseDown={handleMouseDown}
-            />
-        </ImageWrapper>
+        <ImageSlide ref={containerRef} className="keen-slider__slide">
+            {initialScale !== 0 ? <TransformWrapper
+                initialScale={initialScale}
+                initialPositionX={initialPosition.current.x}
+                initialPositionY={initialPosition.current.y}
+                ref={transformComponentRef}
+                doubleClick={{
+                    step: step * 2
+                }}
+                maxScale={initialScale * 6}
+                minScale={initialScale}
+                zoomAnimation={{
+                    disabled: true
+                }}
+                onZoomStop={onZoomStop}
+                customTransform={setTransform}
+            >
+                <ZoomComponent image={image} position={position} scale={initialScale} mobile={mobile}/>
+            </TransformWrapper> : null}
+
+        </ImageSlide>
     );
 };

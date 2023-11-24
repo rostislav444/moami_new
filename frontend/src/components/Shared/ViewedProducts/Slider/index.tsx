@@ -4,6 +4,7 @@ import {H2} from "@/components/Shared/Typograpy";
 import {ViewedProductsList} from "@/components/Shared/ViewedProducts/style";
 import {Variant} from "@/components/App/Catalogue/VarinatList/Variant";
 import {variantState} from "@/interfaces/catalogue";
+import {useTranslation} from "next-i18next";
 
 
 interface SliderProps {
@@ -12,6 +13,7 @@ interface SliderProps {
 
 
 export const Slider = ({viewedData}: SliderProps) => {
+    const { t } = useTranslation('common', { useSuspense: false })
     const router = useRouter();
     const {asPath} = router;
 
@@ -35,7 +37,7 @@ export const Slider = ({viewedData}: SliderProps) => {
 
     return (
         <div>
-            <H2 mt={12} mb={8}>Вы смотрели ({viewedData.length})</H2>
+            <H2 mt={12} mb={8}>{t('titles.youWatched')} ({viewedData.length})</H2>
             <ViewedProductsList ref={sliderRef} className="keen-slider">
                 {viewedData.map(variant =>
                     <div key={variant.id} className="keen-slider__slide">

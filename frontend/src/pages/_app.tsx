@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {Provider} from 'react-redux'
 import '@/styles/globals.css'
 import App, {AppContext, AppProps} from 'next/app'
@@ -16,13 +16,17 @@ import {variantState} from "@/interfaces/catalogue";
 import {setViewedProductsData} from "@/state/reducers/user";
 import {SessionProvider} from "next-auth/react";
 import {appWithTranslation} from 'next-i18next'
+import {fetchInitialData} from "@/utils/fetchInitialData";
+import {useRouter} from "next/router";
+
+
+export const baseUrl = API_BASE_URL
+
 
 const useStore = (initialState: any) => {
     const store = useState(() => initializeStore(initialState))[0]
     return store;
 }
-
-export const baseUrl = API_BASE_URL
 
 interface MyAppProps extends AppProps {
     initialReduxState: any,
@@ -40,6 +44,8 @@ const getDataFromLocalStorage = () => {
 }
 
 function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState}: MyAppProps) {
+    const router = useRouter();
+    const {locale} = router;
     const {cart, viewedIds} = getDataFromLocalStorage()
     const preparedState = {
         ...initialReduxState,
@@ -56,33 +62,6 @@ function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState
     const store = useStore(preparedState);
     const api = fetchWithLocale('uk')
 
-    // useEffect(() => {
-    //     async function fetchData() {
-    //         const headers = {
-    //             'Accept-Language': locale,
-    //             'Content-Type': 'application/json',
-    //         }
-    //         const urls = [
-    //             '/category/categories/',
-    //             '/category/collections/',
-    //             '/pages/pages/'
-    //         ];
-    //
-    //         const [categories, collections, pages] = await Promise.all(
-    //             urls.map(url =>
-    //                 fetch(baseUrl + url, {headers})
-    //                     .then(res => res.json())
-    //             )
-    //         );
-    //
-    //         store.dispatch(setCategories(categories));
-    //         store.dispatch(setCollections(collections));
-    //         store.dispatch(setPages(pages));
-    //     }
-    //
-    //     fetchData()
-    //
-    // }, [locale]);
 
     useEffect(() => {
         if (viewedIds && viewedIds.length > 0) {
@@ -107,7 +86,7 @@ function MyApp({Component, pageProps: {session, ...pageProps}, initialReduxState
             <Provider store={store}>
                 <ThemeProvider>
                     <Global styles={globalStyles}/>
-                    <Component {...pageProps} />
+                    <Component key={locale} {...pageProps} />
                 </ThemeProvider>
             </Provider>
         </SessionProvider>
@@ -118,40 +97,12 @@ MyApp.getInitialProps = async (context: AppContext) => {
     const ctx = await App.getInitialProps(context);
     const {locale} = context.router;
 
-    const getHeaders = (context: AppContext) => {
-        const isLocale = locale || 'uk'
-        return {
-            'Accept-Language': isLocale,
-            'Content-Type': 'application/json',
-        }
-    }
-
-    const fetchInitialData = async (context: AppContext) => {
-        const headers = getHeaders(context);
-
-        const urls = [
-            '/category/categories/',
-            '/category/collections/',
-            '/sizes/size-grids/',
-            '/pages/pages/'
-        ];
-
-        const [categories, collections, sizeGrids, pages] = await Promise.all(
-            urls.map(url =>
-                fetch(baseUrl + url, {headers})
-                    .then(res => res.json())
-            )
-        );
-
-        return {categories, collections, sizeGrids, pages};
-    }
-
     const _reduxStore = initializeStore(ctx.pageProps.initialReduxState || {});
 
     // only fetch initial data when the store is first created (on server side or client side first load)
     if (typeof window === 'undefined' || !ctx.pageProps.initialReduxState) {
         const {dispatch} = _reduxStore;
-        const {categories, collections, sizeGrids, pages} = await fetchInitialData(context);
+        const {categories, collections, sizeGrids, pages} = await fetchInitialData(locale || 'uk');
 
         dispatch(setCategories(categories));
         dispatch(setCollections(collections));

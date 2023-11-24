@@ -1,4 +1,4 @@
-import styled   from "@emotion/styled";
+import styled from "@emotion/styled";
 import {Button} from "@/components/Shared/Buttons";
 
 export const Wrapper = styled.div`

@@ -17,6 +17,7 @@ import {selectCategories} from "@/state/reducers/categories";
 import {CategoryState} from "@/interfaces/categories";
 import {Sizes} from "@/components/App/Product/Description/Sizes";
 import {PriceBlock} from "@/components/App/Product/Description/PriceBlock";
+import {useTranslation} from "next-i18next";
 
 const getCategory = (categories: CategoryState[], parentId: number, id: number) => {
     const parentCategory = categories.find(category => category.id === parentId)
@@ -31,6 +32,7 @@ const getCategory = (categories: CategoryState[], parentId: number, id: number) 
 
 export const DescriptionBlock = ({variant}: VariantPageProps) => {
     const store = useStore()
+     const {t} = useTranslation('common', {useSuspense: false})
     const categories = useAppSelector(selectCategories)
     const category = getCategory(categories, variant.product.category.parent, variant.product.category.id)
     const currentSizeGrid = category?.selected_size_grid || category?.preferred_size_grid
@@ -86,7 +88,7 @@ export const DescriptionBlock = ({variant}: VariantPageProps) => {
         <PriceBlock variant={variant}/>
         <ProductPreview>
             <li>
-                <Span bold mr={1}>Cостав:</Span>
+                <Span bold mr={1}>{t('titles.composition')}:</Span>
                 <Span>{variant.product.compositions.map(composition => `${composition.composition} - ${composition.value}%`)
                               .join(', ')}</Span>
             </li>
@@ -106,9 +108,9 @@ export const DescriptionBlock = ({variant}: VariantPageProps) => {
             setSizeNotSelectedError={setSizeNotSelectedError}
             currentSizeGrid={currentSizeGrid}
         />
-        {sizeNotSelectedError && <Error mt={4}>Выберите размер</Error>}
+        {sizeNotSelectedError && <Error mt={4}>{t('titles.chooseSize')}</Error>}
         <Actions>
-            <BuyButton onClick={handleAddToCart}>Купить</BuyButton>
+            <BuyButton onClick={handleAddToCart}>{t('titles.buy')}</BuyButton>
             {/*<AddToWishlistWrapper>*/}
             {/*    <Icon src={'/icons/heart.svg'}/>*/}
             {/*</AddToWishlistWrapper>*/}

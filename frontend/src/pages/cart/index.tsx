@@ -3,17 +3,20 @@ import Layout from "@/components/Shared/Layout";
 import {CartPage} from "@/components/App/Cart";
 import {GetStaticProps} from "next";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useTranslation} from "next-i18next";
 
 
 export default function Cart() {
+    const {t} = useTranslation('common', {useSuspense: false})
+
     const breadcrumbs = [
-        {title: 'Главная', url: '/'},
-        {title: 'Корзина', url: '/cart'},
+        {title: t('pages.main'), url: '/'},
+        {title: t('pages.cart'), url: '/cart'},
     ]
 
     return (
         <Layout breadcrumbs={breadcrumbs}>
-            <CartPage />
+            <CartPage/>
         </Layout>
     )
 }

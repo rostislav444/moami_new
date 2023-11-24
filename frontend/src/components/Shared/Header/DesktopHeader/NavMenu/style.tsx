@@ -37,11 +37,12 @@ export const SubMenuWrapper = styled.div`
   position: absolute;
   display: none;
   width: 100%;
-  border-top: 2px solid black;
+  // border-top: 2px solid ${props => props.theme.color.primary};;
   top: 127px;
   left: 0;
-  background-color: ${props => props.theme.color.primaryLight};
+  background-color: ${props => props.theme.color.light};
   z-index: 10;
+  border-bottom: 2px solid  ${props => props.theme.color.primary};
 `
 
 export const SubMenu = styled.ul`
@@ -59,7 +60,7 @@ export const SubMenu = styled.ul`
 `
 
 export const SubMenuItem = styled.li`
-  padding: 12px;
+  padding: 16px 24px;
   border-bottom: 2px solid transparent;
   cursor: pointer;
 

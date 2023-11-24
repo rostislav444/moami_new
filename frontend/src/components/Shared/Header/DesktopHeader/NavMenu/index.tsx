@@ -5,6 +5,7 @@ import React              from "react";
 import {CategoryState}    from "@/interfaces/categories";
 import {CollectionsState} from "@/interfaces/collections";
 import {useRouter}        from "next/router";
+import {useTranslation} from "next-i18next";
 
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export const DesktopNavMenu = ({categories, collections}: Props) => {
+     const {t} = useTranslation('common', {useSuspense: false})
     const router = useRouter();
     const {locale} = router;
 
@@ -37,7 +39,7 @@ export const DesktopNavMenu = ({categories, collections}: Props) => {
                 </s.NavMenuItem>
             )}
             <s.NavMenuItem>
-                <Link locale={locale} href={`/collections`}><span>Коллекции</span></Link>
+                <Link locale={locale} href={`/collections`}><span>{t('pages.collections')}</span></Link>
                 <s.SubMenuWrapper className={'sub-menu'}>
                     <s.SubMenu>
                         {collections.map((collection) =>

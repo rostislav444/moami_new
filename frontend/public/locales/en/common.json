@@ -9,5 +9,38 @@
       "weInSocial": "We in social networks",
       "collections": "Collections"
     }
+  },
+  "titles": {
+    "hello": "Hello",
+    "youWatched": "You watched",
+    "sizeGrid": "Size grid",
+    "composition": "Composition",
+    "chooseSize": "ChooseSize",
+    "buy": "Buy"
+  },
+  "form": {
+    "loginTitle": "Log into your account",
+    "password": "Password",
+    "passwordError": "Enter your password",
+    "emailPlaceholder": "Enter your email",
+    "emailError": "Enter correct e-mail",
+    "login": "Login",
+    "loginGoogle": "Login with Google",
+    "logout": "Logout"
+  },
+  "cart": {
+    "photo": "Photo",
+    "details": "Details",
+    "price": "Price",
+    "quantity": "Quantity",
+    "total": "Total",
+    "amount": "Amount",
+    "continueShopping": "Continue shopping",
+    "checkout": "Checkout"
+  },
+  "pages": {
+    "main": "Main",
+    "cart": "Cart",
+    "collections": "Collection"
   }
 }

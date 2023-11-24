@@ -5,8 +5,11 @@ import {CartItem}                                  from "@/components/App/Cart/C
 import Link                                        from "next/link";
 import {ShoppingCartButton}                        from "@/components/App/Cart/style";
 import {PL}                                        from "@/components/Shared/Typograpy";
+import {useTranslation} from "next-i18next";
 
 export const CartPC = ({items, quantity, total, handelRemoveItem, handleUpdate,}: CartProductsProps) => {
+    const { t } = useTranslation('common', { useSuspense: false })
+
     return <>
         <CartGrid>
             <CartHeader/>
@@ -15,16 +18,15 @@ export const CartPC = ({items, quantity, total, handelRemoveItem, handleUpdate,}
             )}
         </CartGrid>
         <CartActions>
-             <PL bold>Всего: {total} ₴</PL>
+             <PL bold>{t('cart.amount')}: {total} ₴</PL>
             <CartActionsButtons>
                 <Link href='/'>
-                    <ShoppingCartButton light>Продолжить покупки</ShoppingCartButton>
+                    <ShoppingCartButton light>{t('cart.continueShopping')}</ShoppingCartButton>
                 </Link>
                 <Link href='/order'>
-                    <ShoppingCartButton>Оформить заказ</ShoppingCartButton>
+                    <ShoppingCartButton>{t('cart.checkout')}</ShoppingCartButton>
                 </Link>
             </CartActionsButtons>
-
         </CartActions>
     </>
 

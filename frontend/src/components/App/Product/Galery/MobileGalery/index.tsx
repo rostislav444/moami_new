@@ -12,6 +12,7 @@ import {useEffect, useState} from "react";
 import {useKeenSlider} from "keen-slider/react";
 import {Video} from "@/components/Shared/Video";
 import Image from "next/image";
+import {GalleryModal} from "@/components/App/Product/Galery/Modal";
 
 interface ProductImageGalleryProps {
     images: VariantImage[];
@@ -22,6 +23,7 @@ interface ProductImageGalleryProps {
 
 
 export const MobileProductGallery = ({hasWindow, product_video, video, images}: ProductImageGalleryProps) => {
+    const [showModal, setShowModal] = useState(false)
     const [currentSlide, setCurrentSlide] = useState(0)
 
 
@@ -39,6 +41,7 @@ export const MobileProductGallery = ({hasWindow, product_video, video, images}: 
     const [thumbnailRef, thumbnailInstanceRef] = useKeenSlider(
         {
             initial: 0,
+            loop: true,
             slides: {perView: 4, spacing: 10},
             breakpoints: {
                 "(min-width: 560px)": {slides: {perView: 6, spacing: 15}},
@@ -46,6 +49,10 @@ export const MobileProductGallery = ({hasWindow, product_video, video, images}: 
         },
         []
     )
+
+    const handleImageClick = (index: number) => {
+        setShowModal(true)
+    }
 
 
     useEffect(() => {
@@ -61,7 +68,7 @@ export const MobileProductGallery = ({hasWindow, product_video, video, images}: 
     };
 
 
-    return (
+    return <>
         <Wrapper>
             <ImageColumn ref={sliderRef} className="keen-slider">
                 {hasWindow && product_video &&
@@ -89,6 +96,7 @@ export const MobileProductGallery = ({hasWindow, product_video, video, images}: 
                                 style={{objectFit: 'cover', backgroundColor: '#E1CFC6'}}
                                 src={image.image}
                                 alt={'alt' + key}
+                                onClick={() => handleImageClick(key)}
                             />
                         </ImageWrapper>
                     </div>
@@ -128,6 +136,6 @@ export const MobileProductGallery = ({hasWindow, product_video, video, images}: 
                 })}
             </ThumbnailWrapper>
         </Wrapper>
-
-    )
+        {showModal && <GalleryModal mobile images={images} initialSlide={currentSlide} onClose={setShowModal}/>}
+    </>
 }

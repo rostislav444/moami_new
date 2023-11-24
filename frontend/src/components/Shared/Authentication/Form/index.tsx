@@ -4,6 +4,7 @@ import {signIn, signOut, useSession} from 'next-auth/react';
 import {Form, Input, InputWrapper} from '@/components/Shared/Form';
 import {Button} from '@/components/Shared/Buttons';
 import {Error, P} from '@/components/Shared/Typograpy';
+import {useTranslation} from "next-i18next";
 
 interface AuthenticationFormProps {
     onAuthenticated?: any
@@ -15,6 +16,7 @@ interface FormDataState {
 }
 
 export const AuthenticationForm: React.FC<AuthenticationFormProps> = ({onAuthenticated}) => {
+    const { t } = useTranslation('common', { useSuspense: false })
     const {data: session} = useSession();
     const {register, handleSubmit, formState: {errors}} = useForm<FormDataState>();
     const [error, setError] = useState(false)
@@ -37,8 +39,8 @@ export const AuthenticationForm: React.FC<AuthenticationFormProps> = ({onAuthent
 
     return session ? <div>
         <InputWrapper>
-            <P capitalize mb={4}>Здравствуйте {session?.user?.name} </P>
-            <Button onClick={() => signOut()}>Выход</Button>
+            <P capitalize mb={4}>{t('titles.hello')} {session?.user?.name} </P>
+            <Button onClick={() => signOut()}>{t('form.logout')}</Button>
         </InputWrapper>
     </div> : <div>
         <Form onSubmit={handleSubmit(handleCredentialsLogin)}>
@@ -48,10 +50,10 @@ export const AuthenticationForm: React.FC<AuthenticationFormProps> = ({onAuthent
                     type="email"
                     placeholder='E-mail'
                     {...register('email', {
-                        required: 'Введите e-mail',
+                        required: t('form.emailPlaceholder'),
                         pattern: {
                             value: /^\S+@\S+$/i,
-                            message: 'Введите корректный e-mail'
+                            message: t('form.emailError'),
                         }
                     })}
                 />
@@ -60,22 +62,22 @@ export const AuthenticationForm: React.FC<AuthenticationFormProps> = ({onAuthent
             <InputWrapper>
                 <Input
                     type='password'
-                    placeholder='Пароль'
+                    placeholder={t('form.password')}
                     {...register('password', {
-                        required: 'Введите пароль'
+                        required: t('form.passwordError')
                     })}
                 />
                 {errors.password && <Error>{errors.password.message}</Error>}
             </InputWrapper>
             <InputWrapper>
-                <Button type='submit'>Вход в кабинет</Button>
+                <Button type='submit'>{t('form.login')}</Button>
             </InputWrapper>
 
         </Form>
         <InputWrapper mt={3}>
             <Button white onClick={handleGoogleLogin}>
                 <img src={'/icons/google.jpg'}/>
-                <span>Вход при помощи google</span>
+                <span>{t('form.loginGoogle')}</span>
             </Button>
         </InputWrapper>
     </div>

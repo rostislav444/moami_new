@@ -8,6 +8,7 @@ export const CartGrid = styled.div`
   padding: 32px;
   background-color: white;
   border: 1px solid ${props => props.theme.color.primary};
+  background-color: ${props => props.theme.color.light};
 `;
 
 const GridItem = styled.div`

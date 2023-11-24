@@ -11,6 +11,7 @@ import {categoriesBySlugList, getCategoriesAndPage} from "@/utils/categories";
 import {CategoryState} from "@/interfaces/categories";
 import {API_BASE_URL} from "@/local";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useTranslation} from "next-i18next";
 
 const baseUrl = API_BASE_URL
 
@@ -25,7 +26,15 @@ export interface CatalogueCategoryProps extends BaseProps {
 
 export const perPage = 24;
 
-export default function CatalogueCategory({paginatedVariants, statusCode, locale, params, page}: CatalogueCategoryProps) {
+
+export default function CatalogueCategory({
+                                              paginatedVariants,
+                                              statusCode,
+                                              locale,
+                                              params,
+                                              page
+                                          }: CatalogueCategoryProps) {
+    const {t} = useTranslation('common', {useSuspense: false})
     const store = useStore();
     const categories = selectCategories(store.getState())
     const path = params.join('/') + (page > 1 ? `/page/${page}` : '')
@@ -39,7 +48,7 @@ export default function CatalogueCategory({paginatedVariants, statusCode, locale
     const breadcrumbsCategories = categoriesBySlugList(categories, params, [])
 
     return (
-        <Layout key={key} breadcrumbs={[{title: 'Главная', link: '/'}, ...breadcrumbsCategories]}>
+        <Layout key={key} breadcrumbs={[{title: t('pages.main'), link: '/'}, ...breadcrumbsCategories]}>
             <Catalogue initialVariants={results} count={count} url={params.join('/')} page={page}/>
         </Layout>
     )

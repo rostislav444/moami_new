@@ -50,6 +50,6 @@ export const DesktopProductGallery = ({hasWindow, product_video, video, images}:
                 </ImageWrapper>
             )}
         </ImageColumn>
-        {showModal && <GalleryModal images={images} initialSlide={initialSlide} onClose={setShowModal}/>}
+        {showModal && <GalleryModal  images={images} initialSlide={initialSlide} onClose={setShowModal}/>}
     </>
 }

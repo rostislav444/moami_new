@@ -33,4 +33,20 @@ export const IconsWrapper = styled.div`
 `
 
 
+export const LanguagesWrapper = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 8px;
+
+`
+
+export const LanguageLink = styled.a<{selected: boolean}>`
+  margin: 8px;
+  color: ${props => props.selected ? props.theme.color.primary : 'black'};
+  text-decoration: ${props => props.selected ? 'underline' : 'none'};
+`
+
+
 

@@ -5,6 +5,7 @@ import {useStore} from "react-redux";
 import {VariantState} from "@/interfaces/variant";
 import {CategoryState} from "@/interfaces/categories";
 import {setSelectSizeGrid} from "@/state/reducers/categories";
+import {useTranslation} from "next-i18next";
 
 
 interface TopBlockProps {
@@ -19,6 +20,7 @@ interface TopBlockProps {
 
 
 export const TopBlock = ({variant, currentSizeGrid, category, categoryIds}: TopBlockProps) => {
+     const {t} = useTranslation('common', {useSuspense: false})
     const store = useStore()
     const sizeGrids = category ? category.size_group.grids.map(grid => grid.slug) : []
 
@@ -32,7 +34,7 @@ export const TopBlock = ({variant, currentSizeGrid, category, categoryIds}: TopB
         <FlexSpaceBetween mb={4}>
             <Caption>Код: {variant.code}</Caption>
             <Flex>
-                <Span mr={2}>Размерная сетка:</Span>
+                <Span mr={2}>{t('titles.sizeGrid')}:</Span>
                 {currentSizeGrid && <DropdownSelect pt={0.5} transparent value={currentSizeGrid}
                                                     options={sizeGrids.map(grid => ({label: grid, value: grid}))}
                                                     onChange={handleGridChange}/>}

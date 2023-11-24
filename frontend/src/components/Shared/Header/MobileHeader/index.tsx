@@ -8,6 +8,7 @@ import {Icon} from "@/components/Shared/Icons";
 import {useSession} from "next-auth/react";
 import {AuthenticationForm} from "@/components/Shared/Authentication/Form";
 import {Modal} from "@/components/Shared/UI/Modal";
+import {useTranslation} from "next-i18next";
 
 
 interface MobileHeaderProps {
@@ -15,6 +16,7 @@ interface MobileHeaderProps {
 }
 
 export const MobileHeader = ({data}: MobileHeaderProps) => {
+    const { t } = useTranslation('common', { useSuspense: false })
     const {data: session} = useSession();
     const [isOpen, setIsOpen] = useState(false);
     const [authModalOpen, setAuthModalOpen] = useState(false)
@@ -44,7 +46,7 @@ export const MobileHeader = ({data}: MobileHeaderProps) => {
             </Link>
         </HeaderWrapper>
         {isOpen && <MobileMenuPopup toggleMenu={toggleMenu} data={data}/>}
-        <Modal title={'Вход в личный кабинет'} isOpen={authModalOpen} onClose={setAuthModalOpen}>
+        <Modal title={t('form.loginTitle')} isOpen={authModalOpen} onClose={setAuthModalOpen}>
             <AuthenticationForm onAuthenticated={() => setAuthModalOpen(false)}/>
         </Modal>
     </>

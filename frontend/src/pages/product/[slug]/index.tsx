@@ -5,15 +5,18 @@ import {ProductPage} from "@/components/App/Product";
 import {GetStaticProps} from "next";
 import {VariantPageProps} from "@/interfaces/variant";
 import fetchWithLocale from "@/utils/fetchWrapper";
-import {useEffect, useRef} from "react";
+import {useEffect} from "react";
 import {pageView} from "@/lib/FacebookPixel";
 import {useStore} from "react-redux";
 import {addViewedProductData} from "@/state/reducers/user";
 import {useSession} from "next-auth/react";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useTranslation} from "next-i18next";
 
 
 export default function Product({variant, locale}: VariantPageProps) {
+    const {t} = useTranslation('common', {useSuspense: false})
+
     const {data: session} = useSession();
     const router = useRouter()
     const store = useStore()
@@ -48,8 +51,9 @@ export default function Product({variant, locale}: VariantPageProps) {
         }
     }, [session, store, api, variant]);
 
+
     const breadcrumbs = [
-        {title: 'Главная', link: '/'},
+        {title: t('pages.main'), link: '/'},
         ...categoriesBreadcrumbs,
         {title: variant.name, link: `/p-${slug}/`}
     ]
@@ -80,7 +84,6 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
         notFound: true
     }
 }
-
 
 
 export const getStaticPaths = async () => {
