@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-
+import Link from 'next/link'
 
 
 export const HeaderWrapper = styled.header`
@@ -42,7 +42,7 @@ export const LanguagesWrapper = styled.div`
 
 `
 
-export const LanguageLink = styled.a<{selected: boolean}>`
+export const LanguageLink = styled(Link)<{selected: boolean}>`
   margin: 8px;
   color: ${props => props.selected ? props.theme.color.primary : 'black'};
   text-decoration: ${props => props.selected ? 'underline' : 'none'};

@@ -31,7 +31,7 @@ export const DesktopHeader = ({data}: DesktopHeaderProps) => {
     const {categories, collections} = data
 
     const localeOptions = [
-        {value: 'uk', link: '',  label: 'Укр'},
+        {value: 'uk', link: '', label: 'Укр'},
         {value: 'ru', link: '/ru', label: 'Рус'},
         {value: 'en', link: '/en', label: 'Eng'},
     ]
@@ -48,7 +48,14 @@ export const DesktopHeader = ({data}: DesktopHeaderProps) => {
                     <IconsWrapper>
                         <LanguagesWrapper>
                             {localeOptions.map(({value, link, label}, index) =>
-                                <LanguageLink selected={value===locale} key={index} href={link + asPath}>{label}</LanguageLink>
+                                <LanguageLink
+                                    key={index}
+                                    locale={value}
+                                    selected={value === locale}
+                                    href={asPath}
+                                >
+                                    {label}
+                                </LanguageLink>
                             )}
                         </LanguagesWrapper>
                         <div>
