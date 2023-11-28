@@ -15,13 +15,17 @@ class Category(NameSlug, MPTTModel, Translatable):
     google_taxonomy = models.ForeignKey('integrations.GoogleTaxonomy', null=True, blank=True, on_delete=models.SET_NULL,
                                          verbose_name='Google Taxonomy')
     facebook_category = models.ForeignKey('integrations.FacebookCategories', null=True, blank=True,
-                                           on_delete=models.SET_NULL, verbose_name='Facebook Category')
+                                           on_delete=models.SET_NULL, verbose_name='Категория Facebook')
+    modna_kast_category = models.ForeignKey('integrations.ModnaKastaCategories', null=True, blank=True,
+                                           on_delete=models.SET_NULL, verbose_name='Категория ModnaKasta')
     size_group = models.ForeignKey(SizeGroup, null=True, blank=True, on_delete=models.PROTECT,
                                    related_name='categories')
     preferred_size_grid = models.ForeignKey(SizeGrid, null=True, blank=True, on_delete=models.SET_NULL,
                                             verbose_name='предпочтительная размерная сетка')
     ordering = models.PositiveIntegerField(default=0, blank=False, null=False)
     image = DeletableImageField(upload_to='categories', blank=True, null=True, verbose_name='Изображение')
+
+    update_mk_stock = models.BooleanField(default=False)
 
     class MPTTMeta:
         order_insertion_by = ['ordering', 'name']
@@ -104,3 +108,7 @@ class Collections(NameSlug):
 
     def get_products_count(self):
         return self.products.annotate(num_variants=Count('variants')).aggregate(total=Sum('num_variants'))['total'] or 0
+
+
+
+

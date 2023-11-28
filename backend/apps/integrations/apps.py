@@ -7,3 +7,6 @@ class IntegrationsConfig(AppConfig):
     verbose_name = 'Интеграции'
     verbose_name_plural = 'Интеграции'
 
+    def ready(self):
+        import apps.integrations.signals
+

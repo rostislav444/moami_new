@@ -25,8 +25,8 @@ class CategoryAdmin(MPTTModelAdmin):
     list_filter = [CategoryFilter]
     sortable = 'ordering'
 
-    search_fields = ['google_taxonomy__name_ru, facebook_category__name']
-    autocomplete_fields = ['google_taxonomy', 'facebook_category']
+    search_fields = ['google_taxonomy__name_ru, facebook_category__name', 'modna_kast_category__name_alias']
+    autocomplete_fields = ['google_taxonomy', 'facebook_category', 'modna_kast_category']
 
     def get_image(self, obj):
         style = 'border: 1px solid #ccc; object-fit: cover;'
@@ -36,7 +36,8 @@ class CategoryAdmin(MPTTModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'parent', 'size_group', 'preferred_size_grid', 'google_taxonomy', 'facebook_category', 'ordering')
+            'fields': ('name', 'parent', 'size_group', 'preferred_size_grid', 'google_taxonomy', 'facebook_category',
+                       'modna_kast_category', 'ordering', 'update_mk_stock')
         }),
         ('Изображение', {
             'fields': ('get_image', 'image',)

@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     # dj_rest
     "dj_rest_auth",
     "dj_rest_auth.registration",
+    'prettyjson',
 ]
 
 MIDDLEWARE = [

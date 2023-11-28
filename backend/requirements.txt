@@ -15,3 +15,5 @@ singlemodeladmin==0.9
 drf-writable-nested==0.7.0
 django-admin-sortable==2.3
 django-redis==4.12.1
+django-prettyjson
+Pygments

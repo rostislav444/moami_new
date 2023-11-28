@@ -3,7 +3,7 @@ import {IconsWrapper, LanguageLink, LanguagesWrapper} from './style'
 import {Content} from '@/styles/Blocks/Content'
 import {Icon} from "@/components/Shared/Icons";
 import Link from 'next/link'
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {CartIcon} from "./CartIcon";
 import {useRouter} from 'next/router';
 import {Logo} from "@/components/Shared/Header/components/Logo";
@@ -22,9 +22,9 @@ export const DesktopHeader = ({data}: DesktopHeaderProps) => {
     const {t} = useTranslation('common', {useSuspense: false})
     const {data: session} = useSession();
     const [authModalOpen, setAuthModalOpen] = useState(false)
-
+    const localeRef = useRef<string>()
     const router = useRouter();
-    const {locale, asPath} = router;
+    const {locale, asPath, reload} = router;
 
     if (!data) return null
 

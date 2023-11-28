@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name='FacebookСategoriesLoader',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('table', models.FileField(help_text='.csv', upload_to='facebook_categories', validators=[apps.integrations.models.validate_txt], verbose_name='Таблица со списком категорий (.csv)')),
+                ('table', models.FileField(help_text='.csv', upload_to='facebook_categories', validators=[apps.core.utils.validators.validate_txt], verbose_name='Таблица со списком категорий (.csv)')),
                 ('filter_root', models.CharField(blank=True, default='clothing & accessories', max_length=1000, null=True)),
                 ('delete_all', models.BooleanField(default=False)),
             ],

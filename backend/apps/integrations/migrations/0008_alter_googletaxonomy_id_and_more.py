@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='googletaxonomyuplaoder',
             name='table_ru',
-            field=models.FileField(help_text='.txt', upload_to='google_taxonomy', validators=[apps.integrations.models.validate_txt], verbose_name='Таблица на русском (.txt)'),
+            field=models.FileField(help_text='.txt', upload_to='google_taxonomy', validators=[apps.core.utils.validators.validate_txt], verbose_name='Таблица на русском (.txt)'),
         ),
     ]

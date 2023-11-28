@@ -304,6 +304,17 @@ class VariantSize(models.Model):
             key = list(sizes.keys())[0]
             return sizes[key]
 
+    @property
+    def sku(self):
+        return '-'.join([self.variant.get_code_slug, self.get_size]).upper()
+
+    @property
+    def mk_sku(self):
+        sku = self.sku
+        if 'ONE SIZE' in sku:
+            sku = sku.replace('ONE SIZE', 'onesize')
+        return sku
+
     def __str__(self):
         return self.get_size
 
