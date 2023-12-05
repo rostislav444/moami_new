@@ -26,11 +26,11 @@ def mk_update_size_stock(sender, instance, **kwargs):
         update_stock(sku, instance.stock)
 
 
-@receiver(pre_save, sender=VariantImage)
-def update_variant_images(sender, instance, **kwargs):
-    if instance.pk:
-        images = instance.variant.images.all()
-        print(images)
+# @receiver(pre_save, sender=VariantImage)
+# def update_variant_images(sender, instance, **kwargs):
+#     if instance.pk:
+#         images = instance.variant.images.all()
+#         print(images)
 
 
 @receiver(post_save, sender=Category)
@@ -50,20 +50,3 @@ def update_mk_stock(sender, instance, **kwargs):
 
         Category.objects.filter(pk=instance.pk).update(update_mk_stock=False)
 
-#
-# @receiver(post_save, sender=Category)
-# def get_cate(sender, instance, **kwargs):
-#     url = 'https://hub.modnakasta.ua/api/products/update-stock/id'
-#
-#     # if instance.update_mk_stock:
-#     #     sizes = VariantSize.objects.filter(variant__product__category=instance)
-#     #     payload = {'items': []}
-#     #     for size in sizes:
-#     #         payload['items'].append({
-#     #             'unique_sku_id': size.mk_sku,
-#     #             'stock': size.stock
-#     #         })
-#     #
-#     #     mk_request(url, payload)
-#     #
-#     #     Category.objects.filter(pk=instance.pk).update(update_mk_stock=False)
