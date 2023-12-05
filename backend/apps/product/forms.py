@@ -75,11 +75,11 @@ class ProductAttributeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ProductAttributeForm, self).__init__(*args, **kwargs)
-        group_id = self.get_attr_group_id(kwargs)
-
-        if group_id:
-            attr_group = AttributeGroup.objects.get(id=group_id)
-            self.init_attribute_group_fields(attr_group)
+        # group_id = self.get_attr_group_id(kwargs)
+        #
+        # if group_id:
+        #     attr_group = AttributeGroup.objects.get(id=group_id)
+        #     self.init_attribute_group_fields(attr_group)
 
 
 class ProductAttributeFormSet(forms.BaseInlineFormSet):
