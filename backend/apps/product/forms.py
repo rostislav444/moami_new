@@ -46,6 +46,9 @@ class ProductAttributeForm(forms.ModelForm):
         }
 
     def hide_fields(self, attr_group):
+        if attr_group.data_type is None:
+            return
+
         field_types = self.fields_by_data_types()
 
         for key, field in field_types.items():
