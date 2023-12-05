@@ -375,7 +375,7 @@ class VariantImage(SortableMixin):
     index = models.PositiveIntegerField(default=0)
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='images')
     image = DeletableImageField(upload_to='variant_images', get_parent='variant', verbose_name="Файл")
-    slug = models.SlugField(max_length=255, blank=True)
+    slug = models.SlugField(max_length=1024, blank=True)
     exclude_at_marketplace = models.BooleanField(default=False, verbose_name='Исключить на площадках')
 
     objects = VariantImageManager()
@@ -394,7 +394,7 @@ class VariantImage(SortableMixin):
                 image_changed = True
 
         if not self.pk:
-            self.slug = slugify(f'{self.variant.code}-{timezone.now().timestamp()}')
+            self.slug = slugify(unidecode(f'{self.variant.code}-{timezone.now().timestamp()}'))
         super().save(*args, **kwargs)
 
         # Call create_thumbnails() if the image has changed
