@@ -5,6 +5,17 @@ from apps.translation.models import Translatable
 
 
 class AttributeGroup(NameSlug, Translatable):
+    ATTR_TYPE_CHOICES = (
+        ('multi_attr', 'multi_attr'),
+        ('single_attr', 'single'),
+        ('integer', 'integer'),
+        ('sting', 'sting'),
+    )
+
+    mk_key_name = models.CharField(max_length=255, null=True, blank=True)
+    mk_type = models.CharField(max_length=255, null=True, blank=True)
+    data_type = models.CharField(max_length=50, choices=ATTR_TYPE_CHOICES, default=ATTR_TYPE_CHOICES[0][0])
+
     class Meta:
         verbose_name = 'Группа атрибутов'
         verbose_name_plural = 'Группы атрибутов'
@@ -15,6 +26,7 @@ class AttributeGroup(NameSlug, Translatable):
 
 class Attribute(NameSlug, Translatable):
     attribute_group = models.ForeignKey('AttributeGroup', on_delete=models.CASCADE, related_name='attributes')
+    mk_id = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Атрибут'

@@ -26,7 +26,7 @@ ALLOWED_HOSTS = [
     'moami.com.ua',
     '0.0.0.0',
     'localhost',
-    '127.1.0.1',
+    '127.0.0.1',
     'localhost:3000'
     '127.0.0.1:3000'
 ]

@@ -10,7 +10,7 @@ class AttributeInline(admin.TabularInline):
 
 @admin.register(AttributeGroup)
 class AttributeGroupAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'data_type')
     inlines = [AttributeInline]
 
 

@@ -32,6 +32,7 @@ class SizeGroup(NameSlug):
 class Size(models.Model):
     group = models.ForeignKey(SizeGroup, on_delete=models.CASCADE, related_name='sizes')
     order = models.PositiveSmallIntegerField(default=0)
+    mk_id = models.CharField(max_length=25, null=True, blank=True)
 
     class Meta:
         ordering = ['order', 'group__name']

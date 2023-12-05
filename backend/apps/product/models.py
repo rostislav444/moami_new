@@ -39,6 +39,7 @@ class Brand(Translatable):
 
 class Country(Translatable):
     name = models.CharField(max_length=255)
+    mk_id = models.CharField(max_length=24, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Страна'
@@ -52,6 +53,7 @@ class Country(Translatable):
 class Color(Translatable):
     name = models.CharField(max_length=255)
     code = ColorField(max_length=255, default='#FFFFFF')
+    mk_id = models.CharField(max_length=24, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Цвет'
@@ -88,6 +90,9 @@ class Product(Translatable):
     rozetka_category = models.ForeignKey('integrations.RozetkaCategories', on_delete=models.CASCADE,
                                          related_name='products', verbose_name='Категория Rozetka', blank=True,
                                          null=True)
+
+    mk_attributes_copy_to = models.ManyToManyField('self', blank=True)
+    mk_attributes_copy = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Товар'
@@ -147,16 +152,35 @@ class ProductComposition(models.Model):
 
 class ProductAttribute(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
-    attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE)
-    attributes = models.ManyToManyField(Attribute, blank=True)
+    attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE, verbose_name='Тип',
+                                        related_name='product_attribute_group')
+    # Attribute values dependant on attribute_group data type selected
+    value_single_attribute = models.ForeignKey(Attribute, blank=True, null=True, on_delete=models.CASCADE,
+                                               related_name='single_attr', verbose_name='Единичный выбор')
+    value_multi_attributes = models.ManyToManyField(Attribute, blank=True, related_name='multi_attr',
+                                                    verbose_name='Множественный выбор')
+    value_int = models.PositiveIntegerField(null=True, blank=True, verbose_name='Число')
+    value_str = models.CharField(max_length=255, null=True, blank=True, verbose_name='Строка')
 
     class Meta:
         unique_together = ('product', 'attribute_group')
         verbose_name = 'Атрибут'
         verbose_name_plural = 'Атрибуты'
 
-    # def __str__(self):
-    #     return f'{str(self.product)} ({self.attribute_group.name})'
+    def __str__(self):
+        attr_group, attr_type = self.attribute_group, self.attribute_group.data_type
+        value = ''
+
+        if attr_type == AttributeGroup.ATTR_TYPE_CHOICES[0][0] and self.value_multi_attributes.count():
+            value = ', '.join([choice.name for choice in self.value_multi_attributes.all()])
+        elif attr_type == AttributeGroup.ATTR_TYPE_CHOICES[1][0] and self.value_single_attribute:
+            value = self.value_single_attribute.name
+        elif attr_type == AttributeGroup.ATTR_TYPE_CHOICES[2][0] and self.value_int:
+            value = str(self.value_int)
+        elif attr_type == AttributeGroup.ATTR_TYPE_CHOICES[3][0] and self.value_str:
+            value = self.value_str
+
+        return attr_group.name + ' - ' + value
 
 
 class ProductComment(MPTTModel):
@@ -274,6 +298,17 @@ class Variant(models.Model):
         self.slug = self.get_slug
 
     get_total_views.short_description = 'Просмотры'
+
+
+class VariantAttribute(models.Model):
+    variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='attributes')
+    attribute_group = models.ForeignKey(AttributeGroup, on_delete=models.CASCADE)
+    attributes = models.ManyToManyField(Attribute, blank=True)
+
+    class Meta:
+        unique_together = ('variant', 'attribute_group')
+        verbose_name = 'Атрибут'
+        verbose_name_plural = 'Атрибуты'
 
 
 class VariantSize(models.Model):

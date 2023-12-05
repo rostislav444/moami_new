@@ -1,9 +1,9 @@
 from django.contrib import admin
+# from nested_inline.admin import NestedStackedInline, NestedModelAdmin, NestedTabularInline
+from django.utils.html import format_html
 
 from apps.sizes.forms import SizeInterpretationForm
 from apps.sizes.models import SizeGroup, SizeGrid, Size, SizeInterpretation, SizeProperty, SizePropertyValue
-# from nested_inline.admin import NestedStackedInline, NestedModelAdmin, NestedTabularInline
-from django.utils.html import format_html
 
 
 @admin.register(SizeGrid)
@@ -39,7 +39,7 @@ class SizeInterpretationInline(admin.TabularInline):
 
 @admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'group',)
+    list_display = ('__str__', 'group', 'mk_id')
     search_fields = ('group__name',)
     ordering = ('group__name',)
     inlines = [SizeInterpretationInline, SizePropertyValueInline]
@@ -63,8 +63,8 @@ class SizeInline(admin.TabularInline):
     link_field.short_description = 'link'
     link_field.allow_tags = True
 
-    fields = ('order', 'link_field',)
-    readonly_fields = ('link_field',)
+    fields = ('order', 'link_field', 'mk_id')
+    readonly_fields = ('link_field', 'mk_id')
 
 
 @admin.register(SizeProperty)

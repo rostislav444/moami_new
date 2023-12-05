@@ -21,7 +21,7 @@ class CategoryFilter(AutocompleteFilter):
 @admin.register(Category)
 class CategoryAdmin(MPTTModelAdmin):
     mptt_level_indent = 20
-    list_display = ('name', 'google_taxonomy', 'facebook_category', 'ordering', 'size_group')
+    list_display = ('name', 'google_taxonomy', 'facebook_category', 'modna_kast_category', 'ordering', 'size_group')
     list_filter = [CategoryFilter]
     sortable = 'ordering'
 

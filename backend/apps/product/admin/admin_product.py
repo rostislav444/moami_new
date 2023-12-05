@@ -1,6 +1,7 @@
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from django.urls import resolve
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -8,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.categories.models import Category, CategoryAttributeGroup
 from apps.product.admin.admin_variant import VariantInline
-from apps.product.forms import ProductAttributeFormSet
+from apps.product.forms import ProductAttributeFormSet, ProductAttributeForm
 from apps.product.models import Brand, Color, Country, CustomProperty, Product, ProductAttribute, ProductComposition, \
     ProductVideo, ProductComment
 
@@ -20,12 +21,12 @@ class BrandAdmin(admin.ModelAdmin):
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'mk_id',)
 
 
 @admin.register(Color)
 class ColorAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'mk_id',)
 
 
 class ProductCompositionInline(admin.TabularInline):
@@ -33,31 +34,29 @@ class ProductCompositionInline(admin.TabularInline):
     extra = 0
 
 
-class ProductAttributeInline(admin.TabularInline):
+class ProductAttributeInline(admin.StackedInline):
     model = ProductAttribute
     formset = ProductAttributeFormSet
+    form = ProductAttributeForm
 
+    categories = None
     category_attribute_groups = None
 
-    def get_formset(self, request, obj=None, **kwargs):
-        formset = super().get_formset(request, obj, **kwargs)
-        if obj:
-            categories = obj.category.get_ancestors(include_self=True)
-            self.category_attribute_groups = CategoryAttributeGroup.objects.filter(category__in=categories).distinct()
-        return formset
+    def get_min_num(self, request, obj=None, **kwargs):
+        # if self.category_attribute_groups:
+        #     return self.category_attribute_groups.filter(required=True).count()
+        return 0
 
-    def get_extra(self, request, obj=None, **kwargs):
+    def get_max_num(self, request, obj=None, **kwargs):
         if self.category_attribute_groups:
             return self.category_attribute_groups.count()
         return 0
 
-    def get_min_num(self, request, obj=None, **kwargs):
-        if self.category_attribute_groups:
-            return self.category_attribute_groups.filter(required=True).count()
-        return 0
-
     def get_extra(self, request, obj=None, **kwargs):
-        if self.category_attribute_groups:
+        if obj:
+            self.categories = obj.category.get_ancestors(include_self=True)
+            self.category_attribute_groups = CategoryAttributeGroup.objects.filter(
+                category__in=self.categories).distinct()
             return self.category_attribute_groups.count()
         return 0
 
@@ -156,7 +155,10 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'category', 'brand', 'country', 'collections')
+            'fields': ('name', 'slug', 'category', 'brand', 'country', 'collections',)
+        }),
+        ('Копировать аттрибуты Modna Kasta', {
+            'fields': ('mk_attributes_copy_to', 'mk_attributes_copy',)
         }),
         ('Rozetka', {
             'fields': ('rozetka_category', 'rozetka_name',)
@@ -197,3 +199,11 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
             ''')
         html = f'''<ul style="{ul_styles}">{''.join(images)}</ul>'''
         return format_html(html)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == 'mk_attributes_copy_to':
+            resolved = resolve(request.path_info)
+            product = Product.objects.get(id=resolved.kwargs['object_id'])
+            kwargs['queryset'] = Product.objects.filter(category=product.category).exclude(id=resolved.kwargs['object_id'])
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
