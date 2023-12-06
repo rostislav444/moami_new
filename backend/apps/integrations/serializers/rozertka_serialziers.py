@@ -105,7 +105,10 @@ class RozetkaProductSerializer(serializers.ModelSerializer):
     variants = RozetkaVariantSerializer(many=True)
     composition = serializers.SerializerMethodField()
     composition_uk = serializers.SerializerMethodField()
-    attributes = RozetkaFeedProductSerializer(many=True)
+    # attributes = RozetkaFeedProductSerializer(many=True)
+
+    # TODO fix 2
+    attributes = serializers.SerializerMethodField()
 
     preferred_size_grid = serializers.CharField(source='get_preferred_size_grid')
 
@@ -133,6 +136,9 @@ class RozetkaProductSerializer(serializers.ModelSerializer):
             'preferred_size_grid',
             'rozetka_category'
         )
+
+    def get_attributes(self):
+        return []
 
     def get_name(self, obj):
         return obj.get_rozetka_name(lang_code='ru')
