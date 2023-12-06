@@ -5,12 +5,17 @@ from apps.product.models import VariantImage
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        ids = []
+        count = VariantImage.objects.count()
         for image in VariantImage.objects.all():
             try:
-                image.create_thumbnails()
+                image.save()
             except:
+                ids.append(image.id)
+                print(len(ids) / count * 100)
                 continue
-            print(image.thumbnails)
+
+        VariantImage.objects.filter(id__in=ids).delete()
 
         self.stdout.write(self.style.SUCCESS('Successfully moved thumbs'))
 
