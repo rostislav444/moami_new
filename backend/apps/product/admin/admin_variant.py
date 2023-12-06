@@ -54,7 +54,7 @@ class VariantImageThumbnailInline(admin.TabularInline):
     model = VariantImageThumbnail
     extra = 0
 
-
+# SortableTabularInline
 class VariantImageInline(SortableTabularInline):
     model = VariantImage
     extra = 0

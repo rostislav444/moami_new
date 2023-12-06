@@ -62,11 +62,14 @@ class ProductCompositionSerializer(serializers.ModelSerializer):
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
     attribute_group = serializers.CharField(source='attribute_group.name')
-    attributes = AttributeSerializer(many=True)
+    attributes = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductAttribute
         fields = ('attribute_group', 'attributes')
+
+    def get_attributes(self, instance):
+        return []
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -79,7 +82,7 @@ class ProductSerializer(serializers.ModelSerializer):
     # Properties
     compositions = ProductCompositionSerializer(many=True)
     properties = CustomPropertySerializer(many=True)
-    attributes = ProductAttributeSerializer(many=True)
+    attributes = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -93,6 +96,10 @@ class ProductSerializer(serializers.ModelSerializer):
             link += category.slug + '/'
             breadcrumbs.append({'title': category.name, 'link': link})
         return breadcrumbs
+
+    # TODO fix
+    def get_attributes(self, instance):
+        return []
 
 
 class VariantImageThumbnailSerializer(serializers.ModelSerializer):
