@@ -29,8 +29,8 @@ export const Variant = ({variant, slider = false}: VariantProps) => {
                 <CataloguesImages link={`/p-${variant.slug}`} images={variant.images} alt={'alt'}/> :
                 <SingleImage
                     link={`/p-${variant.slug}`}
-                    image={variant.images[0].thumbnails[1].image}
-                    thumbnail={variant.images[0].thumbnails[3].image}
+                    image={variant.images[0]?.thumbnails[1]?.image}
+                    thumbnail={variant.images[0]?.thumbnails[3]?.image}
                     alt={'alt'}
                 />
             }
