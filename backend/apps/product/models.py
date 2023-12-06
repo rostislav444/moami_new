@@ -17,10 +17,12 @@ from mptt.models import MPTTModel, TreeForeignKey
 from unidecode import unidecode
 
 from apps.abstract.fields import DeletableImageField, DeletableVideoField
+from apps.abstract.models import ImageWithThumbnails
 from apps.attributes.models import Attribute, AttributeGroup, Composition
 from apps.categories.models import Collections
 from apps.sizes.models import Size
 from apps.translation.models import Translatable
+from project import settings
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z-]*$', 'Разрешенные символы 0-9, a-z, A-Z, -')
 
@@ -91,8 +93,11 @@ class Product(Translatable):
                                          related_name='products', verbose_name='Категория Rozetka', blank=True,
                                          null=True)
 
-    mk_attributes_copy_to = models.ManyToManyField('self', blank=True)
-    mk_attributes_copy = models.BooleanField(default=False)
+    mk_attributes_copy_to = models.ManyToManyField('self', blank=True,
+                                                   help_text='Список товаров из тойже категории в которые будет '
+                                                             'осуществлено копирование выбранных атрибутов Модна Каста',
+                                                   verbose_name='Скопировать набор атрибутов в товары')
+    mk_attributes_copy = models.BooleanField(default=False, verbose_name='Применить копирование аттрибутов')
 
     class Meta:
         verbose_name = 'Товар'
@@ -169,18 +174,30 @@ class ProductAttribute(models.Model):
 
     def __str__(self):
         attr_group, attr_type = self.attribute_group, self.attribute_group.data_type
-        value = ''
+        value = self.get_attribute_string_value()
+        return attr_group.name + ' - ' + value if value else ''
+
+    def get_attribute_string_value(self, lang='ru'):
+        attr_type = self.attribute_group.data_type
+        value = None
+
+        def get_language(item, field_name):
+            if lang == settings.LANGUAGE_CODE:
+                return getattr(item, field_name)
+            else:
+                return getattr(item, 'get_translation__' + field_name + '__' + lang)
 
         if attr_type == AttributeGroup.ATTR_TYPE_CHOICES[0][0] and self.value_multi_attributes.count():
-            value = ', '.join([choice.name for choice in self.value_multi_attributes.all()])
+            value = ', '.join(
+                [get_language(choice, 'name') for choice in self.value_multi_attributes.all()])
         elif attr_type == AttributeGroup.ATTR_TYPE_CHOICES[1][0] and self.value_single_attribute:
-            value = self.value_single_attribute.name
+            value = get_language(self.value_single_attribute, 'name')
         elif attr_type == AttributeGroup.ATTR_TYPE_CHOICES[2][0] and self.value_int:
             value = str(self.value_int)
         elif attr_type == AttributeGroup.ATTR_TYPE_CHOICES[3][0] and self.value_str:
             value = self.value_str
 
-        return attr_group.name + ' - ' + value
+        return value
 
 
 class ProductComment(MPTTModel):
@@ -354,11 +371,6 @@ class VariantSize(models.Model):
         return self.get_size
 
 
-class VariantImageManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().select_related('variant').prefetch_related('thumbnails')
-
-
 class VariantVideo(models.Model):
     variant = models.OneToOneField(Variant, on_delete=models.CASCADE, related_name='video')
     video = DeletableVideoField(upload_to='videos', blank=True, null=True)
@@ -371,83 +383,18 @@ class VariantVideo(models.Model):
         return f'{self.variant.code} - {self.video.name}'
 
 
-class VariantImage(SortableMixin):
+class VariantImage(ImageWithThumbnails, SortableMixin):
     index = models.PositiveIntegerField(default=0)
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='images')
-    image = DeletableImageField(upload_to='variant_images', get_parent='variant', verbose_name="Файл")
-    slug = models.SlugField(max_length=1024, blank=True)
     exclude_at_marketplace = models.BooleanField(default=False, verbose_name='Исключить на площадках')
-
-    objects = VariantImageManager()
 
     class Meta:
         verbose_name = 'Изображение'
         verbose_name_plural = 'Изображения'
         ordering = ['index']
 
-    def save(self, *args, **kwargs):
-        # If the object exists, get the current image value from the database
-        image_changed = False
-        if self.pk:
-            orig = VariantImage.objects.get(pk=self.pk)
-            if orig.image != self.image:
-                image_changed = True
-
-        if not self.pk:
-            self.slug = slugify(unidecode(f'{self.variant.code}-{timezone.now().timestamp()}'))
-        super().save(*args, **kwargs)
-
-        # Call create_thumbnails() if the image has changed
-        if image_changed:
-            self.create_thumbnails()
-
-    def create_thumbnails(self):
-        image = Image.open(self.image)
-        width, height = image.size
-
-        sizes = {
-            'large': {'size': (1200, 1200), 'suffix': '_large'},
-            'medium': {'size': (800, 800), 'suffix': '_medium'},
-            'small': {'size': (400, 400), 'suffix': '_small'},
-            'thumbnail': {'size': (200, 200), 'suffix': '_thumbnail'},
-        }
-
-        ext_format_map = {
-            '.jpg': {'format': 'JPEG', 'mime_type': 'image/jpeg'},
-            '.jpeg': {'format': 'JPEG', 'mime_type': 'image/jpeg'},
-            '.png': {'format': 'PNG', 'mime_type': 'image/png'},
-            '.gif': {'format': 'GIF', 'mime_type': 'image/gif'},
-            '.webp': {'format': 'WEBP', 'mime_type': 'image/webp'}
-        }
-
-        ext = os.path.splitext(self.image.name)[1].lower()
-
-        try:
-            format_info = ext_format_map[ext]
-        except KeyError:
-            return  # unsupported file format
-
-        for size_name, size_options in sizes.items():
-            thumbnail = image.copy()
-            thumbnail.thumbnail(size_options['size'])
-            thumbnail_file = BytesIO()
-
-            thumbnail.save(thumbnail_file, format=format_info['format'])
-            thumbnail_filename = f'{self.slug}{size_options["suffix"]}{ext}'
-            thumbnail_file = SimpleUploadedFile(thumbnail_filename, thumbnail_file.getvalue(), format_info['mime_type'])
-
-            # check if there is already a thumbnail for this size
-            try:
-                thumbnail_obj = self.thumbnails.get(size=size_name)
-            except VariantImageThumbnail.DoesNotExist:
-                thumbnail_obj = VariantImageThumbnail(variant_image=self, size=size_name)
-
-            # if there is a thumbnail for this size, delete the old image file from the storage
-            if thumbnail_obj.image and thumbnail_obj.image.name != thumbnail_filename:
-                thumbnail_obj.image.delete()
-
-            thumbnail_obj.image.save(thumbnail_filename, thumbnail_file, save=False)
-            thumbnail_obj.save()
+    def get_image_slug(self):
+        return self.variant.code
 
     def __str__(self):
         return f'{self.variant.product.name} - {self.variant.code} - {self.image.name}'
@@ -455,14 +402,14 @@ class VariantImage(SortableMixin):
 
 class VariantImageThumbnail(models.Model):
     SIZE_CHOICES = (
-        ('large', 'Large'),
-        ('medium', 'Medium'),
-        ('small', 'Small'),
-        ('thumbnail', 'Thumbnail'),
+        ('large', 'Large',),
+        ('medium', 'Medium',),
+        ('small', 'Small',),
+        ('thumbnail', 'Thumbnail',),
     )
 
     variant_image = models.ForeignKey(
-        VariantImage, on_delete=models.CASCADE, related_name='thumbnails'
+        VariantImage, on_delete=models.CASCADE, related_name='old_thumbnails'
     )
     size = models.CharField(max_length=50, choices=SIZE_CHOICES)
     image = DeletableImageField(upload_to='variant_thumbnails', get_parent='variant_image.variant')

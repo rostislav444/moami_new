@@ -1,12 +1,12 @@
 from django.core.files.images import get_image_dimensions
 from rest_framework import serializers
 
-from apps.attributes.serializer import AttributeSerializer
 from apps.categories.serializers import CategoryIdSerializer
 from apps.product.models import Product, Variant, Color, VariantSize, VariantImage, CustomProperty, ProductComposition, \
     ProductAttribute, ProductComment, ProductCommentImage
 from apps.sizes.serializers import SizeGridSerializer
 from apps.user.serializers import UserSerializer
+from project import settings
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -37,12 +37,11 @@ class VariantWithImagesSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         image = obj.images.first()
-        if image:
-            thumb = image.thumbnails.filter(size='thumbnail').first()
-            if thumb:
-                request = self.context.get('request')
-                if request:
-                    return request.build_absolute_uri(thumb.image.url)
+        if image and 's' in image.thumbnails:
+            thumb = settings.MEDIA_URL+image.thumbnails['s']
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(thumb)
         return None
 
 
@@ -109,7 +108,7 @@ class VariantImageThumbnailSerializer(serializers.ModelSerializer):
 
 
 class VariantImageSerializer(serializers.ModelSerializer):
-    thumbnails = VariantImageThumbnailSerializer(many=True)
+    thumbnails = serializers.SerializerMethodField()
     dimensions = serializers.SerializerMethodField()
 
     class Meta:
@@ -123,6 +122,15 @@ class VariantImageSerializer(serializers.ModelSerializer):
             return {'width': w, 'height': h}
         except FileNotFoundError:
             return None
+
+    def get_thumbnails(self, obj):
+        data = []
+        request = self.context.get('request')
+        if request and 'l' in obj.thumbnails.keys():
+            for key, _ in VariantImage.THUMBNAILS_SIZES:
+                url = settings.MEDIA_URL + obj.thumbnails[key]
+                data.append({'image': request.build_absolute_uri(url)})
+        return data
 
 
 class VariantSerializer(serializers.ModelSerializer):

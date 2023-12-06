@@ -6,10 +6,10 @@ from apps.translation.models import Translatable
 
 class AttributeGroup(NameSlug, Translatable):
     ATTR_TYPE_CHOICES = (
-        ('multi_attr', 'multi_attr'),
-        ('single_attr', 'single'),
-        ('integer', 'integer'),
-        ('sting', 'sting'),
+        ('multi_attr', 'Множественный выбор'),
+        ('single_attr', 'Единичный выбор'),
+        ('integer', 'Число'),
+        ('sting', 'Строка'),
     )
 
     mk_key_name = models.CharField(max_length=255, null=True, blank=True)
@@ -19,6 +19,7 @@ class AttributeGroup(NameSlug, Translatable):
     class Meta:
         verbose_name = 'Группа атрибутов'
         verbose_name_plural = 'Группы атрибутов'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name

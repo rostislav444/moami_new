@@ -1,3 +1,6 @@
+from django.utils import translation
+from django.db.models import Prefetch
+from django.db.models import Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -5,33 +8,47 @@ from django.template.loader import render_to_string
 from apps.integrations.models import RozetkaCategories
 from apps.integrations.serializers import RozetkaProductSerializer, RozetkaCategoriesSerializer, \
     GoogleProductSerializer, GoogleProductByLanguageSerializer, FacebookProductSerializer
-from apps.product.models import Product
+from apps.product.models import Product, ProductAttribute
 from project import settings
 
 
 def rozetka(request):
-    products = Product.objects \
-        .select_related('brand') \
-        .prefetch_related('variants') \
-        .prefetch_related('variants__images') \
-        .prefetch_related('variants__sizes') \
-        .prefetch_related('variants__sizes__size') \
-        .prefetch_related('variants__color') \
-        .prefetch_related('variants__color__translations') \
-        .prefetch_related('attributes') \
-        .prefetch_related('attributes__attribute_group') \
-        .prefetch_related('attributes__attributes') \
-        .filter(rozetka_category__isnull=False).exclude(variants__isnull=True).distinct()
-    products_serializer = RozetkaProductSerializer(products, many=True)
+    translation.activate('ru')
+
+    # Prefetch and filter product attributes queryset
+    product_attributes = ProductAttribute.objects.filter(attribute_group__mk_key_name__isnull=True).filter(
+        Q(value_multi_attributes__isnull=False) |
+        Q(value_single_attribute__isnull=False) |
+        Q(value_int__isnull=False) |
+        Q(value_str__isnull=False)
+    ).prefetch_related(
+        'value_single_attribute',
+        'value_multi_attributes'
+    ).distinct()
+
+    products = Product.objects.select_related('brand').prefetch_related(
+        Prefetch('attributes', queryset=product_attributes),
+        'variants',
+        'variants__images',
+        'variants__sizes__size',
+        'variants__color__translations',
+        'attributes__attribute_group'
+    ).filter(
+        rozetka_category__isnull=False
+    ).exclude(
+        variants__isnull=True
+    ).distinct()
 
     categories = RozetkaCategories.objects.all()
     categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
+    products_serializer = RozetkaProductSerializer(products, many=True)
 
-    response = {
-        'products': products_serializer.data,
+    context = {
         'categories': categories_serializer.data,
+        'products': products_serializer.data,
     }
-    return render(request, 'feed/rozetka.xml', response, content_type='application/xml')
+
+    return render(request, 'feed/rozetka.xml', context, content_type='application/xml')
 
 
 def google(request, lang_code):

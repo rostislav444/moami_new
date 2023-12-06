@@ -6,6 +6,7 @@ from apps.attributes.models import AttributeGroup, Attribute, Composition
 class AttributeInline(admin.TabularInline):
     model = Attribute
     extra = 0
+    show_change_link = True
 
 
 @admin.register(AttributeGroup)

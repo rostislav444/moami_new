@@ -1,14 +1,14 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db import transaction
-from django.utils.translation import get_language as language
+from django.utils.translation import get_language
 
 from project import settings
 
 
 class TranslatableManager(models.Manager):
     def get_queryset(self):
-        current_language = language()
+        current_language = get_language()
         if current_language == settings.LANGUAGE_CODE:
             return super().get_queryset()
         return super().get_queryset().prefetch_related('translations')
@@ -83,7 +83,7 @@ class Translatable(models.Model):
         if name in exclude_fields:
             return super().__getattribute__(name)
 
-        current_language = language()
+        current_language = get_language()
 
         if current_language != settings.LANGUAGE_CODE:
             if name in self.translatable_fields:

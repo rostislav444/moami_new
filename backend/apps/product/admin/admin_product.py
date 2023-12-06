@@ -1,8 +1,7 @@
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
-from django.urls import resolve
-from django.urls import reverse
+from django.urls import reverse, resolve
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -43,8 +42,8 @@ class ProductAttributeInline(admin.StackedInline):
     category_attribute_groups = None
 
     def get_min_num(self, request, obj=None, **kwargs):
-        # if self.category_attribute_groups:
-        #     return self.category_attribute_groups.filter(required=True).count()
+        if self.category_attribute_groups:
+            return self.category_attribute_groups.filter(required=True).count()
         return 0
 
     def get_max_num(self, request, obj=None, **kwargs):
@@ -90,9 +89,7 @@ class CustomPropertyInline(admin.TabularInline):
 
 class CategoryFilter(SimpleListFilter):
     title = _('Category')
-
     template = 'admin/category_filter.html'
-
     parameter_name = 'category'
 
     def lookups(self, request, model_admin):

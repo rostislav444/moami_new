@@ -5,6 +5,7 @@ from django.utils.safestring import mark_safe
 
 from apps.product.admin.admin_variant_size import VariantSizeInline
 from apps.product.models import Variant, VariantImage, VariantImageThumbnail, VariantVideo
+from project import settings
 
 
 class VariantInline(admin.TabularInline):
@@ -54,6 +55,7 @@ class VariantImageThumbnailInline(admin.TabularInline):
     model = VariantImageThumbnail
     extra = 0
 
+
 # SortableTabularInline
 class VariantImageInline(SortableTabularInline):
     model = VariantImage
@@ -61,12 +63,12 @@ class VariantImageInline(SortableTabularInline):
 
     def get_image(self, obj):
         if obj.image:
-            thumbnail = obj.thumbnails.filter(size='small').first()
-            if thumbnail:
-                return mark_safe(
-                    f'<img src="{thumbnail.image.url}" style="object-fit: cover" width="100" height="150" />'
-                )
-        return '-'
+            thumb = obj.thumbnails.get('xs')
+            url = settings.MEDIA_URL + thumb if thumb else obj.image.url
+            return mark_safe(
+                f'<img src="{url}" style="object-fit: cover" width="100" height="150" />'
+            )
+        return ''
 
     get_image.short_description = 'Изображение'
 
@@ -138,5 +140,5 @@ class VariantAdmin(SortableAdminMixin, admin.ModelAdmin):
 
 @admin.register(VariantImage)
 class VariantImageAdmin(admin.ModelAdmin):
-    list_display = ('variant', 'slug')
+    list_display = ('variant', 'image',)
     inlines = (VariantImageThumbnailInline,)
