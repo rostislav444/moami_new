@@ -38,7 +38,7 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
     def get_queryset(self):
         params = self.request.GET
 
-        variants = Variant.objects.filter(sizes__isnull=False)
+        variants = Variant.objects.filter(images__isnull=False, sizes__isnull=False)
 
         if 'category' in params:
             variants = self.get_products_by_categories(variants, params['category'])

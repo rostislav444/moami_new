@@ -79,7 +79,7 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
             // translation
             ...(await serverSideTranslations(locale || 'uk', ['common',]))
         },
-        revalidate: 5 * 60 // once every 5 minutes
+        revalidate: 5 * 60
     } : {
         notFound: true
     }
@@ -94,8 +94,5 @@ export const getStaticPaths = async () => {
         params: {slug}
     }))
 
-    return {
-        paths,
-        fallback: 'blocking'
-    }
+    return {paths, fallback: true}
 }
