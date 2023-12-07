@@ -3,7 +3,6 @@ from apps.catalogue.serializers import CatalogueVariantSerializer
 from apps.categories.serializers import CategoriesWithProductsCountSerializer
 from apps.product.models import Variant
 from apps.categories.models import Category
-from django.db.models.expressions import RawSQL
 from rest_framework.pagination import PageNumberPagination
 
 
