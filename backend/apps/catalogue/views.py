@@ -4,6 +4,7 @@ from apps.categories.serializers import CategoriesWithProductsCountSerializer
 from apps.product.models import Variant
 from apps.categories.models import Category
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.exceptions import NotFound
 
 
 class CatalogueVariantsPagination(PageNumberPagination):
@@ -29,7 +30,7 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
             try:
                 category = Category.objects.get(slug=slug) if not category else category.children.get(slug=slug)
             except Category.DoesNotExist:
-                return Variant.objects.none()
+                return NotFound(detail="Category not found", code=404)
 
         # Get all descendants of the final category, including the category itself
         categories = category.get_descendants(include_self=True)
