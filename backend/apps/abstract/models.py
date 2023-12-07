@@ -93,6 +93,7 @@ class ImageWithThumbnails(ImageModel):
 
     @staticmethod
     def get_ext_format_data(ext):
+        ext = ext.lower()
         data = {
             'jpg': {'format': 'JPEG', 'mime_type': 'image/jpeg'},
             'jpeg': {'format': 'JPEG', 'mime_type': 'image/jpeg'},

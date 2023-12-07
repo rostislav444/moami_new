@@ -86,7 +86,7 @@ export const getStaticPaths = async () => {
         collections.forEach(collection => {
             const pages = Math.ceil(collection.products_count / perPage)
 
-            for (let i = 0; i < pages; i++) {
+            for (let i = 0; i < pages - 1; i++) {
                 let newPath;
                 if (i === 0) {
                     newPath = `${collection.slug}`;
@@ -100,6 +100,7 @@ export const getStaticPaths = async () => {
     }
 
     const paths = setCollectionsPages(collections)
+
     return {
         paths: paths.map(path => ({params: {params: path.split('/')}})),
         fallback: 'blocking'

@@ -30,7 +30,7 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
             try:
                 category = Category.objects.get(slug=slug) if not category else category.children.get(slug=slug)
             except Category.DoesNotExist:
-                return NotFound(detail="Category not found", code=404)
+                raise NotFound(detail="Category not found", code=404)
 
         # Get all descendants of the final category, including the category itself
         categories = category.get_descendants(include_self=True)
@@ -41,10 +41,10 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
     def get_queryset(self):
         params = self.request.GET
 
-        variants = Variant.objects.filter(images__isnull=False, sizes__isnull=False)
+        variants = Variant.objects.filter(images__isnull=False, sizes__isnull=False).distinct()
 
         if 'category' in params:
-            variants = self.get_products_by_categories(variants, params['category'])
+            return self.get_products_by_categories(variants, params['category'])
         elif 'collection' in params:
-            variants = self.filter_by_collection(variants, params['collection'])
-        return variants
+            return self.filter_by_collection(variants, params['collection'])
+        return Variant.object.none()

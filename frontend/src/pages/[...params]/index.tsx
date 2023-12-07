@@ -37,12 +37,13 @@ export default function CatalogueCategory({
     const {t} = useTranslation('common', {useSuspense: false})
     const store = useStore();
     const categories = selectCategories(store.getState())
+
+    if (params == undefined) {
+        return <Error statusCode={404}/>
+    }
+
     const path = params.join('/') + (page > 1 ? `/page/${page}` : '')
     const key = locale + '/' + path
-
-    if (statusCode) {
-        return <Error statusCode={statusCode}/>
-    }
 
     const {count, results} = paginatedVariants
     const breadcrumbsCategories = categoriesBySlugList(categories, params, [])
@@ -53,9 +54,6 @@ export default function CatalogueCategory({
         </Layout>
     )
 }
-
-
-export let cache: { [key: string]: Array<object> } = {};
 
 
 export const getStaticProps: GetStaticProps = async ({params, locale}) => {
@@ -115,12 +113,11 @@ export const getStaticPaths = async () => {
         return paths;
     }
 
-
     const paths = generateCategoriesPaths(categories)
 
     return {
         paths: paths.map(path => ({params: {params: path.split('/')}})),
-        fallback: 'blocking'
+        fallback: true
     }
 }
 
