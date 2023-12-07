@@ -12,18 +12,15 @@ import {addViewedProductData} from "@/state/reducers/user";
 import {useSession} from "next-auth/react";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 import {useTranslation} from "next-i18next";
+import Error from "next/error";
 
 
 export default function Product({variant, locale}: VariantPageProps) {
     const {t} = useTranslation('common', {useSuspense: false})
-
     const {data: session} = useSession();
     const router = useRouter()
     const store = useStore()
-    const {slug} = router.query
-    const categoriesBreadcrumbs = variant.product.breadcrumbs
     const api = fetchWithLocale()
-
 
     useEffect(() => {
         let isMounted = true
@@ -51,6 +48,12 @@ export default function Product({variant, locale}: VariantPageProps) {
         }
     }, [session, store, api, variant]);
 
+    if (variant === undefined) {
+        return <Error statusCode={404}/>
+    }
+
+    const {slug} = router.query
+    const categoriesBreadcrumbs = variant.product.breadcrumbs
 
     const breadcrumbs = [
         {title: t('pages.main'), link: '/'},
@@ -94,5 +97,5 @@ export const getStaticPaths = async () => {
         params: {slug}
     }))
 
-    return {paths, fallback: true}
+    return {paths, fallback: 'blocking'}
 }

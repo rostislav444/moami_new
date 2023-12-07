@@ -35,7 +35,7 @@ class VariantViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.
         code = split_slug[1]
 
         try:
-            return Variant.objects.get(code=code.upper())
+            return Variant.objects.select_related('product').get(code__iexact=code)
         except Variant.DoesNotExist:
             raise NotFound(detail="Variant not found.")
 

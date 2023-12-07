@@ -117,7 +117,7 @@ export const getStaticPaths = async () => {
 
     return {
         paths: paths.map(path => ({params: {params: path.split('/')}})),
-        fallback: true
+        fallback: 'blocking'
     }
 }
 

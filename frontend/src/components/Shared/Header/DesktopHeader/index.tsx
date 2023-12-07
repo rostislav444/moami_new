@@ -68,7 +68,7 @@ export const DesktopHeader = ({data}: DesktopHeaderProps) => {
                         </Link>
                     </IconsWrapper>
                 </s.HeaderfirstLine>
-                <DesktopNavMenu categories={categories} collections={collections}/>
+                <DesktopNavMenu categories={categories}/>
             </Content>
         </s.HeaderWrapper>
         <Modal title={t('form.loginTitle')} isOpen={authModalOpen} onClose={setAuthModalOpen}>

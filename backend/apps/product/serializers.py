@@ -1,4 +1,5 @@
 from django.core.files.images import get_image_dimensions
+from django.db.models import Sum
 from rest_framework import serializers
 
 from apps.categories.serializers import CategoryIdSerializer
@@ -38,7 +39,7 @@ class VariantWithImagesSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         image = obj.images.first()
         if image and 's' in image.thumbnails:
-            thumb = settings.MEDIA_URL+image.thumbnails['s']
+            thumb = settings.MEDIA_URL + image.thumbnails['s']
             request = self.context.get('request')
             if request:
                 return request.build_absolute_uri(thumb)
@@ -72,7 +73,7 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    variants = VariantWithImagesSerializer(many=True)
+    variants = serializers.SerializerMethodField()
     breadcrumbs = serializers.SerializerMethodField()
     size_grids = SizeGridSerializer(source='category.size_group.grids', many=True)
     preferred_size_grid = serializers.CharField(source='get_preferred_size_grid')
@@ -95,6 +96,13 @@ class ProductSerializer(serializers.ModelSerializer):
             link += category.slug + '/'
             breadcrumbs.append({'title': category.name, 'link': link})
         return breadcrumbs
+
+    def get_variants(self, obj):
+        variants = obj.variants.filter(images__isnull=False, sizes__isnull=False).annotate(
+            total_sizes=Sum('sizes__stock')).exclude(total_sizes=0).distinct()
+        serializer = VariantWithImagesSerializer(variants, many=True)
+        serializer.context.update(self.context)
+        return serializer.data
 
     # TODO fix
     def get_attributes(self, instance):

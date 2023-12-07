@@ -68,7 +68,7 @@ class Color(Translatable):
 
 class ProductManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset('category')
+        return super().get_queryset()
 
 
 class Product(Translatable):

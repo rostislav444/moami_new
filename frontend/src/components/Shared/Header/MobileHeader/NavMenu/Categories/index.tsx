@@ -12,7 +12,7 @@ interface Props {
 export const MobileMenuPopupCategories = ({toggleMenu, data}: Props) => {
     const router = useRouter();
     const {locale} = router;
-    const {categories, collections} = data
+    const {categories} = data
 
     return <s.BurgerMenuUl>
         {categories.map((category: any) => (
@@ -36,19 +36,5 @@ export const MobileMenuPopupCategories = ({toggleMenu, data}: Props) => {
                 </s.BurgerSubMenu>
             </s.BurgerMenuItem>
         ))}
-        <s.BurgerMenuItem onClick={toggleMenu}>
-            <Link href={`/collections`}>
-                <P mb={1}>Коллекции</P>
-            </Link>
-            <s.BurgerSubMenu>
-                {collections.map((collection: any) => (
-                    <Link key={collection.id} href={`/collections/${collection.slug}`} locale={locale} onClick={toggleMenu}>
-                        <s.BurgerSubMenuItem>
-                            <P>{collection.name}</P>
-                        </s.BurgerSubMenuItem>
-                    </Link>
-                ))}
-            </s.BurgerSubMenu>
-        </s.BurgerMenuItem>
     </s.BurgerMenuUl>
 }

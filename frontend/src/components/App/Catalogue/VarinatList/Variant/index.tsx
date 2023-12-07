@@ -22,7 +22,6 @@ export const Variant = ({variant, slider = false}: VariantProps) => {
         return price.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ');
     }
 
-
     return (
         <div>
             {slider ?

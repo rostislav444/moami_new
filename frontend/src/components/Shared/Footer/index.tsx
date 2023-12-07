@@ -6,15 +6,15 @@ import {useSelector} from "react-redux";
 import {RootState} from "@/state/store";
 import Link from "next/link";
 import {useRouter} from "next/router";
-import { useTranslation } from "next-i18next";
-
+import {useTranslation} from "next-i18next";
 
 
 export const Footer = () => {
+    const {t} = useTranslation('common', {useSuspense: false})
     const pages = useSelector((state: RootState) => state.pages.pages)
     const router = useRouter()
     const locale = router.locale || 'ru'
-    const { t } = useTranslation('common', { useSuspense: false })
+
 
     return <FooterWrapper>
         <Content>
@@ -30,9 +30,6 @@ export const Footer = () => {
                             {pages.map((page, index) => <li key={index}>
                                 <Link locale={locale} href={'/info/' + page.slug}>{page.name}</Link>
                             </li>)}
-                            <li>
-                                <a color='white'>{t('footer.titles.collections')}</a>
-                            </li>
                         </PagesBlockList>
                     </div>
                     <div>
