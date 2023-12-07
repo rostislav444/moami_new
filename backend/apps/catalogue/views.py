@@ -26,7 +26,10 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
     def get_products_by_categories(variants, category_slug):
         category = None
         for slug in category_slug.split(','):
-            category = Category.objects.get(slug=slug) if not category else category.children.get(slug=slug)
+            try:
+                category = Category.objects.get(slug=slug) if not category else category.children.get(slug=slug)
+            except Category.DoesNotExist:
+                return Variant.objects.none()
 
         # Get all descendants of the final category, including the category itself
         categories = category.get_descendants(include_self=True)
