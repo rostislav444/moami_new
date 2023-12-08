@@ -54,25 +54,25 @@ def update_mk_stock(sender, instance, **kwargs):
         Category.objects.filter(pk=instance.pk).update(update_mk_stock=False)
 
 
-@receiver(post_save, sender=Variant)
-def load_variant_to_mk(sender, instance, **kwargs):
-    url = 'https://hub.modnakasta.ua/api/supplier-content/submit/products'
-
-    if instance:
-        payload = ModnaKastaProductSerializer(instance).data
-        response = mk_request(url, payload)
-
-        update_status = VariantMkUpdateStatus.objects.filter(variant=instance).first()
-
-        if update_status:
-            update_status.status = response['status_code']
-            update_status.response = response['message']
-        else:
-            update_status = VariantMkUpdateStatus(
-                variant=instance,
-                status=response['status_code'],
-                response=response['message']
-            )
-        update_status.save()
+# @receiver(post_save, sender=Variant)
+# def load_variant_to_mk(sender, instance, **kwargs):
+#     url = 'https://hub.modnakasta.ua/api/supplier-content/submit/products'
+#
+#     if instance:
+#         payload = ModnaKastaProductSerializer(instance).data
+#         response = mk_request(url, payload)
+#
+#         update_status = VariantMkUpdateStatus.objects.filter(variant=instance).first()
+#
+#         if update_status:
+#             update_status.status = response['status_code']
+#             update_status.response = response['message']
+#         else:
+#             update_status = VariantMkUpdateStatus(
+#                 variant=instance,
+#                 status=response['status_code'],
+#                 response=response['message']
+#             )
+#         update_status.save()
 
 
