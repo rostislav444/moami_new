@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.integrations.serializers.variant_serializer import FeedVariantSerializer
+from apps.integrations.serializers.serializers_variant import FeedVariantSerializer
 from apps.product.models import Product
 from apps.translation.serialziers import TranslationFiled
 from project import settings

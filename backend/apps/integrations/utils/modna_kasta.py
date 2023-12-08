@@ -16,16 +16,24 @@ def mk_request(url, payload):
     headers = get_mk_request_headers()
     response = requests.post(url, json=payload, headers=headers)
 
+    status_code = response.status_code
+    message = response.json()
+
     log_obj = ModnaKastaLog(
-        status=response.status_code,
+        status=status_code,
         url=url,
-        message=response.json(),
+        message=message,
         payload=payload
     )
     log_obj.save()
 
-    print("Status Code:", response.status_code)
+    print("Status Code:", status_code)
     print("JSON Response:", response.json())
+
+    return {
+        'status_code': status_code,
+        'message': message
+    }
 
 
 def show_hide_sizes(skus, available):
@@ -46,5 +54,6 @@ def update_stock(sku, stock):
         }]
     }
     mk_request(url, payload)
+
 
 

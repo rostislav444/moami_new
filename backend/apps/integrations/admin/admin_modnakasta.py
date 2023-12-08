@@ -17,7 +17,7 @@ class ModnaKastaTolenAdmin(SingleModelAdmin):
 
 
 def formated_json(obj, field):
-    data = json.dumps(getattr(obj, field), indent=2)
+    data = json.dumps(getattr(obj, field), indent=2, ensure_ascii=False)
 
     # format it with pygments and highlight it
     formatter = HtmlFormatter(style='colorful')

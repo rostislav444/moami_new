@@ -1,21 +1,15 @@
-import os
-from io import BytesIO
-
-from PIL import Image
 from adminsortable.models import SortableMixin
 from colorfield.fields import ColorField
 from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 from mptt.models import MPTTModel, TreeForeignKey
 from unidecode import unidecode
-
+from django.core.exceptions import ObjectDoesNotExist
 from apps.abstract.fields import DeletableImageField, DeletableVideoField
 from apps.abstract.models import ImageWithThumbnails
 from apps.attributes.models import Attribute, AttributeGroup, Composition
@@ -49,6 +43,8 @@ class Country(Translatable):
         ordering = ['name']
 
     def __str__(self):
+        if self.mk_id:
+            return f'{self.name } ({self.mk_id})'
         return self.name
 
 
@@ -63,6 +59,8 @@ class Color(Translatable):
         ordering = ['name']
 
     def __str__(self):
+        if self.mk_id:
+            return f'{self.name} ({self.mk_id})'
         return self.name
 
 
@@ -177,6 +175,20 @@ class ProductAttribute(models.Model):
         value = self.get_attribute_string_value()
         return attr_group.name + ' - ' + value if value else ''
 
+    @property
+    def get_attribute_ids(self):
+        attr_type = self.attribute_group.data_type
+
+        if attr_type == AttributeGroup.ATTR_TYPE_CHOICES[0][0] and self.value_multi_attributes.count():
+            return [int(choice.mk_id) for choice in self.value_multi_attributes.all()]
+        elif attr_type == AttributeGroup.ATTR_TYPE_CHOICES[1][0] and self.value_single_attribute:
+            return [int(self.value_single_attribute.mk_id)]
+        elif attr_type == AttributeGroup.ATTR_TYPE_CHOICES[2][0] and self.value_int:
+            return self.value_int
+        elif attr_type == AttributeGroup.ATTR_TYPE_CHOICES[3][0] and self.value_str:
+            return self.value_str
+        return None
+
     def get_attribute_string_value(self, lang='ru'):
         attr_type = self.attribute_group.data_type
         value = None
@@ -274,6 +286,23 @@ class Variant(models.Model):
             return self.rozetka_code
         return self.code
 
+    @property
+    def get_composition(self):
+        compositions = []
+        for item in self.product.compositions.all():
+            compositions.append(str(item.value) + '% ' + item.composition.name)
+        return ', '.join(compositions)
+
+    @property
+    def get_composition_uk(self):
+        compositions = []
+        for item in self.product.compositions.all():
+            try:
+                compositions.append(str(item.value) + '% ' + item.composition.translations.get(language_code='uk').name)
+            except ObjectDoesNotExist:
+                compositions.append(str(item.value) + '% ' + item.composition.name)
+        return ', '.join(compositions)
+
     def get_absolute_url(self):
         domain = 'https://moami.com.ua'
         path = f'/product/{self.product.slug}-code-{self.code}'
@@ -315,6 +344,13 @@ class Variant(models.Model):
         self.slug = self.get_slug
 
     get_total_views.short_description = 'Просмотры'
+
+
+class VariantMkUpdateStatus(models.Model):
+    variant = models.OneToOneField(Variant, on_delete=models.CASCADE)
+    status = models.CharField(max_length=64, null=True, blank=True)
+    time = models.DateTimeField(auto_now=True)
+    response = models.JSONField(default=dict, null=True, blank=True)
 
 
 class VariantAttribute(models.Model):
@@ -438,8 +474,3 @@ class VarintViewSource(models.Model):
     views = models.PositiveIntegerField(default=0, verbose_name='Просмотры')
 
 
-# If Product slug changed rewrite Variant slug
-@receiver(post_save, sender=Product)
-def rewrite_variant_slug(sender, instance, **kwargs):
-    for variant in instance.variants.all():
-        variant.save()

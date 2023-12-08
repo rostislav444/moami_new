@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from apps.product.admin.admin_variant_size import VariantSizeInline
-from apps.product.models import Variant, VariantImage, VariantImageThumbnail, VariantVideo
+from apps.product.models import Variant, VariantImage, VariantImageThumbnail, VariantVideo, VariantMkUpdateStatus
 from project import settings
 
 
@@ -103,6 +103,13 @@ class VariantVideoInline(admin.TabularInline):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+class VariantMkUpdateStatusInline(admin.TabularInline):
+    model = VariantMkUpdateStatus
+    readonly_fields = ('status', 'response', 'time',)
+    fields = ('status', 'time',)
+    extra = 0
+
+
 @admin.register(Variant)
 class VariantAdmin(SortableAdminMixin, admin.ModelAdmin):
     def product_link(self, obj):
@@ -135,7 +142,8 @@ class VariantAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display = ('get_image', 'get_total_views', 'code', 'rozetka_code', 'color')
     readonly_fields = ('get_image', 'product_link', 'slug', 'get_total_views',)
     search_fields = ('code', 'product__name')
-    inlines = (VariantVideoInline, VariantImageInline, VariantSizeInline,)
+    inlines = (VariantMkUpdateStatusInline, VariantVideoInline, VariantImageInline, VariantSizeInline,)
+
 
 
 @admin.register(VariantImage)
