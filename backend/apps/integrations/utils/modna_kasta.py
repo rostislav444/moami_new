@@ -27,9 +27,6 @@ def mk_request(url, payload):
     )
     log_obj.save()
 
-    print("Status Code:", status_code)
-    print("JSON Response:", response.json())
-
     return {
         'status_code': status_code,
         'message': message
