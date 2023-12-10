@@ -58,13 +58,14 @@ def get_data(filter_expr=None, exclude_expr=None):
     return context
 
 
-@cache_page(60 * 60 * 4)
+@cache_page(60 * 60 * 24)
 def rozetka(request):
     context = get_data()
 
     return render(request, 'feed/rozetka.xml', context, content_type='application/xml')
 
 
+@cache_page(60 * 60 * 24)
 def modna_kasta(request):
     exclude_expr = Q(variants__sizes__size__interpretations__value__iexact='One size')
     context = get_data(exclude_expr=exclude_expr)
