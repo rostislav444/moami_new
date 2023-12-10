@@ -23,6 +23,7 @@ def rozetka(request):
         Q(value_int__isnull=False) |
         Q(value_str__isnull=False)
     ).prefetch_related(
+        'attribute_group',
         'value_single_attribute',
         'value_multi_attributes'
     ).distinct()
