@@ -49,4 +49,4 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
             return self.get_products_by_categories(variants, params['category'])
         elif 'collection' in params:
             return self.filter_by_collection(variants, params['collection'])
-        return Variant.object.none()
+        return Variant.objects.none()
