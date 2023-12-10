@@ -1,10 +1,12 @@
-from django.utils import translation
 from django.db.models import Prefetch
 from django.db.models import Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.utils import translation
+from django.utils.decorators import method_decorator
 
+from apps.core.utils.cache import cache_per_view_and_locale
 from apps.integrations.models import RozetkaCategories
 from apps.integrations.serializers import RozetkaProductSerializer, RozetkaCategoriesSerializer, \
     GoogleProductSerializer, GoogleProductByLanguageSerializer, FacebookProductSerializer
@@ -12,6 +14,7 @@ from apps.product.models import Product, ProductAttribute
 from project import settings
 
 
+@method_decorator(cache_per_view_and_locale(60 * 60), name='dispatch')
 def rozetka(request):
     translation.activate('ru')
 
