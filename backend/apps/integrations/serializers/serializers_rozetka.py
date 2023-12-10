@@ -86,7 +86,7 @@ class RozetkaProductSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source='category.name')
     description_uk = serializers.CharField(source='get_translation__description__uk')
     # Nested fields
-    rozetka_name_uk = serializers.CharField(source='get_translation__rozetka_name__uk')
+    # rozetka_name_uk = serializers.CharField(source='get_translation__rozetka_name__uk')
     rozetka_category = RozetkaCategoriesSerializer()
     variants = RozetkaVariantSerializer(many=True)
     composition = serializers.SerializerMethodField()
@@ -105,8 +105,8 @@ class RozetkaProductSerializer(serializers.ModelSerializer):
             'country_uk',
             'description',
             'description_uk',
-            'rozetka_name',
-            'rozetka_name_uk',
+            # 'rozetka_name',
+            # 'rozetka_name_uk',
             'variants',
             'category',
             'price',
