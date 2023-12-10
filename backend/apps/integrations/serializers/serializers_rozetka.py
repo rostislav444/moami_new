@@ -50,9 +50,9 @@ class RozetkaVariantSerializer(serializers.ModelSerializer):
 
     def get_color_uk(self, obj):
         try:
-            return obj.color.translations.get(language_code='uk').name
-        except ObjectDoesNotExist:
-            return obj.color.name
+            return obj.color.get_translation('name', 'uk')
+        except:
+            return obj.color.get_name
 
 
 class RozetkaProductAttributesSerializer(serializers.ModelSerializer):
@@ -137,10 +137,8 @@ class RozetkaProductSerializer(serializers.ModelSerializer):
     def get_composition_uk(self, obj):
         compositions = []
         for item in obj.compositions.all():
-            try:
-                compositions.append(str(item.value) + '% ' + item.composition.translations.get(language_code='uk').name)
-            except ObjectDoesNotExist:
-                compositions.append(str(item.value) + '% ' + item.composition.name)
+            value = str(item.value) + '% ' + item.composition.get_translation('name', 'uk')
+            compositions.appendvalue(value)
         return ', '.join(compositions)
 
 
