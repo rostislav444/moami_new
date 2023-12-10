@@ -26,7 +26,7 @@ def rozetka(request):
         'value_multi_attributes'
     ).distinct()
 
-    products = Product.objects.select_related('brand').prefetch_related(
+    products = Product.objects.select_related('brand', 'category', 'country').prefetch_related(
         Prefetch('attributes', queryset=product_attributes),
         'variants',
         'variants__images',
