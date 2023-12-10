@@ -37,7 +37,7 @@ def rozetka(request):
         rozetka_category__isnull=False
     ).exclude(
         variants__isnull=True
-    ).distinct()[:10]
+    ).distinct()
 
     categories = RozetkaCategories.objects.all()
     categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
