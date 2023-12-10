@@ -138,7 +138,7 @@ class RozetkaProductSerializer(serializers.ModelSerializer):
         compositions = []
         for item in obj.compositions.all():
             value = str(item.value) + '% ' + item.composition.get_translation('name', 'uk')
-            compositions.appendvalue(value)
+            compositions.append(value)
         return ', '.join(compositions)
 
 
