@@ -16,7 +16,8 @@ def rozetka(request):
     translation.activate('ru')
 
     # Prefetch and filter product attributes queryset
-    product_attributes = ProductAttribute.objects.filter(attribute_group__mk_key_name__isnull=True).filter(
+    # .filter(attribute_group__mk_key_name__isnull=True)
+    product_attributes = ProductAttribute.objects.filter(
         Q(value_multi_attributes__isnull=False) |
         Q(value_single_attribute__isnull=False) |
         Q(value_int__isnull=False) |
