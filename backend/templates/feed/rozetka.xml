@@ -43,12 +43,12 @@
                                     <value lang="uk">{{ attribute.attributes_uk }}</value>
                                 </param>
                             {% endfor %}
-                            {% if composition %}
-                                <param name="Склад">
-                                    <value lang="ru">{{ composition }}</value>
-                                    <value lang="uk">{{ composition_uk }}</value>
-                                </param>
-                            {% endif %}
+
+                            <param name="Склад">
+                                <value lang="ru">{{ product.composition }}</value>
+                                <value lang="uk">{{ product.composition_uk }}</value>
+                            </param>
+
                             <param name="Колір">
                                 <value lang="ru">{{ variant.color }}</value>
                                 <value lang="uk">{{ variant.color_uk }}</value>
