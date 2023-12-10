@@ -41,9 +41,10 @@ class Size(models.Model):
 
     def get_interpretations_dict(self):
         interpretations = self.interpretations.all()
-        if interpretations.exists():
-            return {interpretation.grid.slug: interpretation.value for interpretation in interpretations}
-        return {}
+        data = {}
+        for interpretation in interpretations:
+            data[interpretation.grid.slug] = interpretation.value
+        return data
 
     def __str__(self):
         data = self.get_interpretations_dict()
