@@ -13,8 +13,7 @@ from apps.product.models import Product, ProductAttribute
 from project import settings
 
 
-@cache_page(60 * 60 * 24)
-def rozetka(request):
+def get_data(filter_expr=None, exclude_expr=None):
     translation.activate('ru')
 
     # Prefetch and filter product attributes queryset
@@ -37,11 +36,15 @@ def rozetka(request):
         'variants__sizes__size',
         'variants__color__translations',
         'attributes__attribute_group'
-    ).filter(
-        rozetka_category__isnull=False
-    ).exclude(
-        variants__isnull=True
-    ).distinct()
+    ).filter(rozetka_category__isnull=False).exclude(variants__isnull=True)
+
+    if filter_expr:
+        products = products.filter(filter_expr)
+
+    if exclude_expr:
+        products = products.exclude(exclude_expr)
+
+    products = products.distinct()
 
     categories = RozetkaCategories.objects.all()
     categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
@@ -52,7 +55,21 @@ def rozetka(request):
         'products': products_serializer.data,
     }
 
+    return context
+
+
+@cache_page(60 * 60 * 4)
+def rozetka(request):
+    context = get_data()
+
     return render(request, 'feed/rozetka.xml', context, content_type='application/xml')
+
+
+def modna_kasta(request):
+    exclude_expr = Q(variants__sizes__size__interpretations__iexact='One size')
+    context = get_data(exclude_expr=exclude_expr)
+
+    return render(request, 'feed/modna_kasta.xml', context, content_type='application/xml')
 
 
 def google(request, lang_code):
