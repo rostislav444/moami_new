@@ -66,7 +66,7 @@ def rozetka(request):
 
 
 def modna_kasta(request):
-    exclude_expr = Q(variants__sizes__size__interpretations__iexact='One size')
+    exclude_expr = Q(variants__sizes__size__interpretations__value__iexact='One size')
     context = get_data(exclude_expr=exclude_expr)
 
     return render(request, 'feed/modna_kasta.xml', context, content_type='application/xml')
