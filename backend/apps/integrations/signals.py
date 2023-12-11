@@ -1,13 +1,10 @@
-import json
-
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
 from apps.categories.models import Category
-from apps.integrations.serializers import ModnaKastaProductSerializer
 from apps.integrations.utils.modna_kasta import mk_request
 from apps.integrations.utils.modna_kasta import show_hide_sizes, update_stock
-from apps.product.models import VariantSize, Variant, VariantMkUpdateStatus
+from apps.product.models import VariantSize
 
 
 @receiver(pre_save, sender=VariantSize)
@@ -53,7 +50,6 @@ def update_mk_stock(sender, instance, **kwargs):
 
         Category.objects.filter(pk=instance.pk).update(update_mk_stock=False)
 
-
 # @receiver(post_save, sender=Variant)
 # def load_variant_to_mk(sender, instance, **kwargs):
 #     url = 'https://hub.modnakasta.ua/api/supplier-content/submit/products'
@@ -74,5 +70,3 @@ def update_mk_stock(sender, instance, **kwargs):
 #                 response=response['message']
 #             )
 #         update_status.save()
-
-
