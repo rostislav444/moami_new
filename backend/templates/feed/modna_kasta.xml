@@ -21,7 +21,7 @@
                     {% for size in variant.sizes %}
                         <offer id="{{ size.full_id }}" available="true">
                             <price>{{ product.price }}</price>
-                            {% if product.promo_price %}<promo_price>{{ product.promo_price }}</promo_price>{% endif %}
+                            {% if product.promo_price %}<price_promo>{{ product.promo_price }}</price_promo>{% endif %}
                             {% if product.old_price %}<old_price>{{ product.old_price }}</old_price>{% endif %}
                             <currencyId>UAH</currencyId>
                             <categoryId>{{ product.category.rozetka_id }}</categoryId>

@@ -161,7 +161,7 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
             'fields': ('rozetka_category', 'rozetka_name',)
         }),
         ('Цена', {
-            'fields': (('price', 'old_price'),)
+            'fields': (('promo_price', 'price', 'old_price'),)
         }),
         ('Описание', {
             'fields': ('description',)
