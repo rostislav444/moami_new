@@ -22,7 +22,6 @@ SECRET_KEY = 'django-insecure-hm#r1xssp!bmbqka4mxgtzfe#)ugfo*i6#1pf#oq!hx)xpo8xb
 PRODUCTION = env('PRODUCTION') == 'true'
 DEBUG = PRODUCTION
 
-
 ALLOWED_HOSTS = [
     '212.8.246.22',
     'moami.com.ua',
@@ -40,6 +39,7 @@ INSTALLED_APPS = [
     # Libs that need to be on top
     'colorfield',
     'adminsortable2',
+    'clearcache',
     # Django
     'django.contrib.admin',
     'django.contrib.auth',
@@ -286,4 +286,3 @@ SITE_ID = 1
 
 ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
-
