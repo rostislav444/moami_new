@@ -1,13 +1,11 @@
 from rest_framework import serializers
 
-from apps.integrations.models import ModnaKastaCategories
 from apps.integrations.serializers.serializers_rozetka import RozetkaCategoriesSerializer
 from apps.product.models import Product, Variant, VariantSize, VariantImage, ProductAttribute
 
 
-
 class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
-    size = serializers.CharField(source='get_size')
+    size = serializers.SerializerMethodField()
     full_id = serializers.SerializerMethodField()
 
     class Meta:
@@ -17,6 +15,12 @@ class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_full_id(obj):
         return '-'.join([obj.variant.code, obj.get_size]).upper()
+
+    def get_size(self, obj):
+        size = obj.get_size
+        if size == 'One size':
+            return 'S-L'
+        return size
 
 
 class ModnaKastaXMLVariantImageSerializer(serializers.ModelSerializer):

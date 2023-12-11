@@ -42,7 +42,7 @@ def rozetka(request):
 
     products = products.distinct()
 
-    categories = RozetkaCategories.objects.all()
+    categories = RozetkaCategories.objects.filter(products__isnull=False)
     categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
     products_serializer = RozetkaProductSerializer(products, many=True)
 
@@ -79,15 +79,13 @@ def modna_kasta(request):
         'variants__color__translations',
         'attributes__attribute_group'
     ).filter(
+        rozetka_category__isnull=False,
         category__modna_kast_category__isnull=False
-    ).exclude(
-        variants__isnull=True,
-        variants__sizes__size__interpretations__value__iexact='One size'
-    )
+    ).exclude(variants__isnull=True)
 
     products = products.distinct()
 
-    categories = RozetkaCategories.objects.all()
+    categories = RozetkaCategories.objects.filter(products__isnull=False)
     categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
     products_serializer = ModnaKastaXMLProductSerializer(products, many=True)
 
