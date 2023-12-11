@@ -18,8 +18,6 @@ class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
 
     def get_size(self, obj):
         size = obj.get_size
-        if size == 'One size':
-            return 'S-L'
         return size
 
 
