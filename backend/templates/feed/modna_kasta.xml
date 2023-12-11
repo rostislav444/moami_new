@@ -20,8 +20,8 @@
                 {% for variant in product.variants %}
                     {% for size in variant.sizes %}
                         <offer id="{{ size.full_id }}" available="true">
-                            <price>{{ product.price }}</price>
                             <promo_price>{{ product.promo_price }}</promo_price>
+                            <price>{{ product.price }}</price>
                             <old_price>{{ product.old_price }}</old_price>
                             <currencyId>UAH</currencyId>
                             <categoryId>{{ product.category.rozetka_id }}</categoryId>

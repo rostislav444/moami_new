@@ -54,7 +54,7 @@ def rozetka(request):
     return render(request, 'feed/rozetka.xml', context, content_type='application/xml')
 
 
-# @cache_page(60 * 60 * 2)
+@cache_page(60 * 60 * 2)
 def modna_kasta(request):
     translation.activate('ru')
 
