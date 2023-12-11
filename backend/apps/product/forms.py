@@ -56,8 +56,7 @@ class ProductAttributeForm(forms.ModelForm):
                 if field == 'value_multi_attributes':
                     self.fields[field].widget = forms.MultipleHiddenInput()
                     continue
-                # self.fields[field].widget = forms.HiddenInput()
-                self.fields.pop(field)
+                self.fields[field].widget = forms.HiddenInput()
 
     def init_attribute_group_fields(self, attr_group):
         self.fields['attribute_group'].queryset = AttributeGroup.objects.filter(id=attr_group.id)
@@ -66,13 +65,13 @@ class ProductAttributeForm(forms.ModelForm):
 
         if attr_group.data_type == AttributeGroup.ATTR_TYPE_CHOICES[0][0]:
             self.fields['value_multi_attributes'].queryset = attr_group.attributes.all()
-            # self.fields['value_single_attribute'].queryset = Attribute.objects.none()
+            self.fields['value_single_attribute'].queryset = Attribute.objects.none()
         elif attr_group.data_type == AttributeGroup.ATTR_TYPE_CHOICES[1][0]:
             self.fields['value_multi_attributes'].queryset = Attribute.objects.none()
-            # self.fields['value_single_attribute'].queryset = attr_group.attributes.all()
-        # else:
-        #     self.fields['value_multi_attributes'].queryset = Attribute.objects.none()
-        #     self.fields['value_single_attribute'].queryset = Attribute.objects.none()
+            self.fields['value_single_attribute'].queryset = attr_group.attributes.all()
+        else:
+            self.fields['value_multi_attributes'].queryset = Attribute.objects.none()
+            self.fields['value_single_attribute'].queryset = Attribute.objects.none()
 
     def __init__(self, *args, **kwargs):
         super(ProductAttributeForm, self).__init__(*args, **kwargs)
