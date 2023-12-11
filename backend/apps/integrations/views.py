@@ -42,7 +42,7 @@ def rozetka(request):
 
     products = products.distinct()
 
-    categories = RozetkaCategories.objects.filter(products__isnull=False)
+    categories = RozetkaCategories.objects.all()
     categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
     products_serializer = RozetkaProductSerializer(products, many=True)
 
@@ -85,7 +85,7 @@ def modna_kasta(request):
 
     products = products.distinct()
 
-    categories = RozetkaCategories.objects.filter(products__isnull=False)
+    categories = RozetkaCategories.objects.all()
     categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
     products_serializer = ModnaKastaXMLProductSerializer(products, many=True)
 
