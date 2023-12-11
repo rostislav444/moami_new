@@ -1,5 +1,3 @@
-import json
-
 import requests
 from django.apps import apps
 from django.core.management.base import BaseCommand
@@ -103,12 +101,17 @@ class Command(BaseCommand):
             elif group['human_name'].startswith('Країна'):
                 continue
 
-            attr_group, _ = AttributeGroup.objects.get_or_create(
-                name=group['human_name'],
-                mk_key_name=group['key_name'],
-                mk_type=group['type'],
-                data_type=self.get_data_type(group)
-            )
+            try:
+                attr_group = AttributeGroup.objects.get(name=group['human_name'], mk_key_name=group['key_name'],
+                                                    mk_type=group['type'])
+            except AttributeGroup.ObjectDoesNotExist:
+                attr_group = AttributeGroup(
+                    name=group['human_name'],
+                    mk_key_name=group['key_name'],
+                    mk_type=group['type'],
+                    data_type=self.get_data_type(group)
+                )
+                attr_group.save()
 
             category_attr_group, _ = CategoryAttributeGroup.objects.get_or_create(
                 category=category,
