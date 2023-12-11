@@ -19,7 +19,7 @@
             {% for product in products %}
                 {% for variant in product.variants %}
                     {% for size in variant.sizes %}
-                        <offer id="{{ size.mk_full_id }}" available="true">
+                        <offer id="{{ size.full_id }}" available="true">
                             <price>{{ product.price }}</price>
                             {% if product.promo_price %}<promo_price>{{ product.promo_price }}</promo_price>{% endif %}
                             {% if product.old_price %}<old_price>{{ product.old_price }}</old_price>{% endif %}
