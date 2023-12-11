@@ -106,7 +106,7 @@ class ModnaKastaXMLProductSerializer(serializers.ModelSerializer):
     def get_composition_uk(self, obj):
         compositions = []
         for item in obj.compositions.all():
-            value = str(item.value) + '% ' + item.composition.get_translation__name__uk
+            value = str(item.value) + '% ' + 'item.composition.get_translation__name__uk'
             compositions.append(value)
         return ', '.join(compositions)
 
