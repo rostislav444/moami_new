@@ -65,19 +65,18 @@ def modna_kasta(request):
         Q(value_single_attribute__isnull=False) |
         Q(value_int__isnull=False) |
         Q(value_str__isnull=False)
-    ).prefetch_related(
-        'attribute_group',
-        'value_single_attribute',
-        'value_multi_attributes'
     ).distinct()
 
     products = Product.objects.select_related('brand', 'category', 'country').prefetch_related(
-        Prefetch('attributes', queryset=product_attributes),
         'variants',
         'variants__images',
         'variants__sizes__size',
         'variants__color__translations',
-        'attributes__attribute_group'
+        'compositions__composition',
+        'attributes__attribute_group',
+        'attributes__value_single_attribute',
+        'attributes__value_multi_attributes',
+        Prefetch('attributes', queryset=product_attributes),
     ).filter(
         rozetka_category__isnull=False,
         category__modna_kast_category__isnull=False
