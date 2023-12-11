@@ -56,12 +56,13 @@ class ProductAttributeForm(forms.ModelForm):
                 if field == 'value_multi_attributes':
                     self.fields[field].widget = forms.MultipleHiddenInput()
                     continue
-                self.fields[field].widget = forms.HiddenInput()
+                # self.fields[field].widget = forms.HiddenInput()
+                self.fields.pop(field)
 
     def init_attribute_group_fields(self, attr_group):
         self.fields['attribute_group'].queryset = AttributeGroup.objects.filter(id=attr_group.id)
         self.fields['attribute_group'].empty_label = None
-        # self.hide_fields(attr_group)
+        self.hide_fields(attr_group)
 
         if attr_group.data_type == AttributeGroup.ATTR_TYPE_CHOICES[0][0]:
             self.fields['value_multi_attributes'].queryset = attr_group.attributes.all()
