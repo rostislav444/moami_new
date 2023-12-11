@@ -54,8 +54,9 @@ class ModnaKastaXMLProductAttributesSerializer(serializers.ModelSerializer):
         model = ProductAttribute
         fields = ('id', 'attribute_group', 'attribute_group_uk', 'attributes', 'attributes_uk')
 
-    def get_attribute_group_uk(self, obj):
-        return getattr(obj.attribute_group, 'get_translation__name__uk')
+    @staticmethod
+    def get_attribute_group_uk(obj):
+        return obj.attribute_group.get_translation('name', 'uk')
 
     @staticmethod
     def get_attributes(obj):
