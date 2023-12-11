@@ -102,8 +102,9 @@ class ProductAttributeFormSet(forms.BaseInlineFormSet):
             instance = kwargs['instance']
             category = instance.category
             categories = category.get_ancestors(include_self=True)
-            attr_groups = AttributeGroup.objects.filter(categories__category__in=categories).exclude(
-                product_attribute_group__product__pk=kwargs['instance'].pk).distinct()
+            attr_groups = (AttributeGroup.objects
+                           .filter(categories__category__in=categories)
+                           .exclude(product_attribute_group__product__pk=kwargs['instance'].pk).distinct())
 
             kwargs.update({
                 'initial': [

@@ -22,6 +22,9 @@ class AttributeGroup(NameSlug, Translatable):
         ordering = ('name',)
 
     def __str__(self):
+        required = self.categories.filter(required=True).count()
+        if required > 0:
+            return self.name + ' *'
         return self.name
 
 

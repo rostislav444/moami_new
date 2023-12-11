@@ -1,13 +1,9 @@
 from rest_framework import serializers
 
 from apps.integrations.models import ModnaKastaCategories
+from apps.integrations.serializers.serializers_rozetka import RozetkaCategoriesSerializer
 from apps.product.models import Product, Variant, VariantSize, VariantImage, ProductAttribute
 
-
-class ModnaKastaCategory(serializers.ModelSerializer):
-    class Meta:
-        model = ModnaKastaCategories
-        fields = ['name', 'name_alias', 'kind_id', 'affiliation_id']
 
 
 class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
@@ -73,7 +69,7 @@ class ModnaKastaXMLProductSerializer(serializers.ModelSerializer):
     brand = serializers.CharField(source='brand.name')
     country = serializers.CharField(source='country.name')
     country_uk = serializers.CharField(source='country.get_translation__name__uk')
-    category = ModnaKastaCategory(source='category.modna_kast_category')
+    category = RozetkaCategoriesSerializer(source='rozetka_category')
     description_uk = serializers.CharField(source='get_translation__description__uk')
     variants = ModnaKastaXMLVariantSerializer(many=True)
     composition = serializers.SerializerMethodField()

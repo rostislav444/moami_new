@@ -11,9 +11,8 @@
         </currencies>
         <categories>
             {% for category in categories %}
-                <category id="{{ category.kind_id }}"
-                          affiliation_id="{{  category.affiliation_id }}"
-                          kind_id="{{ category.kind_id }}">{{ category.name }}</category>
+                <category id="{{ category.rozetka_id }}"
+                          rz_id="{{ category.rozetka_id }}">{{ category.name }}</category>
             {% endfor %}
         </categories>
         <offers>
@@ -25,7 +24,7 @@
                             {% if product.promo_price %}<promo_price>{{ product.promo_price }}</promo_price>{% endif %}
                             {% if product.old_price %}<old_price>{{ product.old_price }}</old_price>{% endif %}
                             <currencyId>UAH</currencyId>
-                            <categoryId>{{ product.category.kind_id }}</categoryId>
+                            <categoryId>{{ product.category.rozetka_id }}</categoryId>
                             {% for image in variant.images %}
                                 <picture>https://moami.com.ua{{ image.image }}</picture>
                             {% endfor %}

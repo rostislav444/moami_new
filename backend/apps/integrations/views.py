@@ -9,7 +9,7 @@ from django.views.decorators.cache import cache_page
 from apps.integrations.models import RozetkaCategories, ModnaKastaCategories
 from apps.integrations.serializers import RozetkaProductSerializer, RozetkaCategoriesSerializer, \
     GoogleProductSerializer, GoogleProductByLanguageSerializer, FacebookProductSerializer
-from apps.integrations.serializers.serializers_modna_kasta_xml import ModnaKastaXMLProductSerializer, ModnaKastaCategory
+from apps.integrations.serializers.serializers_modna_kasta_xml import ModnaKastaXMLProductSerializer
 from apps.product.models import Product, ProductAttribute
 from project import settings
 
@@ -87,8 +87,8 @@ def modna_kasta(request):
 
     products = products.distinct()
 
-    categories = ModnaKastaCategories.objects.filter(categories__isnull=False)
-    categories_serializer = ModnaKastaCategory(categories, many=True)
+    categories = RozetkaCategories.objects.all()
+    categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
     products_serializer = ModnaKastaXMLProductSerializer(products, many=True)
 
     context = {
