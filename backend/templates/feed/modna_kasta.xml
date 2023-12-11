@@ -40,6 +40,7 @@
                             {% for attribute in product.attributes %}
                                 <param name="{{ attribute.attribute_group_uk }}">{{ attribute.attributes_uk }}</param>
                             {% endfor %}
+                            <param name="Назва">{{ product.name_uk }} {{ product.brand }} {{ variant.color_uk }}</param>
                             <param name="Приналежність">Жінкам</param>
                             <param name="Вид">Жінкам</param>
                             <param name="Склад">{{ product.composition_uk }}</param>
