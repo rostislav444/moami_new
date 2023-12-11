@@ -104,7 +104,7 @@ class Command(BaseCommand):
             try:
                 attr_group = AttributeGroup.objects.get(name=group['human_name'], mk_key_name=group['key_name'],
                                                     mk_type=group['type'])
-            except AttributeGroup.ObjectDoesNotExist:
+            except:
                 attr_group = AttributeGroup(
                     name=group['human_name'],
                     mk_key_name=group['key_name'],
