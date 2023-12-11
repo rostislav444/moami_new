@@ -27,6 +27,14 @@ class VariantSizeSerializer(serializers.ModelSerializer):
         return obj.size.get_interpretations_dict()
 
 
+class ProductCompositionSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='composition.name')
+
+    class Meta:
+        model = ProductComposition
+        fields = ('id', 'name', 'value')
+
+
 class VariantWithImagesSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     color = ColorSerializer()

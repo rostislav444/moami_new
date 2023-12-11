@@ -96,3 +96,5 @@ class ModnaKastaProductSerializer(serializers.ModelSerializer):
             response.append(data)
 
         return response
+
+

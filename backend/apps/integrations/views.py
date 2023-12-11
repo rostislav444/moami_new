@@ -6,14 +6,16 @@ from django.template.loader import render_to_string
 from django.utils import translation
 from django.views.decorators.cache import cache_page
 
-from apps.integrations.models import RozetkaCategories
+from apps.integrations.models import RozetkaCategories, ModnaKastaCategories
 from apps.integrations.serializers import RozetkaProductSerializer, RozetkaCategoriesSerializer, \
     GoogleProductSerializer, GoogleProductByLanguageSerializer, FacebookProductSerializer
+from apps.integrations.serializers.serializers_modna_kasta_xml import ModnaKastaXMLProductSerializer, ModnaKastaCategory
 from apps.product.models import Product, ProductAttribute
 from project import settings
 
 
-def get_data(filter_expr=None, exclude_expr=None):
+@cache_page(60 * 60 * 24)
+def rozetka(request):
     translation.activate('ru')
 
     # Prefetch and filter product attributes queryset
@@ -38,12 +40,6 @@ def get_data(filter_expr=None, exclude_expr=None):
         'attributes__attribute_group'
     ).filter(rozetka_category__isnull=False).exclude(variants__isnull=True)
 
-    if filter_expr:
-        products = products.filter(filter_expr)
-
-    if exclude_expr:
-        products = products.exclude(exclude_expr)
-
     products = products.distinct()
 
     categories = RozetkaCategories.objects.all()
@@ -55,20 +51,50 @@ def get_data(filter_expr=None, exclude_expr=None):
         'products': products_serializer.data,
     }
 
-    return context
-
-
-@cache_page(60 * 60 * 24)
-def rozetka(request):
-    context = get_data()
-
     return render(request, 'feed/rozetka.xml', context, content_type='application/xml')
 
 
-@cache_page(60 * 60 * 24)
+# @cache_page(60 * 60 * 24)
 def modna_kasta(request):
-    exclude_expr = Q(variants__sizes__size__interpretations__value__iexact='One size')
-    context = get_data(exclude_expr=exclude_expr)
+    translation.activate('ru')
+
+    # Prefetch and filter product attributes queryset
+    # .filter(attribute_group__mk_key_name__isnull=True)
+    product_attributes = ProductAttribute.objects.filter(
+        Q(value_multi_attributes__isnull=False) |
+        Q(value_single_attribute__isnull=False) |
+        Q(value_int__isnull=False) |
+        Q(value_str__isnull=False)
+    ).prefetch_related(
+        'attribute_group',
+        'value_single_attribute',
+        'value_multi_attributes'
+    ).distinct()
+
+    products = Product.objects.select_related('brand', 'category', 'country').prefetch_related(
+        Prefetch('attributes', queryset=product_attributes),
+        'variants',
+        'variants__images',
+        'variants__sizes__size',
+        'variants__color__translations',
+        'attributes__attribute_group'
+    ).filter(
+        category__modna_kast_category__isnull=False
+    ).exclude(
+        variants__isnull=True,
+        variants__sizes__size__interpretations__value__iexact='One size'
+    )
+
+    products = products.distinct()
+
+    categories = ModnaKastaCategories.objects.filter(categories__isnull=False)
+    categories_serializer = ModnaKastaCategory(categories, many=True)
+    products_serializer = ModnaKastaXMLProductSerializer(products, many=True)
+
+    context = {
+        'categories': categories_serializer.data,
+        'products': products_serializer.data,
+    }
 
     return render(request, 'feed/modna_kasta.xml', context, content_type='application/xml')
 

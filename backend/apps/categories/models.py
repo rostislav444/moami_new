@@ -13,11 +13,12 @@ from apps.translation.models import Translatable
 class Category(NameSlug, MPTTModel, Translatable):
     parent = TreeForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
     google_taxonomy = models.ForeignKey('integrations.GoogleTaxonomy', null=True, blank=True, on_delete=models.SET_NULL,
-                                         verbose_name='Google Taxonomy')
+                                        verbose_name='Google Taxonomy')
     facebook_category = models.ForeignKey('integrations.FacebookCategories', null=True, blank=True,
-                                           on_delete=models.SET_NULL, verbose_name='Категория Facebook')
+                                          on_delete=models.SET_NULL, verbose_name='Категория Facebook')
     modna_kast_category = models.ForeignKey('integrations.ModnaKastaCategories', null=True, blank=True,
-                                           on_delete=models.SET_NULL, verbose_name='Категория ModnaKasta')
+                                            on_delete=models.SET_NULL, verbose_name='Категория ModnaKasta',
+                                            related_name='categories')
     size_group = models.ForeignKey(SizeGroup, null=True, blank=True, on_delete=models.PROTECT,
                                    related_name='categories')
     preferred_size_grid = models.ForeignKey(SizeGrid, null=True, blank=True, on_delete=models.SET_NULL,
@@ -108,7 +109,3 @@ class Collections(NameSlug):
 
     def get_products_count(self):
         return self.products.annotate(num_variants=Count('variants')).aggregate(total=Sum('num_variants'))['total'] or 0
-
-
-
-
