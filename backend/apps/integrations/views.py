@@ -85,7 +85,7 @@ def modna_kasta(request):
 
     products = products.distinct()
 
-    categories = RozetkaCategories.objects.all()
+    categories = RozetkaCategories.objects.all().distinct()
     categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
     products_serializer = ModnaKastaXMLProductSerializer(products, many=True)
 
