@@ -95,7 +95,7 @@ def generate_mk_feed():
 
     feed_directory = os.path.join(settings.MEDIA_ROOT, 'feed')
 
-    feed_xml_path = os.path.join(feed_directory, 'feed.xml')
+    feed_xml_path = os.path.join(feed_directory, 'modna_kasta_feed.xml')
     categories_xml_path = os.path.join(feed_directory, 'categories.xml')
     products_xml_path = os.path.join(feed_directory, 'products.xml')
 
