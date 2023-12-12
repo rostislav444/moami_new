@@ -1,7 +1,7 @@
 import os
-import re
 import sys
 from datetime import datetime
+
 from django.db.models import Prefetch
 from django.db.models import Q
 from django.template.loader import get_template
@@ -12,6 +12,9 @@ from apps.integrations.serializers import RozetkaCategoriesSerializer
 from apps.integrations.serializers.serializers_modna_kasta_xml import ModnaKastaXMLProductSerializer
 from apps.product.models import Product, ProductAttribute
 from project import settings
+
+feed_directory = os.path.join(settings.MEDIA_ROOT, 'modna_kasta_feed')
+feed_xml_path = os.path.join(feed_directory, 'feed.xml')
 
 
 def render_categories_xml(categories_xml_path):
@@ -92,10 +95,6 @@ def render_products_xml(products_xml_path):
 def generate_mk_feed():
     translation.activate('ru')
     template_path = 'feed/mk_feed/feed.xml'
-
-    feed_directory = os.path.join(settings.MEDIA_ROOT, 'feed')
-
-    feed_xml_path = os.path.join(feed_directory, 'modna_kasta_feed.xml')
     categories_xml_path = os.path.join(feed_directory, 'categories.xml')
     products_xml_path = os.path.join(feed_directory, 'products.xml')
 
@@ -105,7 +104,8 @@ def generate_mk_feed():
     render_categories_xml(categories_xml_path)
     render_products_xml(products_xml_path)
 
-    with open(categories_xml_path, 'r', encoding='utf-8') as categories_xml, open(products_xml_path, 'r', encoding='utf-8') as products_xml:
+    with open(categories_xml_path, 'r', encoding='utf-8') as categories_xml, open(products_xml_path, 'r',
+                                                                                  encoding='utf-8') as products_xml:
         template = get_template(template_path)
 
         categories_content = categories_xml.read()

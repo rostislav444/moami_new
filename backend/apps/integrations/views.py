@@ -1,15 +1,18 @@
+import os
+
 from django.db.models import Prefetch
 from django.db.models import Q
+from django.http import FileResponse
 from django.http import HttpResponse, Http404
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.utils import translation
 from django.views.decorators.cache import cache_page
 
-from apps.integrations.models import RozetkaCategories, ModnaKastaCategories
+from apps.integrations.models import RozetkaCategories
 from apps.integrations.serializers import RozetkaProductSerializer, RozetkaCategoriesSerializer, \
     GoogleProductSerializer, GoogleProductByLanguageSerializer, FacebookProductSerializer
-from apps.integrations.serializers.serializers_modna_kasta_xml import ModnaKastaXMLProductSerializer
+from apps.integrations.utils.generate_mk_feed import feed_xml_path
 from apps.product.models import Product, ProductAttribute
 from project import settings
 
@@ -53,46 +56,12 @@ def rozetka(request):
     return render(request, 'feed/rozetka.xml', context, content_type='application/xml')
 
 
-@cache_page(60 * 60 * 2)
 def modna_kasta(request):
-    translation.activate('ru')
-
-    # Prefetch and filter product attributes queryset
-    # .filter(attribute_group__mk_key_name__isnull=True)
-    product_attributes = ProductAttribute.objects.select_related('attribute_group').filter(
-        Q(value_multi_attributes__isnull=False) |
-        Q(value_single_attribute__isnull=False) |
-        Q(value_int__isnull=False) |
-        Q(value_str__isnull=False)
-    ).prefetch_related(
-        'value_single_attribute',
-        'value_multi_attributes'
-    ).distinct()
-
-    products = Product.objects.select_related('brand', 'category', 'country').prefetch_related(
-        'variants',
-        'variants__images',
-        'variants__sizes__size',
-        'variants__color__translations',
-        'compositions__composition',
-        Prefetch('attributes', queryset=product_attributes),
-    ).filter(
-        rozetka_category__isnull=False,
-        category__modna_kast_category__isnull=False
-    ).exclude(variants__isnull=True)
-
-    products = products.distinct()
-
-    categories = RozetkaCategories.objects.all().distinct()
-    categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
-    products_serializer = ModnaKastaXMLProductSerializer(products, many=True)
-
-    context = {
-        'categories': categories_serializer.data,
-        'products': products_serializer.data,
-    }
-
-    return render(request, 'feed/modna_kasta.xml', context, content_type='application/xml')
+    if os.path.exists(feed_xml_path):
+        with open(feed_xml_path, 'rb') as file:
+            response = FileResponse(file, content_type='application/xml')
+            return response
+    return HttpResponse("The XML file does not exist.", status=404)
 
 
 def google(request, lang_code):
