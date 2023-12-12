@@ -58,9 +58,7 @@ def rozetka(request):
 
 def modna_kasta(request):
     if os.path.exists(feed_xml_path):
-        with open(feed_xml_path, 'rb') as file:
-            response = FileResponse(file, content_type='application/xml')
-            return response
+        return FileResponse(open(feed_xml_path, "rb"))
     return HttpResponse("The XML file does not exist.", status=404)
 
 
