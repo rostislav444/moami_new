@@ -30,7 +30,7 @@ class AttributeGroup(NameSlug, Translatable):
 
 
 class Attribute(NameSlug, Translatable):
-    slug = models.SlugField(max_length=255, blank=True, editable=False)
+    slug = models.SlugField(max_length=255, unique=False, blank=True, editable=False)
     attribute_group = models.ForeignKey('AttributeGroup', on_delete=models.CASCADE, related_name='attributes')
     mk_id = models.CharField(max_length=255, null=True, blank=True)
 
