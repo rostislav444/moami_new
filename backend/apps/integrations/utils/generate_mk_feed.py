@@ -13,8 +13,10 @@ from apps.integrations.serializers.serializers_modna_kasta_xml import ModnaKasta
 from apps.product.models import Product, ProductAttribute
 from project import settings
 
-feed_directory = os.path.join(settings.MEDIA_ROOT, 'modna_kasta_feed')
-feed_xml_path = os.path.join(feed_directory, 'feed.xml')
+feed_directory = os.path.join(settings.MEDIA_ROOT, 'feed')
+
+modna_kasta_feed_xml_path = os.path.join(feed_directory, 'modna_kasta.xml')
+rozetka_feed_xml_path = os.path.join(feed_directory, 'rozetka.xml')
 
 
 def render_categories_xml(categories_xml_path):
@@ -36,7 +38,7 @@ def render_categories_xml(categories_xml_path):
         f.write(response)
 
 
-def render_products_xml(products_xml_path):
+def render_products_xml(products_xml_path, rozetka=False):
     product_template_path = 'feed/mk_feed/product.xml'
 
     def get_product_attributes():
@@ -70,7 +72,10 @@ def render_products_xml(products_xml_path):
 
     def render_product(product):
         template = get_template(product_template_path)
-        rendered_template = template.render(context={'product': product})
+        rendered_template = template.render(context={
+            'product': product,
+            'rozetka': rozetka
+        })
         return rendered_template.strip()
 
     def write_file(products_data, products_qty):
@@ -92,22 +97,13 @@ def render_products_xml(products_xml_path):
     write_file(products_data_generator, products_qs.count())
 
 
-def generate_mk_feed():
-    translation.activate('ru')
-    template_path = 'feed/mk_feed/feed.xml'
-    categories_xml_path = os.path.join(feed_directory, 'categories.xml')
-    products_xml_path = os.path.join(feed_directory, 'products.xml')
+def write_final_feed(template_path, categories_xml_path, products_xml_path, rozetka):
+    final_xml_path = rozetka_feed_xml_path if rozetka else modna_kasta_feed_xml_path
 
-    if not os.path.exists(feed_directory):
-        os.makedirs(feed_directory)
+    with (open(categories_xml_path, 'r', encoding='utf-8') as categories_xml,
+          open(products_xml_path, 'r', encoding='utf-8') as products_xml):
 
-    render_categories_xml(categories_xml_path)
-    render_products_xml(products_xml_path)
-
-    with open(categories_xml_path, 'r', encoding='utf-8') as categories_xml, open(products_xml_path, 'r',
-                                                                                  encoding='utf-8') as products_xml:
         template = get_template(template_path)
-
         categories_content = categories_xml.read()
         products_content = products_xml.read()
 
@@ -117,9 +113,28 @@ def generate_mk_feed():
             'time': datetime.now()
         })
 
-        with open(feed_xml_path, 'w', encoding='utf-8') as feed:
+        with open(final_xml_path, 'w', encoding='utf-8') as feed:
             feed.write(rendered_template)
 
-        print('Feed been writen')
+        # Remove useless files
+        for path in [categories_xml_path, products_xml_path]:
+            if os.path.exists(path):
+                os.remove(path)
+
+        print(f' {"Rozetka" if rozetka else "Modna Kasta"} feed been writen')
+
+
+def generate_mk_feed(rozetka=False):
+    translation.activate('ru')
+    template_path = 'feed/mk_feed/feed.xml'
+    categories_xml_path = os.path.join(feed_directory, 'categories.xml')
+    products_xml_path = os.path.join(feed_directory, 'products.xml')
+
+    if not os.path.exists(feed_directory):
+        os.makedirs(feed_directory)
+
+    render_categories_xml(categories_xml_path)
+    render_products_xml(products_xml_path, rozetka)
+    write_final_feed(template_path, categories_xml_path, products_xml_path, rozetka)
 
     return True

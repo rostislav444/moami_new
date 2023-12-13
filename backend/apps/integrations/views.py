@@ -12,7 +12,7 @@ from django.views.decorators.cache import cache_page
 from apps.integrations.models import RozetkaCategories
 from apps.integrations.serializers import RozetkaProductSerializer, RozetkaCategoriesSerializer, \
     GoogleProductSerializer, GoogleProductByLanguageSerializer, FacebookProductSerializer
-from apps.integrations.utils.generate_mk_feed import feed_xml_path
+from apps.integrations.utils.generate_mk_feed import modna_kasta_feed_xml_path
 from apps.product.models import Product, ProductAttribute
 from project import settings
 
@@ -57,8 +57,8 @@ def rozetka(request):
 
 
 def modna_kasta(request):
-    if os.path.exists(feed_xml_path):
-        return FileResponse(open(feed_xml_path, "rb"))
+    if os.path.exists(modna_kasta_feed_xml_path):
+        return FileResponse(open(modna_kasta_feed_xml_path, "rb"))
     return HttpResponse("The XML file does not exist.", status=404)
 
 
