@@ -4,6 +4,7 @@ from django.db import models
 from django.db import transaction
 from django.utils.translation import get_language
 from easygoogletranslate import EasyGoogleTranslate
+
 from project import settings
 
 
@@ -19,7 +20,6 @@ class Translatable(models.Model):
     auto_translate = models.BooleanField(default=True)
 
     objects = TranslatableManager()
-
 
     class Meta:
         abstract = True

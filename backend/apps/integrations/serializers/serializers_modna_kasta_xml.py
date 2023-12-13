@@ -7,13 +7,18 @@ from apps.product.models import Product, Variant, VariantSize, VariantImage, Pro
 class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField()
     full_id = serializers.SerializerMethodField()
+    mk_full_id = serializers.SerializerMethodField()
 
     class Meta:
         model = VariantSize
-        fields = ('id', 'full_id', 'size', 'stock')
+        fields = ('id', 'full_id', 'mk_full_id', 'size', 'stock')
 
     @staticmethod
     def get_full_id(obj):
+        return ' '.join([obj.variant.code, obj.get_size]).upper()
+
+    @staticmethod
+    def get_mk_full_id(obj):
         return '-'.join([obj.variant.code, obj.get_size]).upper()
 
     def get_size(self, obj):
