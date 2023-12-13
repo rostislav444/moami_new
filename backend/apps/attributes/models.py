@@ -35,6 +35,7 @@ class Attribute(NameSlug, Translatable):
     class Meta:
         verbose_name = 'Атрибут'
         verbose_name_plural = 'Атрибуты'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
