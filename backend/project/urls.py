@@ -20,6 +20,7 @@ api = [
 
 urlpatterns = [
     path('ru/rozetka/', rozetka),
+    path('admin/clearcache/', include('clearcache.urls')),
     path('admin/', admin.site.urls),
     path('api/', include(api)),
 ]
