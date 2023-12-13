@@ -8,4 +8,4 @@ USER=$(grep "DB_USER=" /var/www/moami/backend/.env | cut -d '=' -f2 | tr -d '[:s
 echo "Extracted Password: $PASSWORD"
 echo "Extracted User: $USER"
 
-PGPASSWORD="$PASSWORD" pg_dump -h localhost -U "$USER" -p 5432 -d moami -F c > moami_dump.sql
+PGPASSWORD="$PASSWORD" pg_dump -h localhost -U "$USER" -p 5432 -d moami -F c > /var/www/moami/backend/media/moami_dump.sql
