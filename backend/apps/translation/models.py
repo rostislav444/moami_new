@@ -1,8 +1,9 @@
+from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db import transaction
 from django.utils.translation import get_language
-
+from easygoogletranslate import EasyGoogleTranslate
 from project import settings
 
 
@@ -37,7 +38,8 @@ class Translatable(models.Model):
         fields = []
         for field in self._meta.get_fields():
             if isinstance(field, models.CharField) or isinstance(field, models.TextField):
-                if field.name != 'slug' and field.name not in self.exclude_translation:
+                if not any(field.name.endswith(val) for val in
+                           ['slug', '_id']) and field.name not in self.exclude_translation:
                     fields.append(field.name)
         return fields
 
@@ -56,6 +58,28 @@ class Translatable(models.Model):
             except ObjectDoesNotExist:
                 return getattr(self, field)
 
+    def get_translation_model(self):
+        app = self.__class__._meta.app_label
+        model = self.__class__.__name__
+        return apps.get_model(app, model + 'Translation')
+
+    def create_translations(self):
+        transaction_model = self.get_translation_model()
+        fields = self.get_translatable_fields
+
+        for lang_code, name in settings.FOREIGN_LANGUAGES:
+            data = {'language_code': lang_code}
+            for field in fields:
+                value = getattr(self, field)
+                if value:
+                    translator = EasyGoogleTranslate(source_language='ru', target_language=lang_code, timeout=10)
+                    data[field] = translator.translate(value)
+            item = transaction_model(parent=self, **data)
+            item.save()
+
+    def save(self, *args, **kwargs):
+        self.create_translations()
+        super(Translatable, self).save(*args, **kwargs)
 
     def __getattr__(self, item):
         if item.startswith('get_translation'):
