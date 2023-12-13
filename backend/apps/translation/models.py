@@ -68,13 +68,19 @@ class Translatable(models.Model):
         fields = self.get_translatable_fields
 
         for lang_code, name in settings.FOREIGN_LANGUAGES:
-            data = {'language_code': lang_code}
+            data = {}
             for field in fields:
                 value = getattr(self, field)
                 if value:
                     translator = EasyGoogleTranslate(source_language='ru', target_language=lang_code, timeout=10)
                     data[field] = translator.translate(value)
-            item = transaction_model(parent=self, **data)
+
+            try:
+                item = transaction_model.objects.get(parent=self, language_code=lang_code)
+            except ObjectDoesNotExist:
+                item = transaction_model(parent=self, language_code=lang_code)
+            for k, v in data.items():
+                setattr(item, k, v)
             item.save()
 
     def save(self, *args, **kwargs):
