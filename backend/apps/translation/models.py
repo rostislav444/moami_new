@@ -16,7 +16,10 @@ class TranslatableManager(models.Manager):
 
 
 class Translatable(models.Model):
+    auto_translate = models.BooleanField(default=True)
+
     objects = TranslatableManager()
+
 
     class Meta:
         abstract = True
@@ -84,7 +87,8 @@ class Translatable(models.Model):
             item.save()
 
     def save(self, *args, **kwargs):
-        self.create_translations()
+        if self.auto_translate:
+            self.create_translations()
         super(Translatable, self).save(*args, **kwargs)
 
     def __getattr__(self, item):
