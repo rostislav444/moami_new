@@ -28,11 +28,6 @@ class AttributeGroup(NameSlug, Translatable):
             return self.name + ' *'
         return self.name
 
-    def save(self, *args, **kwargs):
-        translator = EasyGoogleTranslate(source_language='uk', target_language='ru', timeout=10)
-        self.name = translator.translate(self.name)
-        super(AttributeGroup, self).save(*args, **kwargs)
-
 
 class Attribute(NameSlug, Translatable):
     attribute_group = models.ForeignKey('AttributeGroup', on_delete=models.CASCADE, related_name='attributes')
@@ -45,11 +40,6 @@ class Attribute(NameSlug, Translatable):
 
     def __str__(self):
         return self.name
-
-    def save(self, *args, **kwargs):
-        translator = EasyGoogleTranslate(source_language='uk', target_language='ru', timeout=10)
-        self.name = translator.translate(self.name)
-        super(Attribute, self).save(*args, **kwargs)
 
 
 class Composition(NameSlug, Translatable):

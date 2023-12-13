@@ -15,6 +15,9 @@ class Command(BaseCommand):
         self.url = 'https://hub.modnakasta.ua/api/supplier-content/category/details'
         self.headers = get_mk_request_headers()
 
+    def add_arguments(self, parser):
+        parser.add_argument("--update", type=bool, required=False)
+
     @staticmethod
     def create_attribute_groups_attributes(values, attr_group):
         for val in values:
@@ -86,6 +89,30 @@ class Command(BaseCommand):
 
         return AttributeGroup.ATTR_TYPE_CHOICES[0][0]
 
+    def update_attrs_uk_translation(self, schema):
+        for group in schema:
+            values = self.get_schema_values(group)
+
+            try:
+                attr_group = AttributeGroup.objects.get(mk_key_name=group['key_name'])
+            except:
+                continue
+            attr_group.translations.filter(language_code='uk').update(name=group['human_name'])
+
+            if values is not None:
+                for val in values:
+                    if val.get('value'):
+                        try:
+                            attr = Attribute.objects.get(mk_id=val['id'])
+                        except:
+                            continue
+
+                        attr.translations.filter(language_code='uk').update(name=val['value'])
+
+                        print(attr)
+
+
+
     def create_attribute_groups(self, schema, category):
         for group in schema:
             required = group['requirements'].get('required?')
@@ -134,13 +161,15 @@ class Command(BaseCommand):
             return data.get('schema')
         return None
 
-    def handle(self, *args, **options):
-        print('start')
+    def handle(self, update=False, *args, **options):
         categories = Category.objects.select_related('modna_kast_category').filter(modna_kast_category__isnull=False)
         for category in categories:
             mk_category = category.modna_kast_category
             schema = self.fetch_mk_category_characteristics(mk_category)
 
             if schema:
-                self.create_attribute_groups(schema, category)
+                if update:
+                    self.update_attrs_uk_translation(schema)
+                else:
+                    self.create_attribute_groups(schema, category)
         print('end')

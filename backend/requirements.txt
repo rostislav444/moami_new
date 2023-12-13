@@ -17,3 +17,4 @@ django-admin-sortable==2.3
 django-redis==4.12.1
 django-prettyjson
 Pygments
+easygoogletranslate
