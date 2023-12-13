@@ -1,59 +1,20 @@
 import os
 
-from django.db.models import Prefetch
-from django.db.models import Q
 from django.http import FileResponse
 from django.http import HttpResponse, Http404
-from django.shortcuts import render
 from django.template.loader import render_to_string
-from django.utils import translation
-from django.views.decorators.cache import cache_page
 
-from apps.integrations.models import RozetkaCategories
-from apps.integrations.serializers import RozetkaProductSerializer, RozetkaCategoriesSerializer, \
-    GoogleProductSerializer, GoogleProductByLanguageSerializer, FacebookProductSerializer
-from apps.integrations.utils.generate_mk_feed import modna_kasta_feed_xml_path
-from apps.product.models import Product, ProductAttribute
+from apps.integrations.serializers import GoogleProductSerializer, GoogleProductByLanguageSerializer, \
+    FacebookProductSerializer
+from apps.integrations.utils.generate_mk_feed import rozetka_feed_xml_path, modna_kasta_feed_xml_path
+from apps.product.models import Product
 from project import settings
 
 
-@cache_page(60 * 60 * 24)
 def rozetka(request):
-    translation.activate('ru')
-
-    # Prefetch and filter product attributes queryset
-    product_attributes = ProductAttribute.objects.filter(
-        Q(value_multi_attributes__isnull=False) |
-        Q(value_single_attribute__isnull=False) |
-        Q(value_int__isnull=False) |
-        Q(value_str__isnull=False)
-    ).prefetch_related(
-        'attribute_group',
-        'value_single_attribute',
-        'value_multi_attributes'
-    ).distinct()
-
-    products = Product.objects.select_related('brand', 'category', 'country').prefetch_related(
-        Prefetch('attributes', queryset=product_attributes),
-        'variants',
-        'variants__images',
-        'variants__sizes__size',
-        'variants__color__translations',
-        'attributes__attribute_group'
-    ).filter(rozetka_category__isnull=False).exclude(variants__isnull=True)
-
-    products = products.distinct()
-
-    categories = RozetkaCategories.objects.all()
-    categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
-    products_serializer = RozetkaProductSerializer(products, many=True)
-
-    context = {
-        'categories': categories_serializer.data,
-        'products': products_serializer.data,
-    }
-
-    return render(request, 'feed/rozetka.xml', context, content_type='application/xml')
+    if os.path.exists(rozetka_feed_xml_path):
+        return FileResponse(open(rozetka_feed_xml_path, "rb"))
+    return HttpResponse("The XML file does not exist.", status=404)
 
 
 def modna_kasta(request):
