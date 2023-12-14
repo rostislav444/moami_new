@@ -2,9 +2,13 @@ import datetime
 import json
 
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.vary import vary_on_headers
 from rest_framework import mixins, viewsets
-from unidecode import unidecode
 from rest_framework.exceptions import NotFound
+from unidecode import unidecode
+
+from apps.core.utils.cache import cache_per_view_and_locale
 from apps.product.models import Product, ProductComment, Variant, VariantViews, VarintViewSource
 from apps.product.serializers import ProductSerializer, VariantSerializer, ProductCommentSerializer
 
@@ -14,6 +18,8 @@ class ProductList(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
 
 
+@method_decorator(vary_on_headers('Accept-Language'), name='dispatch')
+@method_decorator(cache_per_view_and_locale(60 * 60), name='dispatch')
 class VariantViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Variant.objects.all()
     serializer_class = VariantSerializer
@@ -35,7 +41,11 @@ class VariantViewSet(mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.
         code = split_slug[1]
 
         try:
-            return Variant.objects.select_related('product').get(code__iexact=code)
+            return Variant.objects.select_related(
+                'product', 'color',
+            ).prefetch_related(
+                'images', 'sizes', 'product__compositions'
+            ).get(code__iexact=code)
         except Variant.DoesNotExist:
             raise NotFound(detail="Variant not found.")
 
@@ -77,7 +87,7 @@ def variant_views(request):
 
 
 class ProductCommentsView(mixins.RetrieveModelMixin, mixins.CreateModelMixin, mixins.ListModelMixin,
-                               viewsets.GenericViewSet):
+                          viewsets.GenericViewSet):
     serializer_class = ProductCommentSerializer
     queryset = ProductComment.objects.all()
 
