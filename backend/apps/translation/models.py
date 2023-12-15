@@ -87,9 +87,10 @@ class Translatable(models.Model):
             item.save()
 
     def save(self, *args, **kwargs):
+        super(Translatable, self).save(*args, **kwargs)
+
         if self.auto_translate:
             self.create_translations()
-        super(Translatable, self).save(*args, **kwargs)
 
     def __getattr__(self, item):
         if item.startswith('get_translation'):
