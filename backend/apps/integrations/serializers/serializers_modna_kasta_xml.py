@@ -43,10 +43,7 @@ class ModnaKastaXMLVariantSerializer(serializers.ModelSerializer):
         fields = ('id', 'code', 'color', 'color_uk', 'sizes', 'images')
 
     def get_color_uk(self, obj):
-        try:
-            return obj.color.get_translation('name', 'uk')
-        except:
-            return obj.color.get_name
+        return obj.color.get_translation__name__uk
 
 
 class ModnaKastaXMLProductAttributesSerializer(serializers.ModelSerializer):
