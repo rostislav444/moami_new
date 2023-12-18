@@ -88,7 +88,7 @@ class ModnaKastaXMLProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'name_uk', 'category', 'brand', 'country', 'country_uk', 'kind_id', 'description',
+        fields = ('id', 'name', 'name_uk', 'category', 'brand', 'country', 'country_uk', 'mk_category', 'description',
                   'description_uk', 'variants', 'category', 'price', 'promo_price', 'old_price', 'composition',
                   'composition_uk', 'attributes', 'preferred_size_grid', 'rozetka_category')
 
