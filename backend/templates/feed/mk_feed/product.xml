@@ -47,7 +47,7 @@
                 <param name="Склад">{{ product.composition_uk }}</param>
                 <param name="Колір">{{ variant.color_uk }}</param>
                 <param name="Країна-виробник товару">{{ product.country_uk }}</param>
-                <param name="Назва">{{ product.name_uk }} {{ product.brand }} {{ variant.color_uk }}</param>
+                <param name="Назва*">{{ product.name_uk }} {{ product.brand }} {{ variant.color_uk }}</param>
                 <param name="Приналежність">Жінкам</param>
                 <param name="Вид">{{ product.mk_category }}</param>
                 {% for attribute in product.attributes %}
