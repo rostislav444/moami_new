@@ -19,12 +19,6 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
     pagination_class = CatalogueVariantsPagination
 
     @staticmethod
-    def filter_by_collection(variants, collection_slug=None):
-        if collection_slug:
-            return variants.filter(product__collections__slug=collection_slug).distinct()
-        return variants
-
-    @staticmethod
     def get_products_by_categories(variants, category_slug):
         category = None
         for slug in category_slug.split(','):
@@ -37,7 +31,7 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
         categories = category.get_descendants(include_self=True)
 
         # Filter the variants by the categories
-        return variants.filter(product__category__in=categories).distinct()
+        return variants.filter(product__category__in=categories).order_by('product__index').distinct()
 
     def get_queryset(self):
         params = self.request.GET
@@ -47,6 +41,4 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
 
         if 'category' in params:
             return self.get_products_by_categories(variants, params['category'])
-        elif 'collection' in params:
-            return self.filter_by_collection(variants, params['collection'])
         return Variant.objects.none()

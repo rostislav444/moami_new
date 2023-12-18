@@ -77,6 +77,7 @@ class ModnaKastaXMLProductSerializer(serializers.ModelSerializer):
     brand = serializers.CharField(source='brand.name')
     country = serializers.CharField(source='country.name')
     country_uk = serializers.CharField(source='country.get_translation__name__uk')
+    mk_category = serializers.CharField(source='category.modna_kast_category.name')
     category = RozetkaCategoriesSerializer(source='rozetka_category')
     description_uk = serializers.CharField(source='get_translation__description__uk')
     variants = ModnaKastaXMLVariantSerializer(many=True)
@@ -87,7 +88,7 @@ class ModnaKastaXMLProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'name_uk', 'category', 'brand', 'country', 'country_uk', 'description',
+        fields = ('id', 'name', 'name_uk', 'category', 'brand', 'country', 'country_uk', 'kind_id', 'description',
                   'description_uk', 'variants', 'category', 'price', 'promo_price', 'old_price', 'composition',
                   'composition_uk', 'attributes', 'preferred_size_grid', 'rozetka_category')
 
