@@ -54,7 +54,7 @@ def render_products_xml(products_xml_path, rozetka=False):
 
     def get_products_qs():
         product_attributes = get_product_attributes()
-        return Product.objects.select_related('brand', 'category', 'country').prefetch_related(
+        qs = Product.objects.select_related('brand', 'category', 'country').prefetch_related(
             'variants',
             'variants__images',
             'variants__sizes__size',
@@ -65,6 +65,12 @@ def render_products_xml(products_xml_path, rozetka=False):
             rozetka_category__isnull=False,
             category__modna_kast_category__isnull=False
         ).exclude(variants__isnull=True).distinct()
+
+        if rozetka == False:
+            qs = qs.exclude(brand__name__in=['Hasla', 'Tianqi&tianqi', 'Black Gold', 'PRL Jeans.CO']).exclude(
+                variants__sizes__size__interpretations__value='One size').exclude(category__id__in=[38, 39]).distinct()
+
+        return qs
 
     def get_products_data_generator(products):
         for product in products.iterator():
