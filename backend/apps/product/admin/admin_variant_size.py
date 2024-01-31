@@ -14,7 +14,7 @@ class VariantSizeInline(admin.TabularInline):
 
     # Filter size field queryset by size group selected in product category
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if self.parent_object and db_field.name == 'size':
+        if self.parent_object and db_field.name in ['size', 'max_size']:
             size_group = self.parent_object.product.category.size_group
             if size_group:
                 kwargs['queryset'] = size_group.sizes.all()
