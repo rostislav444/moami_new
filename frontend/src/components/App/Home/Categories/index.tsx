@@ -1,6 +1,6 @@
 import {useStore} from "react-redux";
 import {selectCategories} from "@/state/reducers/categories";
-import {selectCollections} from "@/state/reducers/collections";
+
 import {H1, H2, PL} from "@/components/Shared/Typograpy";
 import {CategoriesWrapper, CategoryImage, ChildCategory, ChildCategoryList, ParentCategory} from "./style";
 import Link from "next/link";
@@ -12,7 +12,6 @@ export const HomeCategories = () => {
     const router = useRouter();
     const {locale} = router;
     const categories = selectCategories(store.getState())
-    const collections = selectCollections(store.getState())
 
     return <CategoriesWrapper>
         {categories.map((category: any) => {
