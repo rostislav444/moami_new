@@ -58,45 +58,32 @@ class ProductAttributeForm(forms.ModelForm):
                     continue
                 self.fields[field].widget = forms.HiddenInput()
 
-    def init_attribute_group_fields(self, attr_group):
+    def init_attribute_group_fields(self, attr_group, mk_category_id):
         self.fields['attribute_group'].queryset = AttributeGroup.objects.filter(id=attr_group.id)
         self.fields['attribute_group'].empty_label = None
         self.hide_fields(attr_group)
 
         if attr_group.data_type == AttributeGroup.ATTR_TYPE_CHOICES[0][0]:
-            self.fields['value_multi_attributes'].queryset = attr_group.attributes.all()
+            self.fields['value_multi_attributes'].queryset = attr_group.attributes.filter(mk_categories__mk_category__id=mk_category_id)
             self.fields['value_single_attribute'].queryset = Attribute.objects.none()
         elif attr_group.data_type == AttributeGroup.ATTR_TYPE_CHOICES[1][0]:
             self.fields['value_multi_attributes'].queryset = Attribute.objects.none()
-            self.fields['value_single_attribute'].queryset = attr_group.attributes.all()
+            self.fields['value_single_attribute'].queryset = attr_group.attributes.filter(mk_categories__mk_category__id=mk_category_id)
         else:
             self.fields['value_multi_attributes'].queryset = Attribute.objects.none()
             self.fields['value_single_attribute'].queryset = Attribute.objects.none()
 
     def __init__(self, *args, **kwargs):
+        mk_category_id = kwargs.pop('mk_category_id')
         super(ProductAttributeForm, self).__init__(*args, **kwargs)
         group_id = self.get_attr_group_id(kwargs)
 
         if group_id:
             attr_group = AttributeGroup.objects.get(id=group_id)
-            self.init_attribute_group_fields(attr_group)
+            self.init_attribute_group_fields(attr_group, mk_category_id)
 
 
 class ProductAttributeFormSet(forms.BaseInlineFormSet):
-    @staticmethod
-    def find_form_by_attribute_group_id(forms, attr_group_id):
-        return next((form for form in forms if form.instance.attribute_group_id == attr_group_id), None)
-
-    def get_forms_lists(self):
-        instance_forms, blank_forms = [], []
-
-        for form in self.forms:
-            if form.instance.attribute_group_id:
-                instance_forms.append(form)
-            else:
-                blank_forms.append(form)
-        return instance_forms, blank_forms
-
     def __init__(self, *args, **kwargs):
         if kwargs['instance'].pk:
             instance = kwargs['instance']
@@ -113,3 +100,9 @@ class ProductAttributeFormSet(forms.BaseInlineFormSet):
             })
 
         super(ProductAttributeFormSet, self).__init__(*args, **kwargs)
+
+    def get_form_kwargs(self, index):
+        kwargs = super(ProductAttributeFormSet, self).get_form_kwargs(index)
+        if self.instance and self.instance.category.modna_kast_category:
+            kwargs.update({'mk_category_id':  self.instance.category.modna_kast_category.id})
+        return kwargs

@@ -1,7 +1,7 @@
 from django.db import models
-from easygoogletranslate import EasyGoogleTranslate
 
 from apps.abstract.models import NameSlug
+# from apps.integrations.models import ModnaKastaCategories
 from apps.translation.models import Translatable
 
 
@@ -41,6 +41,11 @@ class Attribute(NameSlug, Translatable):
 
     def __str__(self):
         return self.name
+
+
+class AttributeInModnaKastaCategory(models.Model):
+    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='mk_categories')
+    mk_category = models.ForeignKey('integrations.ModnaKastaCategories', on_delete=models.CASCADE)
 
 
 class Composition(NameSlug, Translatable):
