@@ -367,6 +367,7 @@ class VariantAttribute(models.Model):
 class VariantSize(models.Model):
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name='sizes')
     size = models.ForeignKey(Size, on_delete=models.CASCADE, related_name='variants')
+    max_size = models.ForeignKey(Size, on_delete=models.CASCADE, related_name='max_sizes', null=True, blank=True)
     stock = models.PositiveIntegerField(default=1)
 
     class Meta:
