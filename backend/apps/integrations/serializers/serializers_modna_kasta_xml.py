@@ -6,6 +6,7 @@ from apps.product.models import Product, Variant, VariantSize, VariantImage, Pro
 
 class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField()
+    max_size = serializers.SerializerMethodField()
     full_id = serializers.SerializerMethodField()
     mk_full_id = serializers.SerializerMethodField()
 
@@ -23,6 +24,10 @@ class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
 
     def get_size(self, obj):
         size = obj.get_size
+        return size
+
+    def get_max_size(self, obj):
+        size = obj.get_max_size
         return size
 
 

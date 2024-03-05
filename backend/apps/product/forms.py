@@ -74,11 +74,13 @@ class ProductAttributeForm(forms.ModelForm):
             self.fields['value_single_attribute'].queryset = Attribute.objects.none()
 
     def __init__(self, *args, **kwargs):
-        mk_category_id = kwargs.pop('mk_category_id')
+        mk_category_id = None
+        if 'mk_category_id' in kwargs:
+            mk_category_id = kwargs.pop('mk_category_id')
         super(ProductAttributeForm, self).__init__(*args, **kwargs)
         group_id = self.get_attr_group_id(kwargs)
 
-        if group_id:
+        if group_id and mk_category_id:
             attr_group = AttributeGroup.objects.get(id=group_id)
             self.init_attribute_group_fields(attr_group, mk_category_id)
 
@@ -103,6 +105,6 @@ class ProductAttributeFormSet(forms.BaseInlineFormSet):
 
     def get_form_kwargs(self, index):
         kwargs = super(ProductAttributeFormSet, self).get_form_kwargs(index)
-        if self.instance and self.instance.category.modna_kast_category:
+        if self.instance and hasattr(self.instance, 'category') and hasattr(self.instance.category, 'modna_kast_category'):
             kwargs.update({'mk_category_id':  self.instance.category.modna_kast_category.id})
         return kwargs

@@ -154,9 +154,9 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
         (None, {
             'fields': ('name', 'slug', 'category', 'brand', 'country', 'collections',)
         }),
-        ('Копировать аттрибуты Modna Kasta', {
-            'fields': ('mk_attributes_copy_to', 'mk_attributes_copy',)
-        }),
+        # ('Копировать аттрибуты Modna Kasta', {
+        #     'fields': ('mk_attributes_copy_to', 'mk_attributes_copy',)
+        # }),
         ('Rozetka', {
             'fields': ('rozetka_category', 'rozetka_name',)
         }),
@@ -200,7 +200,11 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == 'mk_attributes_copy_to':
             resolved = resolve(request.path_info)
-            product = Product.objects.get(id=resolved.kwargs['object_id'])
-            kwargs['queryset'] = Product.objects.filter(category=product.category).exclude(id=resolved.kwargs['object_id'])
+            object_id = resolved.kwargs.get('object_id')
+            # if object_id:
+            #     product = Product.objects.get(id=object_id)
+            #     kwargs['queryset'] = Product.objects.filter(category=product.category).exclude(id=resolved.kwargs['object_id'])
+            # else:
+            #     kwargs['queryset'] = Product.objects.none()
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 

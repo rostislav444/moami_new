@@ -382,9 +382,7 @@ class VariantSize(models.Model):
             return interpretation.value
         return self.size.__str__()
 
-    @property
-    def get_size(self):
-        sizes = self.size.get_interpretations_dict()
+    def get_size_value(self, sizes):
         preferred_size_grid = self.variant.product.get_preferred_size_grid
 
         if preferred_size_grid in sizes.keys():
@@ -392,6 +390,19 @@ class VariantSize(models.Model):
         else:
             key = list(sizes.keys())[0]
             return sizes[key]
+
+    @property
+    def get_size(self):
+        sizes = self.size.get_interpretations_dict()
+        return self.get_size_value(sizes)
+
+    @property
+    def get_max_size(self):
+        if self.max_size:
+            sizes = self.max_size.get_interpretations_dict()
+            return self.get_size_value(sizes)
+        return None
+
 
     @property
     def sku(self):
