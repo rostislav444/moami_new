@@ -1,53 +1,63 @@
-import {Action, AnyAction, combineReducers, configureStore, ThunkAction,} from '@reduxjs/toolkit';
-import {createWrapper, HYDRATE} from 'next-redux-wrapper';
+import {configureStore}             from "@reduxjs/toolkit";
+import userReducer                  from "@/state/reducers/user";
+import {UserState}                  from '@/interfaces/user'
+import cartReducer                  from "@/state/reducers/cart";
+import {CartState}                  from '@/interfaces/cart'
+import categoriesReducer            from "@/state/reducers/categories";
+import {CategoryState}              from '@/interfaces/categories'
+import collectionsReducer           from "@/state/reducers/collections";
+import sizesReducer                 from "@/state/reducers/sizes";
+import {SizesState}                 from '@/interfaces/sizes'
+import {CollectionsState}           from "@/interfaces/collections";
+import PagesReducer                 from "@/state/reducers/pages";
+import {PagesProps}                 from "@/interfaces/pages";
+import routingReducer, {RouteProps} from "@/state/reducers/routing";
 
-import userReducer from "@/state/reducers/user";
-import cartReducer from "@/state/reducers/cart";
-import categoriesReducer from "@/state/reducers/categories";
-import sizesReducer from "@/state/reducers/sizes";
-import PagesReducer from "@/state/reducers/pages";
-import routingReducer from "@/state/reducers/routing";
-
-
-const combinedReducer = combineReducers({
+const reducer = {
     user: userReducer,
     cart: cartReducer,
     categories: categoriesReducer,
-    // sizes: sizesReducer,
+    collections: collectionsReducer,
+    sizes: sizesReducer,
     pages: PagesReducer,
-    // routing: routingReducer,
-});
+    routing: routingReducer,
+}
 
-const reducer = (state: ReturnType<typeof combinedReducer>, action: AnyAction) => {
-    switch (action.type) {
-        case HYDRATE:
-            return {
-                ...state,
-                ...action.payload,
-            }
+const createStore = (preloadedState: any) => {
+    return configureStore({
+        reducer: reducer,
+        preloadedState,
+    })
+}
 
-        default:
-            console.log('DEFAULT', action)
-            return combinedReducer(state, action);
+
+let reduxStore: any;
+
+export const initializeStore = (preloadedState: any) => {
+    let _reduxStore = reduxStore ?? createStore(preloadedState)
+
+    if (reduxStore && preloadedState && preloadedState !== reduxStore.getState()) {
+        _reduxStore = createStore({
+            ...reduxStore.getState(),
+            ...preloadedState,
+        })
+        reduxStore = undefined
     }
-};
 
-export const makeStore = () =>
-    configureStore({
-        // @ts-ignore
-        reducer,
-        devTools: true,
-    });
+    if (typeof window === 'undefined') return _reduxStore
+    if (!reduxStore) reduxStore = _reduxStore
 
-type Store = ReturnType<typeof makeStore>;
+    return _reduxStore
+}
 
-export type AppDispatch = Store['dispatch'];
-export type RootState = ReturnType<Store['getState']>;
-export type AppThunk<ReturnType = void> = ThunkAction<
-    ReturnType,
-    RootState,
-    unknown,
-    Action<string>
->;
+export type AppDispatch = ReturnType<typeof createStore>['dispatch']
 
-export const wrapper = createWrapper(makeStore, {debug: true});
+export type RootState = {
+    user: UserState,
+    cart: CartState,
+    categories: CategoryState,
+    collections: CollectionsState,
+    sizes: SizesState,
+    pages: PagesProps,
+    routing: RouteProps,
+}

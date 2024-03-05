@@ -70,14 +70,16 @@ export default function Product({variant, locale}: VariantPageProps) {
 
 
 export const getStaticProps: GetStaticProps = async ({params, locale}) => {
-    const {slug} = params as { slug: string }
     const apiFetch = fetchWithLocale(locale || 'uk')
+    const {slug} = params as { slug: string }
+
     const response = await apiFetch.get(`/product/variants/${slug}/`)
 
     return response.ok ? {
         props: {
             variant: response.data,
             locale,
+            // translation
             ...(await serverSideTranslations(locale || 'uk', ['common',]))
         },
         revalidate: 5 * 60
@@ -85,11 +87,6 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
         notFound: true
     }
 }
-
-// export const _getServerSideProps = wrapper.getServerSideProps(store => ({req, res, ...etc}) => {
-//   console.log('2. Page.getServerSideProps uses the store to dispatch things');
-//   store.dispatch({type: 'TICK', payload: 'was set in other page'});
-// });
 
 
 export const getStaticPaths = async () => {

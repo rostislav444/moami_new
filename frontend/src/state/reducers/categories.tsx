@@ -1,6 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {CategoryProps} from "@/interfaces/categories";
-import {HYDRATE} from 'next-redux-wrapper';
+
 
 const initialState: CategoryProps = {
     categories: [],
@@ -12,9 +12,6 @@ export const categoriesSlice = createSlice({
     initialState,
     reducers: {
         setCategories: (state, action) => {
-            if (!action.payload) {
-                return state
-            }
             state.categories = action.payload
         },
         setSelectSizeGrid: (state, action) => {
@@ -27,15 +24,6 @@ export const categoriesSlice = createSlice({
                 }
             }
         }
-    },
-    extraReducers: {
-        [HYDRATE]: (state, action) => {
-            console.log('HYDRATE', state, action.payload);
-            return {
-                ...state,
-                ...action.payload.subject,
-            };
-        },
     },
 })
 
