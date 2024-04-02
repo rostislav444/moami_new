@@ -12,7 +12,7 @@ class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VariantSize
-        fields = ('id', 'full_id', 'mk_full_id', 'size', 'stock')
+        fields = ('id', 'full_id', 'mk_full_id', 'size', 'stock', 'max_size')
 
     @staticmethod
     def get_full_id(obj):
