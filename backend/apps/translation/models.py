@@ -70,6 +70,10 @@ class Translatable(models.Model):
         transaction_model = self.get_translation_model()
         fields = self.get_translatable_fields
 
+        translations = self.translations.all()
+        if translations.count() > settings.FOREIGN_LANGUAGES:
+            translations.delete()
+
         for lang_code, name in settings.FOREIGN_LANGUAGES:
             data = {}
             for field in fields:
