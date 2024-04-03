@@ -71,8 +71,8 @@ class Translatable(models.Model):
         fields = self.get_translatable_fields
 
         translations = self.translations.all()
-        if translations.count() > settings.FOREIGN_LANGUAGES_COUNT:
-            translations.delete()
+        if translations.count() > 0:
+            return
 
         for lang_code, name in settings.FOREIGN_LANGUAGES:
             data = {}
