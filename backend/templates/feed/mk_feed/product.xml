@@ -6,7 +6,11 @@
             {% endif %}
             {% if product.price < product.old_price %}
                 <price>{{ product.price }}</price>
-                <old_price>{{ product.old_price }}</old_price>
+                {% if epicentr %}
+                    <price_old>{{ product.old_price }}</price_old>
+                {% else %}
+                    <old_price>{{ product.old_price }}</old_price>
+                {% endif %}
             {% else %}
                 <price>{{ product.price }}</price>
             {% endif %}

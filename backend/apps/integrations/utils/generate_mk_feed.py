@@ -17,6 +17,7 @@ feed_directory = os.path.join(settings.MEDIA_ROOT, 'feed')
 
 modna_kasta_feed_xml_path = os.path.join(feed_directory, 'modna_kasta.xml')
 rozetka_feed_xml_path = os.path.join(feed_directory, 'rozetka.xml')
+epicernt_feed_xml_path = os.path.join(feed_directory, 'epicentr.xml')
 
 
 def render_categories_xml(categories_xml_path):
@@ -38,7 +39,7 @@ def render_categories_xml(categories_xml_path):
         f.write(response)
 
 
-def render_products_xml(products_xml_path, rozetka=False):
+def render_products_xml(products_xml_path, rozetka=False, epicentr=False):
     product_template_path = 'feed/mk_feed/product.xml'
 
     def get_product_attributes():
@@ -80,7 +81,8 @@ def render_products_xml(products_xml_path, rozetka=False):
         template = get_template(product_template_path)
         rendered_template = template.render(context={
             'product': product,
-            'rozetka': rozetka
+            'rozetka': rozetka,
+            'epicentr': epicentr
         })
         return rendered_template.strip()
 
@@ -103,8 +105,11 @@ def render_products_xml(products_xml_path, rozetka=False):
     write_file(products_data_generator, products_qs.count())
 
 
-def write_final_feed(template_path, categories_xml_path, products_xml_path, rozetka):
-    final_xml_path = rozetka_feed_xml_path if rozetka else modna_kasta_feed_xml_path
+def write_final_feed(template_path, categories_xml_path, products_xml_path, rozetka, epicentr=False):
+    if epicentr:
+        final_xml_path = epicernt_feed_xml_path
+    else:
+        final_xml_path = rozetka_feed_xml_path if rozetka else modna_kasta_feed_xml_path
 
     with (open(categories_xml_path, 'r', encoding='utf-8') as categories_xml,
           open(products_xml_path, 'r', encoding='utf-8') as products_xml):
@@ -130,7 +135,7 @@ def write_final_feed(template_path, categories_xml_path, products_xml_path, roze
         print(f' {"Rozetka" if rozetka else "Modna Kasta"} feed been writen')
 
 
-def generate_mk_feed(rozetka=False):
+def generate_mk_feed(rozetka=False, epicentr=False):
     translation.activate('ru')
     template_path = 'feed/mk_feed/feed.xml'
     categories_xml_path = os.path.join(feed_directory, 'categories.xml')
@@ -140,7 +145,7 @@ def generate_mk_feed(rozetka=False):
         os.makedirs(feed_directory)
 
     render_categories_xml(categories_xml_path)
-    render_products_xml(products_xml_path, rozetka)
-    write_final_feed(template_path, categories_xml_path, products_xml_path, rozetka)
+    render_products_xml(products_xml_path, rozetka, epicentr)
+    write_final_feed(template_path, categories_xml_path, products_xml_path, rozetka, epicentr)
 
     return True
