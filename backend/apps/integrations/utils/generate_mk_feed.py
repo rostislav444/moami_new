@@ -132,7 +132,10 @@ def write_final_feed(template_path, categories_xml_path, products_xml_path, roze
             if os.path.exists(path):
                 os.remove(path)
 
-        print(f' {"Rozetka" if rozetka else "Modna Kasta"} feed been writen')
+        if epicentr:
+            print('Epicentr feed been writen')
+        else:
+            print(f' {"Rozetka" if rozetka else "Modna Kasta"} feed been writen')
 
 
 def generate_mk_feed(rozetka=False, epicentr=False):
