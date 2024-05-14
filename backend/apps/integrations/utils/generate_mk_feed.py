@@ -148,6 +148,9 @@ def generate_mk_feed(rozetka=False, epicentr=False):
     else:
         products_xml_path = os.path.join(feed_directory, 'products.xml')
 
+
+    print('epicentr', epicentr, products_xml_path)
+
     if not os.path.exists(feed_directory):
         os.makedirs(feed_directory)
 
