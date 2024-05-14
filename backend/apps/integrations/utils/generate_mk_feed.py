@@ -40,7 +40,10 @@ def render_categories_xml(categories_xml_path):
 
 
 def render_products_xml(products_xml_path, rozetka=False, epicentr=False):
-    product_template_path = 'feed/mk_feed/product_epicentr.xml' if epicentr else 'feed/mk_feed/product.xml'
+    if epicentr:
+        product_template_path = 'feed/mk_feed/product_epicentr.xml'
+    else:
+        product_template_path = 'feed/mk_feed/product.xml'
 
     def get_product_attributes():
         return ProductAttribute.objects.select_related('attribute_group').filter(
