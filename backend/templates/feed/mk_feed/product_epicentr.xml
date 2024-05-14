@@ -7,7 +7,6 @@
             {% else %}
                 <price>{{ product.price }}</price>
             {% endif %}
-            {% if product.promo_price %}<promo_price>{{ product.promo_price }}</promo_price>{% endif %}
             <currencyId>UAH</currencyId>
             <categoryId>{{ product.category.rozetka_id }}</categoryId>
             {% for image in variant.images %}<picture>https://moami.com.ua{{ image.image }}</picture>{% endfor %}
