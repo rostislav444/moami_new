@@ -142,7 +142,11 @@ def generate_mk_feed(rozetka=False, epicentr=False):
     translation.activate('ru')
     template_path = 'feed/mk_feed/feed.xml'
     categories_xml_path = os.path.join(feed_directory, 'categories.xml')
-    products_xml_path = os.path.join(feed_directory, 'products.xml')
+
+    if epicentr:
+        products_xml_path = os.path.join(feed_directory, 'product_epicentr.xml')
+    else:
+        products_xml_path = os.path.join(feed_directory, 'products.xml')
 
     if not os.path.exists(feed_directory):
         os.makedirs(feed_directory)

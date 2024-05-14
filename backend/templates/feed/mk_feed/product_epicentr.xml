@@ -1,0 +1,37 @@
+{% for variant in product.variants %}
+    {% for size in variant.sizes %}
+        <offer id="{{ size.mk_full_id }}" available="true">
+            {% if product.price < product.old_price %}
+                <price>{{ product.price }}</price>
+                <price_old>{{ product.old_price }}</price_old>
+            {% else %}
+                <price>{{ product.price }}</price>
+            {% endif %}
+            {% if product.promo_price %}<promo_price>{{ product.promo_price }}</promo_price>{% endif %}
+            <currencyId>UAH</currencyId>
+            <categoryId>{{ product.category.rozetka_id }}</categoryId>
+            {% for image in variant.images %}<picture>https://moami.com.ua{{ image.image }}</picture>{% endfor %}
+            <vendor>{{ product.brand }}</vendor>
+            <article>{{ variant.code }}</article>
+            <stock_quantity>{{ size.stock }}</stock_quantity>
+            <name>{{ product.name }} {{ product.brand }} {{ variant.code }} {{ size.size }} {{ variant.color }}</name>
+            <name_ua>{{ product.name_uk }} {{ product.brand }} {{ variant.code }} {{ size.size }} {{ variant.color_uk }}</name_ua>
+            <description><![CDATA[{{ product.description }}]]></description>
+            <description_ua><![CDATA[{{ product.description_uk }}]]></description_ua>
+            <param name="Розмір">{{ size.size }}</param>
+            <param name="Максимальний розмір">{{ size.max_size }}</param>
+            <param name="Склад">{{ product.composition_uk }}</param>
+            <param name="Колір">{{ variant.color_uk }}</param>
+            <param name="Країна-виробник товару">{{ product.country_uk }}</param>
+            <param name="Назва">{{ product.name_uk }} {{ product.brand }} {{ variant.color_uk }}</param>
+            <param name="Приналежність">Жінкам</param>
+            <param name="Вид">{{ product.mk_category }}</param>
+            {% for attribute in product.attributes %}
+                {% if attribute.attributes_uk %}
+                    <param name="{{ attribute.attribute_group_uk }}">{{ attribute.attributes_uk }}</param>
+                {% endif %}
+            {% endfor %}
+            <state>new</state>
+        </offer>
+    {% endfor %}
+{% endfor %}
