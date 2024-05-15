@@ -143,7 +143,7 @@ def write_final_feed(template_path, categories_xml_path, products_xml_path, roze
 
 def generate_mk_feed(rozetka=False, epicentr=False):
     translation.activate('ru')
-    template_path = 'feed/mk_feed/feed.xml'
+    template_path = 'feed/mk_feed/feed_epicentr.xml' if epicentr else 'feed/mk_feed/feed.xml'
     categories_xml_path = os.path.join(feed_directory, 'categories.xml')
     products_xml_path = os.path.join(feed_directory, 'products.xml')
 
