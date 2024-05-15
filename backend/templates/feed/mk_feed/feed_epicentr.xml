@@ -2,7 +2,6 @@
 <!DOCTYPE yml_catalog SYSTEM "shops.dtd">
 
 <yml_catalog date="{{ time }}">
-    {{ categories_xml|safe }}
     <offers>
         {{ products_xml|safe }}
     </offers>
