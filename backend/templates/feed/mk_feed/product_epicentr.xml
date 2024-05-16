@@ -7,15 +7,14 @@
             {% else %}
                 <price>{{ product.price }}</price>
             {% endif %}
+            <category>{{ category.category.name }}</category>
             {% for image in variant.images %}<picture>https://moami.com.ua{{ image.image }}</picture>{% endfor %}
             <vendor>{{ product.brand }}</vendor>
-            <article>{{ variant.code }}</article>
-            <stock_quantity>{{ size.stock }}</stock_quantity>
-            <name>{{ product.name }} {{ product.brand }} {{ variant.code }} {{ size.size }} {{ variant.color }}</name>
-            <name_ua>{{ product.name_uk }} {{ product.brand }} {{ variant.code }} {{ size.size }} {{ variant.color_uk }}</name_ua>
-            <description><![CDATA[{{ product.description }}]]></description>
-            <description_ua><![CDATA[{{ product.description_uk }}]]></description_ua>
-            <param name="Розмір">{{ size.size }}</param>
+            <name lang="ru">{{ product.name }} {{ product.brand }} {{ variant.code }} {{ size.size }} {{ variant.color }}</name>
+            <name lang="ua">{{ product.name_uk }} {{ product.brand }} {{ variant.code }} {{ size.size }} {{ variant.color_uk }}</name>
+            <description lang="ru">{{ product.description }}</description>
+            <description lang="ua">{{ product.description_uk }}</description>
+            <country_of_origin>{{ product.country_uk }}</country_of_origin>
             <param name="Максимальний розмір">{{ size.max_size }}</param>
             <param name="Склад">{{ product.composition_uk }}</param>
             <param name="Колір">{{ variant.color_uk }}</param>
@@ -28,7 +27,6 @@
                     <param name="{{ attribute.attribute_group_uk }}">{{ attribute.attributes_uk }}</param>
                 {% endif %}
             {% endfor %}
-            <state>new</state>
         </offer>
     {% endfor %}
 {% endfor %}
