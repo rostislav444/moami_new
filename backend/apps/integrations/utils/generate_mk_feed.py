@@ -56,9 +56,7 @@ def generate_mk_feed(feed_type):
         with open(paths['categories_xml'], 'w') as f:
             f.write(response)
 
-    def render_products_xml(template_path, feed_type):
-        product_template_path = template_path + '/product.xml'
-
+    def render_products_xml():
         def get_product_attributes():
             return ProductAttribute.objects.select_related('attribute_group').filter(
                 Q(value_multi_attributes__isnull=False) |
@@ -96,7 +94,7 @@ def generate_mk_feed(feed_type):
                 yield ModnaKastaXMLProductSerializer(product).data
 
         def render_product(product):
-            template = get_template(product_template_path)
+            template = get_template(paths['product_tpl'])
             rendered_template = template.render(context={'product': product})
             return rendered_template.strip()
 
