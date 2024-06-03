@@ -1,0 +1,5 @@
+<categories>
+    {% for category in categories %}
+        <category id="{{ category.rozetka_id }}" rz_id="{{ category.rozetka_id }}">{{ category.name }}</category>
+    {% endfor %}
+</categories>

@@ -38,8 +38,6 @@ class ModnaKastaVariantDataSerializer(serializers.ModelSerializer):
             Q(
                 Q(value_single_attribute__isnull=False) |
                 Q(value_multi_attributes__isnull=False)
-                # Q(value_int__isnull=False) |
-                # Q(value_str__isnull=False)
             )
         )
         response = []

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE yml_catalog SYSTEM "shops.dtd">
+<yml_catalog date="{{ time }}">
+    <shop>
+        <name>Moami</name>
+        <company>Moami</company>
+        <url>https://moami.com.ua/</url>
+        <currencies>
+            <currency id="UAH" rate="1"/>
+        </currencies>
+        {{ categories_xml|safe }}
+        <offers>
+            {{ products_xml|safe }}
+        </offers>
+    </shop>
+</yml_catalog>

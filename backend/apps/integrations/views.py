@@ -6,20 +6,21 @@ from django.template.loader import render_to_string
 
 from apps.integrations.serializers import GoogleProductSerializer, GoogleProductByLanguageSerializer, \
     FacebookProductSerializer
-from apps.integrations.utils.generate_mk_feed import rozetka_feed_xml_path, modna_kasta_feed_xml_path
 from apps.product.models import Product
 from project import settings
 
 
 def rozetka(request):
-    if os.path.exists(rozetka_feed_xml_path):
-        return FileResponse(open(rozetka_feed_xml_path, "rb"))
+    path = os.path.join(settings.MEDIA_ROOT, 'feed', 'rozetka.xml')
+    if os.path.exists(path):
+        return FileResponse(open(path, "rb"))
     return HttpResponse("The XML file does not exist.", status=404)
 
 
 def modna_kasta(request):
-    if os.path.exists(modna_kasta_feed_xml_path):
-        return FileResponse(open(modna_kasta_feed_xml_path, "rb"))
+    path = os.path.join(settings.MEDIA_ROOT, 'feed', 'modna_kasta.xml')
+    if os.path.exists(path):
+        return FileResponse(open(path, "rb"))
     return HttpResponse("The XML file does not exist.", status=404)
 
 

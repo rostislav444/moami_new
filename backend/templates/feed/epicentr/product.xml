@@ -1,0 +1,32 @@
+{% for variant in product.variants %}
+    {% for size in variant.sizes %}
+        <offer id="{{ size.mk_full_id }}" available="true">
+            {% if product.price < product.old_price %}
+                <price>{{ product.price }}</price>
+                <price_old>{{ product.old_price }}</price_old>
+            {% else %}
+                <price>{{ product.price }}</price>
+            {% endif %}
+            <category>{{ category.category.name }}</category>
+            {% for image in variant.images %}<picture>https://moami.com.ua{{ image.image }}</picture>{% endfor %}
+            <vendor>{{ product.brand }}</vendor>
+            <name lang="ru">{{ product.name }} {{ product.brand }} {{ variant.code }} {{ size.size }} {{ variant.color }}</name>
+            <name lang="ua">{{ product.name_uk }} {{ product.brand }} {{ variant.code }} {{ size.size }} {{ variant.color_uk }}</name>
+            <description lang="ru">{{ product.description }}</description>
+            <description lang="ua">{{ product.description_uk }}</description>
+            <country_of_origin>{{ product.country_uk }}</country_of_origin>
+            <param name="Максимальний розмір">{{ size.max_size }}</param>
+            <param name="Склад">{{ product.composition_uk }}</param>
+            <param name="Колір">{{ variant.color_uk }}</param>
+            <param name="Країна-виробник товару">{{ product.country_uk }}</param>
+            <param name="Назва">{{ product.name_uk }} {{ product.brand }} {{ variant.color_uk }}</param>
+            <param name="Приналежність">Жінкам</param>
+            <param name="Вид">{{ product.mk_category }}</param>
+            {% for attribute in product.attributes %}
+                {% if attribute.attributes_uk %}
+                    <param name="{{ attribute.attribute_group_uk }}">{{ attribute.attributes_uk }}</param>
+                {% endif %}
+            {% endfor %}
+        </offer>
+    {% endfor %}
+{% endfor %}
