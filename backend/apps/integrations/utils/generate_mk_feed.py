@@ -122,7 +122,7 @@ def generate_mk_feed(feed_type):
         with (open(paths['categories_xml'], 'r', encoding='utf-8') as categories_xml,
               open(paths['products_xml'], 'r', encoding='utf-8') as products_xml):
 
-            template = get_template(template_path)
+            template = get_template(paths['feed_tpl'])
             categories_content = categories_xml.read()
             products_content = products_xml.read()
 
