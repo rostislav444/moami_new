@@ -26,7 +26,7 @@ def generate_mk_feed(feed_type):
     template_path = 'feed/' + feed_type
 
     paths = {
-        'feed_tpl': 'feed/%s' % feed_type,
+        'feed_tpl': 'feed/%s/feed.xml' % feed_type,
         'product_tpl': 'feed/%s/product.xml' % feed_type,
         'categories_tpl': 'feed/%s/categories.xml' % feed_type,
         'feed_xml': os.path.join(feed_directory, '%s.xml' % feed_type),
