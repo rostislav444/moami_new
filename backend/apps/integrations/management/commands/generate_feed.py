@@ -5,4 +5,4 @@ from apps.integrations.utils.generate_mk_feed import generate_mk_feed
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        generate_mk_feed('lebitique')
+        generate_mk_feed('leboutique')
