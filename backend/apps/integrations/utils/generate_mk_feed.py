@@ -15,11 +15,12 @@ from project import settings
 
 feed_directory = os.path.join(settings.MEDIA_ROOT, 'feed')
 
+feed_types = ['rozetka', 'epicentr', 'leboutique', 'modna_kasta']
 
-def generate_mk_feed(feed_type):
+
+def generate_feed(feed_type):
     translation.activate('ru')
 
-    feed_types = ['rozetka', 'epicentr', 'leboutique', 'modna_kasta']
     if feed_type not in feed_types:
         raise ValueError('Feed type is not supported')
 
@@ -47,7 +48,7 @@ def generate_mk_feed(feed_type):
             return categories_serializer.data
 
         def render_categories(categories):
-            template = get_template( paths['categories_tpl'])
+            template = get_template(paths['categories_tpl'])
             return template.render(context={'categories': categories})
 
         categories_data = get_categories_data()

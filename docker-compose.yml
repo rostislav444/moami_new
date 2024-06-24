@@ -15,7 +15,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=moami_db
     ports:
-      - 5433:5432
+      - 5432:5432
 
   cache:
     image: redis:alpine

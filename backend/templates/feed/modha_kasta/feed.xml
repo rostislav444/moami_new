@@ -3,7 +3,7 @@
 
 <yml_catalog date="{{ time }}">
     <shop>
-        <name>Guava shop</name>
+        <name>Moami</name>
         <company>Moami</company>
         <url>https://moami.com.ua/</url>
         <currencies>

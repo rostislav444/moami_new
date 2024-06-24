@@ -1,6 +1,6 @@
 {% for variant in product.variants %}
     {% for size in variant.sizes %}
-        <offer id="{% if rozetka %}{{ size.full_id }}{% else %}{{ size.mk_full_id }}{% endif %}" available="true">
+        <offer id="{{ size.mk_full_id }}" available="true">
             {% if product.promo_price < product.promo_price %}
                 <promo_price>{{ product.promo_price }}</promo_price>
             {% endif %}
@@ -26,41 +26,18 @@
             <description><![CDATA[{{ product.description }}]]></description>
             <description_ua><![CDATA[{{ product.description_uk }}]]></description_ua>
             <param name="Розмір">{{ size.size }}</param>
-            {% if rozetka %}
-                <param name="Склад">
-                    <value lang="uk">{{ product.composition_uk }}</value>
-                    <value lang="ru">{{ product.composition }}</value>
-                </param>
-                <param name="Колір">
-                    <value lang="uk">{{ variant.color_uk }}</value>
-                    <value lang="ru">{{ variant.color }}</value>
-                </param>
-                <param name="Країна-виробник товару">
-                    <value lang="uk">{{ product.country_uk }}</value>
-                    <value lang="ru">{{ product.country }}</value>
-                </param>
-                {% for attribute in product.attributes %}
-                    {% if attribute.attributes %}
-                        <param name="{{ attribute.attribute_group_uk }}">
-                            <value lang="ru">{{ attribute.attributes }}</value>
-                            <value lang="uk">{{ attribute.attributes_uk }}</value>
-                        </param>
-                    {% endif %}
-                {% endfor %}
-            {% else %}
-                <param name="Максимальний розмір">{{ size.max_size }}</param>
-                <param name="Склад">{{ product.composition_uk }}</param>
-                <param name="Колір">{{ variant.color_uk }}</param>
-                <param name="Країна-виробник товару">{{ product.country_uk }}</param>
-                <param name="Назва">{{ product.name_uk }} {{ product.brand }} {{ variant.color_uk }}</param>
-                <param name="Приналежність">Жінкам</param>
-                <param name="Вид">{{ product.mk_category }}</param>
-                {% for attribute in product.attributes %}
-                    {% if attribute.attributes_uk %}
-                        <param name="{{ attribute.attribute_group_uk }}">{{ attribute.attributes_uk }}</param>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+            <param name="Максимальний розмір">{{ size.max_size }}</param>
+            <param name="Склад">{{ product.composition_uk }}</param>
+            <param name="Колір">{{ variant.color_uk }}</param>
+            <param name="Країна-виробник товару">{{ product.country_uk }}</param>
+            <param name="Назва">{{ product.name_uk }} {{ product.brand }} {{ variant.color_uk }}</param>
+            <param name="Приналежність">Жінкам</param>
+            <param name="Вид">{{ product.mk_category }}</param>
+            {% for attribute in product.attributes %}
+                {% if attribute.attributes_uk %}
+                    <param name="{{ attribute.attribute_group_uk }}">{{ attribute.attributes_uk }}</param>
+                {% endif %}
+            {% endfor %}
             <state>new</state>
         </offer>
     {% endfor %}
