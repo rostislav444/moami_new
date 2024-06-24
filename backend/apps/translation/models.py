@@ -118,7 +118,6 @@ class Translatable(models.Model):
             'objects',
             'translatable_fields'
         ]
-
         if name in exclude_fields:
             return super().__getattribute__(name)
 
