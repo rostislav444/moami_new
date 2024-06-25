@@ -1,5 +1,5 @@
 # Use the official Node.js image as the base image
-FROM node:16-alpine
+FROM node:20-alpine
 
 # Install PM2 globally
 RUN npm install -g pm2
@@ -10,8 +10,8 @@ WORKDIR /home/app/frontend
 # Copy project files to the working directory
 COPY . .
 
-# Install dependencies
-RUN npm install
+# Install dependencies with legacy-peer-deps flag
+RUN npm install --legacy-peer-deps
 
 # Build the project
 RUN npm run build
