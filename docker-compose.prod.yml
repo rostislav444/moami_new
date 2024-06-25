@@ -1,29 +1,40 @@
 services:
+  frontend:
+    build: ./frontend
+    networks:
+      - nginx_net
+
   web:
+    restart: always
     build:
       context: ./backend
-      dockerfile: Dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
+      dockerfile: Dockerfile.prod
+    command: gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3
     volumes:
-      - ./backend:/home/app/web
+      - static_volume:/home/app/web/static_root
+      - media_volume:/home/app/web/media
     ports:
       - "8000:8000"
+    expose:
+      - 8000
     env_file:
-      - ./backend/.env
+      - ./backend/.env.prod
     depends_on:
       - db
       - rabbitmq
+    networks:
+      - nginx_net
 
   db:
     image: postgres:13-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-        - POSTGRES_USER=postgres
-        - POSTGRES_PASSWORD=postgres
-        - POSTGRES_DB=moami
+        POSTGRES_PASSWORD: postgres
     env_file:
       - ./backend/.env
+    networks:
+      - nginx_net
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -33,34 +44,41 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=user
       - RABBITMQ_DEFAULT_PASS=password
+    networks:
+      - nginx_net
 
   celery:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     command: celery -A project worker --loglevel=info -Q default,payments
-    volumes:
-      - ./backend:/home/app/web
     env_file:
-      - ./backend/.env
+      - ./backend/.env.prod
     depends_on:
       - db
       - rabbitmq
+    networks:
+      - nginx_net
 
   celery-beat:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     command: celery -A project beat --loglevel=info
-    volumes:
-      - ./backend:/home/app/web
     env_file:
-      - ./backend/.env
+      - ./backend/.env.prod
     depends_on:
       - db
       - rabbitmq
+    networks:
+      - nginx_net
 
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+
+networks:
+  nginx_net:
+    name: nginx_net
+    external: true

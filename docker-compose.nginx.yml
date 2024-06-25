@@ -1,0 +1,42 @@
+services:
+  nginx:
+    build: ./nginx
+    volumes:
+      - ./nginx/nginx.conf_v2:/etc/nginx/nginx.conf
+      - ./nginx/cert.pem:/etc/cert.pem
+      - ./nginx/key.pem:/etc/key.pem
+      - static_volume:/home/app/web/static_root
+      - media_volume:/home/app/web/media
+    ports:
+      - '80:80'
+      - '443:443'
+    networks:
+      - nginx_net
+
+  certbot:
+    ports:
+      - "6000:80"
+    env_file:
+      - .env
+    volumes:
+      - ./nginx/:/etc/nginx/
+    build:
+      context: ./certbot
+      dockerfile: Dockerfile
+      args:
+        DOMAIN_EMAIL: ${DOMAIN_EMAIL}
+        DOMAIN_URL: ${DOMAIN_URL}
+    networks:
+        - nginx_net
+    depends_on:
+      - nginx
+
+
+volumes:
+  static_volume:
+  media_volume:
+
+networks:
+  nginx_net:
+    name: nginx_net
+    external: true

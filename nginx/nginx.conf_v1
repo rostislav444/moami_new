@@ -1,0 +1,56 @@
+events {
+    worker_connections 1024;
+}
+
+http {
+    upstream security_app {
+        server localhost:8000;
+    }
+
+    upstream frontend_app {
+        server localhost:3000;
+    }
+
+    server {
+        listen 80;
+        access_log /var/log/nginx/access.log;
+        server_name buh-model.com.ua;
+
+        location /.well-known {
+					# адрес certbot'a в Docker Compose на Linux
+					proxy_pass http://172.17.0.1:6000;
+		}
+
+        location ~ ^/(admin|api) {
+            # Special handling for admin and api, excluding /api/auth
+            location ~ ^/api/auth/ {
+                proxy_pass http://frontend_app;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+
+            include proxy_params;
+            proxy_pass http://security_app;
+        }
+
+        location / {
+            proxy_pass http://frontend_app;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location /static/ {
+            alias /home/app/web/static_root/;
+        }
+
+        location /media/ {
+            alias /home/app/web/media;
+        }
+
+        client_max_body_size 100M;
+    }
+}
