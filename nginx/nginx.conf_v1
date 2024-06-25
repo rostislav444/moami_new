@@ -17,9 +17,9 @@ http {
         server_name moami.com.ua;
 
         location /.well-known {
-					# адрес certbot'a в Docker Compose на Linux
-					proxy_pass http://172.17.0.1:6000;
-		}
+            # адрес certbot'a в Docker Compose на Linux
+            proxy_pass http://172.17.0.1:6000;
+        }
 
         location ~ ^/(admin|api) {
             # Special handling for admin and api, excluding /api/auth
@@ -47,7 +47,7 @@ http {
         }
 
         location /502.html {
-            root /home/app/web/templates/502.html
+            root /home/app/web/templates/;  # Корневая директория должна заканчиваться /
             internal;
         }
 
@@ -56,7 +56,7 @@ http {
         }
 
         location /media/ {
-            alias /home/app/web/media;
+            alias /home/app/web/media/;  # Директория должна заканчиваться /
         }
 
         client_max_body_size 100M;
