@@ -23,10 +23,10 @@ PRODUCTION = env('PRODUCTION') == 'true'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '212.8.246.22',
+    '185.201.252.106',
     'moami.com.ua',
-    '0.0.0.0',
     'localhost',
+    '0.0.0.0',
     '127.0.0.1',
     'localhost:3000'
     '127.0.0.1:3000'
