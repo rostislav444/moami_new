@@ -2,7 +2,7 @@ services:
   nginx:
     build: ./nginx
     volumes:
-      - ./nginx/nginx.conf_v2:/etc/nginx/nginx.conf
+      - ./nginx/nginx.conf_v1:/etc/nginx/nginx.conf
       - ./nginx/cert.pem:/etc/cert.pem
       - ./nginx/key.pem:/etc/key.pem
       - static_volume:/home/app/web/static_root
