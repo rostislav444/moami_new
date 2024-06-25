@@ -1,11 +1,4 @@
 services:
-  frontend:
-    build: ./frontend
-    networks:
-      - nginx_net
-    depends_on:
-      - web
-
   web:
     restart: always
     build:
