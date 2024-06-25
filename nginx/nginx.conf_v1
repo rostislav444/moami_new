@@ -17,9 +17,9 @@ http {
         server_name moami.com.ua;
 
         location /.well-known {
-            # адрес certbot'a в Docker Compose на Linux
-            proxy_pass http://172.17.0.1:6000;
-        }
+					# адрес certbot'a в Docker Compose на Linux
+					proxy_pass http://172.17.0.1:6000;
+		}
 
         location ~ ^/(admin|api) {
             # Special handling for admin and api, excluding /api/auth
@@ -36,19 +36,19 @@ http {
         }
 
         location / {
-            proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
             proxy_pass http://frontend_app;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
 
-            # Fallback for static content if frontend_app is down
-            error_page 502 = /static/index.html;
-            location = /static/index.html {
-                root /home/app/web/static_root;
-                internal;
-            }
+            error_page 502 = /502.html;
+            proxy_intercept_errors on;
+        }
+
+        location /502.html {
+            root /home/app/web/templates/502.html
+            internal;
         }
 
         location /static/ {
