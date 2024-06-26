@@ -4,11 +4,11 @@ events {
 
 http {
     upstream security_app {
-        server web:8000;
+        server 0.0.0.0:8000;
     }
 
     upstream frontend_app {
-        server frontend:3000;
+        server 0.0.0.0:3000;
     }
 
     server {
