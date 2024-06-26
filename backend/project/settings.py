@@ -2,14 +2,19 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 STATICFILE_DIR = os.path.join(BASE_DIR, 'static')
 
-env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+env_path = Path('.') / '.env'
+
+with open(env_path) as f:
+    env_vars = f.read().splitlines()
+
+for env_var in env_vars:
+    key, value = env_var.split('=', 1)
+    os.environ[key] = value
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -19,7 +24,7 @@ SECRET_KEY = 'django-insecure-hm#r1xssp!bmbqka4mxgtzfe#)ugfo*i6#1pf#oq!hx)xpo8xb
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-PRODUCTION = env('PRODUCTION') == 'true'
+PRODUCTION = os.environ.get('PRODUCTION') == 'true'
 DEBUG = True
 
 ALLOWED_HOSTS = [
@@ -122,11 +127,11 @@ WSGI_APPLICATION = 'project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST') or 'localhost',
-        'PORT': env('DB_PORT') or 5432,
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST') or 'localhost',
+        'PORT': os.environ.get('DB_PORT') or 5432,
     }
 }
 
@@ -288,18 +293,9 @@ SITE_ID = 1
 ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
-# Celery Configuration Options
+# CELERY
 CELERY_BROKER_URL = 'amqp://user:password@rabbitmq:5672//'
 # CELERY_RESULT_BACKEND = 'rpc://'
-
-СELERY_QUEUES = {
-    'default': {
-        'exchange': 'default',
-        'exchange_type': 'direct',
-        'binding_key': 'default',
-    },
-}
-
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -308,6 +304,13 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 60 * 60 * 30
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
+СELERY_QUEUES = {
+    'default': {
+        'exchange': 'default',
+        'exchange_type': 'direct',
+        'binding_key': 'default',
+    },
+}
 
 CACHES = {
     'default': {
@@ -315,3 +318,33 @@ CACHES = {
         'LOCATION': 'my_cache_table',
     }
 }
+
+# CKEditor
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat', 'Source']
+        ]
+    }
+}
+
+
+
+if PRODUCTION:
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_DSN'),
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=1.0,
+    )
