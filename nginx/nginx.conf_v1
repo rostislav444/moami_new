@@ -7,9 +7,9 @@ http {
         server localhost:8000;
     }
 
-    upstream frontend_app {
-        server localhost:3000;
-    }
+#     upstream frontend_app {
+#         server localhost:3000;
+#     }
 
     server {
         listen 80;
@@ -35,21 +35,21 @@ http {
             proxy_pass http://security_app;
         }
 
-        location / {
-            proxy_pass http://frontend_app;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-
-            error_page 502 = /502.html;
-            proxy_intercept_errors on;
-        }
-
-        location /502.html {
-            root /home/app/web/templates/;  # Корневая директория должна заканчиваться /
-            internal;
-        }
+#         location / {
+#             proxy_pass http://frontend_app;
+#             proxy_set_header Host $host;
+#             proxy_set_header X-Real-IP $remote_addr;
+#             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#             proxy_set_header X-Forwarded-Proto $scheme;
+#
+#             error_page 502 = /502.html;
+#             proxy_intercept_errors on;
+#         }
+#
+#         location /502.html {
+#             root /home/app/web/templates/;  # Корневая директория должна заканчиваться /
+#             internal;
+#         }
 
         location /static/ {
             alias /home/app/web/static_root/;
