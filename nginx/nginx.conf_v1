@@ -16,11 +16,6 @@ http {
         access_log /var/log/nginx/access.log;
         server_name moami.com.ua;
 
-#         location /.well-known {
-#             # адрес certbot'a в Docker Compose на Linux
-#             proxy_pass http://172.17.0.1:6000;
-#         }
-
         location ~ ^/(admin|api) {
             # Special handling for admin and api, excluding /api/auth
             location ~ ^/api/auth/ {
@@ -29,6 +24,9 @@ http {
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Proto $scheme;
+
+                error_page 502 = /502.html;
+                proxy_intercept_errors on;
             }
 
             include proxy_params;
@@ -47,7 +45,7 @@ http {
         }
 
         location /502.html {
-            root /home/app/web/templates/;  # Корневая директория должна заканчиваться /
+            root /home/app/web/templates/;
             internal;
         }
 
@@ -56,7 +54,7 @@ http {
         }
 
         location /media/ {
-            alias /home/app/web/media/;  # Директория должна заканчиваться /
+            alias /home/app/web/media/;
         }
 
         client_max_body_size 100M;
