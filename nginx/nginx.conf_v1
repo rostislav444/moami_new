@@ -3,7 +3,7 @@ events {
 }
 
 http {
-    upstream security_app {
+    upstream backend_app {
         server web:8000;
     }
 
@@ -30,7 +30,7 @@ http {
             }
 
             include proxy_params;
-            proxy_pass http://security_app;
+            proxy_pass http://backend_app;
         }
 
         location / {

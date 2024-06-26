@@ -2,8 +2,8 @@
 
 # Connect to the PostgreSQL container and reset the database
 docker exec -i moami-db-1 psql -U postgres <<EOF
-DROP DATABASE moami_db;
-CREATE DATABASE moami_db;
+DROP DATABASE moami;
+CREATE DATABASE moami;
 \q
 EOF
 
