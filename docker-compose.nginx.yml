@@ -5,6 +5,7 @@ services:
       - ./nginx/nginx.conf_v1:/etc/nginx/nginx.conf
       - ./nginx/cert.pem:/etc/cert.pem
       - ./nginx/key.pem:/etc/key.pem
+      - ./backend/templates/nginx:/home/app/web/templates
       - static_volume:/home/app/web/static_root
       - media_volume:/home/app/web/media
     ports:
