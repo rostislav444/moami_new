@@ -3,7 +3,7 @@ from datetime import timedelta
 from pathlib import Path
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 STATICFILE_DIR = os.path.join(BASE_DIR, 'static')
 
