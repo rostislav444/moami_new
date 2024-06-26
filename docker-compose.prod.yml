@@ -1,5 +1,14 @@
 services:
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    networks:
+      - nginx_net
+    depends_on:
+      - web
+
   web:
+    container_name: web
     restart: always
     build:
       context: ./backend
@@ -19,6 +28,7 @@ services:
       - rabbitmq
     networks:
       - nginx_net
+
 
   db:
     image: postgres:13-alpine
