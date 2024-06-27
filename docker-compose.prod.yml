@@ -9,8 +9,8 @@ services:
       dockerfile: Dockerfile.prod
     command: gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3
     volumes:
-      - static_volume:/home/app/web/static_root
-      - media_volume:/home/app/web/media
+      - backend/static_root:/home/app/web/static_root
+      - backend/media:/home/app/web/media
     ports:
       - "8000:8000"
     expose:
@@ -73,13 +73,6 @@ services:
 
 volumes:
   postgres_data:
-  static_volume:
-  media_volume:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./backend/media
-      o: bind
 
 networks:
   nginx_net:
