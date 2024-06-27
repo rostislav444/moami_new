@@ -21,5 +21,11 @@ django-colorfield==0.11.0
 django-admin-sortable2==2.2.1
 django-clearcache==1.2.1
 djangorestframework-simplejwt==5.3.1
-django-ckeditor-5==0.2.13
+django-ckeditor
+django-admin-autocomplete-filter==0.7.1
+django-allauth==0.63.3
+dj-rest-auth==6.0.0
+django-celery-results==2.5.1
+django-admin-sortable==2.3
+django-cryptography==1.1
 gunicorn
