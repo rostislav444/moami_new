@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   web:
     container_name: web
@@ -20,7 +22,6 @@ services:
       - rabbitmq
     networks:
       - nginx_net
-
 
   db:
     image: postgres:13-alpine
@@ -74,6 +75,11 @@ volumes:
   postgres_data:
   static_volume:
   media_volume:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./backend/media
+      o: bind
 
 networks:
   nginx_net:
