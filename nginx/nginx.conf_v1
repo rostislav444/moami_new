@@ -16,6 +16,11 @@ http {
         access_log /var/log/nginx/access.log;
         server_name moami.com.ua;
 
+        location /.well-known {
+			# адрес certbot'a в Docker Compose на Linux
+			proxy_pass http://172.17.0.1:6000;
+		}
+
         location ~ ^/(admin|api) {
             # Special handling for admin and api, excluding /api/auth
             location ~ ^/api/auth/ {
