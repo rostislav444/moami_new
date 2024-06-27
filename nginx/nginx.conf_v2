@@ -8,7 +8,7 @@ http {
 
     server {
         listen 80;
-        server_name buh-model.com.ua;
+        server_name moami.com.ua;
         return 301 https://$host$request_uri;
     }
 
@@ -42,6 +42,9 @@ http {
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Proto $scheme;
+
+                error_page 502 = /502.html;
+                proxy_intercept_errors on;
             }
 
             include proxy_params;
@@ -54,6 +57,9 @@ http {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+
+            error_page 502 = /502.html;
+            proxy_intercept_errors on;
         }
 
         client_max_body_size 100M;
