@@ -19,5 +19,5 @@ django-prettyjson
 Pygments
 easygoogletranslate
 django-colorfield==0.11.0
-django-admin-sortable==2.3
+django-admin-sortable2==2.2.1
 gunicorn
