@@ -228,12 +228,14 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'http://127.0.0.1:3000'
+    'http://127.0.0.1:3000',
+    'https://moami.com.ua',
 ]
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     'http://localhost:3000',
-    'http://127.0.0.1:3000'
+    'http://127.0.0.1:3000',
+    'https://moami.com.ua',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
