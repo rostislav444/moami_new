@@ -238,7 +238,8 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
-    'http://127.0.0.1:3000'
+    'http://127.0.0.1:3000',
+    'https://moami.com.ua',
 ]
 
 # Use the custom session auth token
