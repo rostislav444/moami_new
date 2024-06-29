@@ -10,7 +10,7 @@ services:
     command: gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3 --log-level=info
     volumes:
       - static_volume:/home/app/web/static_root
-      - media_volume:/home/app/web/media
+      - ./backend/media:/home/app/web/media
     ports:
       - "8000:8000"
     expose:
@@ -28,7 +28,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      POSTGRES_PASSWORD: postgres
+        POSTGRES_PASSWORD: postgres
     env_file:
       - ./backend/.env
     networks:
@@ -74,7 +74,6 @@ services:
 volumes:
   postgres_data:
   static_volume:
-  media_volume:
 
 
 networks:
