@@ -15,5 +15,7 @@ python manage.py migrate
 
 # change owner of celerybeat-schedule file to app user
 chown app:app /home/app/web/celerybeat-schedule
+chown -R app:app /home/app/web
+chmod -R 775 /home/app/web/media
 
 exec "$@"
