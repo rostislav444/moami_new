@@ -9,8 +9,8 @@ services:
       dockerfile: Dockerfile.prod
     command: gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3 --log-level=info
     volumes:
-      - static_volume:/home/app/web/static_root
-      - media_volume:/home/app/web/media
+      - ./backend/static_root:/home/app/web/static_root
+      - ./backend/media:/home/app/web/media
     ports:
       - "8000:8000"
     expose:

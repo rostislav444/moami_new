@@ -6,8 +6,8 @@ services:
       - ./nginx/cert.pem:/etc/cert.pem
       - ./nginx/key.pem:/etc/key.pem
       - ./backend/templates/nginx:/home/app/web/templates
-      - static_volume:/home/app/web/static_root
-      - media_volume:/home/app/web/media
+      - ./backend/static_root:/home/app/web/static_root
+      - ./backend/media:/home/app/web/media
     ports:
       - '80:80'
       - '443:443'
