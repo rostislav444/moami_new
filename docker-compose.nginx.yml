@@ -32,11 +32,6 @@ services:
     depends_on:
       - nginx
 
-
-volumes:
-  static_volume:
-  media_volume:
-
 networks:
   nginx_net:
     name: nginx_net
