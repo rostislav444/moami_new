@@ -1,4 +1,5 @@
 from adminsortable.models import SortableMixin
+from ckeditor.fields import RichTextField
 from colorfield.fields import ColorField
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -79,6 +80,7 @@ class Product(Translatable):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='products', verbose_name='Бренд')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='products', verbose_name='Страна')
     description = models.TextField(blank=True, null=True, verbose_name='Описание')
+    extra_description = RichTextField(blank=True, null=True, verbose_name='Дополнительное описание')
     slug = models.SlugField(max_length=255, blank=True)
     price = models.PositiveIntegerField(default=0, verbose_name='Цена')
     promo_price = models.PositiveIntegerField(default=0, verbose_name='Акционная цена')

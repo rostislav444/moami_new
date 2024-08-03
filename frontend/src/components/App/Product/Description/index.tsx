@@ -1,5 +1,11 @@
 import {Error, H2, Span} from "@/components/Shared/Typograpy";
-import {Actions, AddToWishlistWrapper, BuyButton, DescriptionColumn, ProductPreview} from "@/components/App/Product/Galery/DesktopGalery/style";
+import {
+    Actions,
+    AddToWishlistWrapper,
+    BuyButton,
+    DescriptionColumn,
+    ProductPreview
+} from "@/components/App/Product/Galery/DesktopGalery/style";
 import {ProductDescription} from "@/components/App/Product/Description/DescriptionText";
 import {VariantsLinks} from "@/components/App/Product/Description/VariantsLinks";
 import {Icon} from "@/components/Shared/Icons";
@@ -32,14 +38,13 @@ const getCategory = (categories: CategoryState[], parentId: number, id: number) 
 
 export const DescriptionBlock = ({variant}: VariantPageProps) => {
     const store = useStore()
-     const {t} = useTranslation('common', {useSuspense: false})
+    const {t} = useTranslation('common', {useSuspense: false})
     const categories = useAppSelector(selectCategories)
     const category = getCategory(categories, variant.product.category.parent, variant.product.category.id)
     const currentSizeGrid = category?.selected_size_grid || category?.preferred_size_grid
     const [selectedSize, setSelectedSize] = useState<number | null>(null)
     const [sizeNotSelectedError, setSizeNotSelectedError] = useState<boolean>(false)
     const {push} = useRouter();
-
 
 
     useEffect(() => {
@@ -89,8 +94,9 @@ export const DescriptionBlock = ({variant}: VariantPageProps) => {
         <ProductPreview>
             <li>
                 <Span bold mr={1}>{t('titles.composition')}:</Span>
-                <Span>{variant.product.compositions.map(composition => `${composition.composition} - ${composition.value}%`)
-                              .join(', ')}</Span>
+                <Span>{variant.product.compositions.map(
+                    composition => `${composition.composition} - ${composition.value}%`)
+                    .join(', ')}</Span>
             </li>
             {variant.product.properties.map((property, key) =>
                 <li key={key}>
@@ -99,7 +105,7 @@ export const DescriptionBlock = ({variant}: VariantPageProps) => {
                 </li>
             )}
         </ProductPreview>
-        <ProductDescription description={variant.product.description}/>
+        <ProductDescription description={variant.product.description} extra_description={variant.product.extra_description}/>
         <VariantsLinks variants={variant.product.variants} selected={variant.id}/>
         <Sizes
             sizes={variant.sizes}

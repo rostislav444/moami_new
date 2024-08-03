@@ -94,8 +94,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'slug', 'price', 'old_price', 'description', 'properties', 'variants', 'breadcrumbs',
-                  'size_grids', 'preferred_size_grid', 'category', 'compositions', 'properties', 'attributes',)
+        fields = (
+            'id', 'name', 'slug', 'price', 'old_price', 'description', 'extra_description', 'properties', 'variants',
+            'breadcrumbs', 'size_grids', 'preferred_size_grid', 'category', 'compositions', 'properties', 'attributes',)
 
     def get_breadcrumbs(self, obj):
         breadcrumbs = []

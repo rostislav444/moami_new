@@ -46,6 +46,7 @@ interface Product {
     price: number;
     old_price: number;
     description: string;
+    extra_description: string;
     variants: VariantWithImage[];
     properties: ProductProperty[];
     breadcrumbs: { title: string; link: string }[];

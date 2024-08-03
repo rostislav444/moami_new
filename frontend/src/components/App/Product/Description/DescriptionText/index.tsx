@@ -1,13 +1,20 @@
-import {DescriptionContainer, DescriptionText, ShowMoreButton} from "@/components/App/Product/Description/DescriptionText/style";
+import {
+    DescriptionContainer,
+    DescriptionText,
+    ExtraDescription,
+    ShowMoreButton
+} from "@/components/App/Product/Description/DescriptionText/style";
 import React, {useEffect, useRef, useState} from "react";
+
 
 
 interface DescriptionProps {
     description: string,
+    extra_description?: string
 }
 
 
-export const ProductDescription = ({description}: DescriptionProps) => {
+export const ProductDescription = ({description, extra_description}: DescriptionProps) => {
     const descriptionRef = useRef<HTMLDivElement>(null)
     const descriptionTextRef = useRef<HTMLDivElement>(null)
     const [showMore, setShowMore] = useState<boolean>(false)
@@ -26,7 +33,7 @@ export const ProductDescription = ({description}: DescriptionProps) => {
         setShowMore(!showMore)
     }
 
-    return (
+    return <div>
         <DescriptionContainer ref={descriptionRef}>
             <DescriptionText ref={descriptionTextRef} showMore={showMore}>
                 {description}
@@ -35,5 +42,8 @@ export const ProductDescription = ({description}: DescriptionProps) => {
                 {!showMore ? 'Читать полностью' : 'Скрыть'}
             </ShowMoreButton>}
         </DescriptionContainer>
-    )
+        <ExtraDescription>
+            {extra_description && <div dangerouslySetInnerHTML={{__html: extra_description}}/>}
+        </ExtraDescription>
+    </div>
 };

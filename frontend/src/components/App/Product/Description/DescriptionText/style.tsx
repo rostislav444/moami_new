@@ -37,3 +37,13 @@ export const ShowMoreButton = styled.button`
     cursor: pointer;
   }
 `
+
+
+export const ExtraDescription = styled.div`
+    display: block;
+    position: relative;
+    width: 100%;
+    height: auto;
+    margin-top: 24px;
+    overflow-x: auto;
+`

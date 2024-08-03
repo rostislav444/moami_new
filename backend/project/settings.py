@@ -331,10 +331,15 @@ CKEDITOR_CONFIGS = {
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
             ['Link', 'Unlink'],
+            ['Table', 'TableCell', 'TableRow', 'TableColumn'],  # Добавление кнопок таблицы
             ['RemoveFormat', 'Source']
-        ]
+        ],
+        'extraPlugins': 'table',  # Добавление плагина таблиц
+        'removePlugins': 'elementspath',  # Удаление ненужных плагинов
+        'resize_enabled': False  # Отключение изменения размера редактора
     }
 }
+
 
 
 

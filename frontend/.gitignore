@@ -31,3 +31,4 @@ dist/
 .env
 
 src/local.tsx
+src/local.ts

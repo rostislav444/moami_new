@@ -164,7 +164,7 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
             'fields': (('promo_price', 'price', 'old_price'),)
         }),
         ('Описание', {
-            'fields': ('description',)
+            'fields': ('description', 'extra_description')
         }),
     )
 
@@ -207,4 +207,3 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
             # else:
             #     kwargs['queryset'] = Product.objects.none()
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
