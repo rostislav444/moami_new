@@ -24,10 +24,13 @@ http {
 
         location = /favicon.ico { access_log off; log_not_found off; }
 
+        location /ru/rozetka {
+            alias /home/app/web/media/feed/rozetka.xml;
+        }
+
         location /static/ {
             alias /home/app/web/static_root/;
             autoindex on;
-
         }
 
         location /media/ {
