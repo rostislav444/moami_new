@@ -24,7 +24,7 @@ http {
 
         location = /favicon.ico { access_log off; log_not_found off; }
 
-        location /ru/rozetka/ {
+        location ~ ^/ru/rozetka/?$ {
             root /home/app/web/media/feed/;
             add_header Content-Type "application/xml; charset=utf-8";
             try_files /rozetka.xml =404;
