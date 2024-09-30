@@ -24,9 +24,10 @@ http {
 
         location = /favicon.ico { access_log off; log_not_found off; }
 
-        location /ru/rozetka {
+        location /ru/rozetka/ {
             alias /home/app/web/media/feed/rozetka.xml;
             add_header Content-Type "application/xml; charset=utf-8";
+
         }
 
         location /static/ {
