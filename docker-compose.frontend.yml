@@ -4,6 +4,7 @@ services:
     build: ./frontend
     networks:
       - nginx_net
+    network_mode: "host"
 
 networks:
   nginx_net:

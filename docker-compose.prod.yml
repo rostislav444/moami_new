@@ -2,8 +2,6 @@ version: '3.8'
 
 services:
   web:
-    container_name: web
-    restart: always
     build:
       context: ./backend
       dockerfile: Dockerfile.prod
@@ -11,17 +9,12 @@ services:
     volumes:
       - ./backend/static_root:/home/app/web/static_root
       - ./backend/media:/home/app/web/media
-    ports:
-      - "8000:8000"
-    expose:
-      - 8000
+    network_mode: "host"
     env_file:
       - ./backend/.env
     depends_on:
       - db
       - rabbitmq
-    networks:
-      - nginx_net
 
   db:
     image: postgres:13-alpine
@@ -31,19 +24,14 @@ services:
       POSTGRES_PASSWORD: postgres
     env_file:
       - ./backend/.env
-    networks:
-      - nginx_net
+    network_mode: "host"
 
   rabbitmq:
     image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
     environment:
       - RABBITMQ_DEFAULT_USER=user
       - RABBITMQ_DEFAULT_PASS=password
-    networks:
-      - nginx_net
+    network_mode: "host"
 
   celery:
     build:
@@ -52,11 +40,10 @@ services:
     command: celery -A project worker --loglevel=info -Q default,payments
     env_file:
       - ./backend/.env
+    network_mode: "host"
     depends_on:
       - db
       - rabbitmq
-    networks:
-      - nginx_net
 
   celery-beat:
     build:
@@ -65,16 +52,10 @@ services:
     command: celery -A project beat --loglevel=info
     env_file:
       - ./backend/.env
+    network_mode: "host"
     depends_on:
       - db
       - rabbitmq
-    networks:
-      - nginx_net
 
 volumes:
   postgres_data:
-
-networks:
-  nginx_net:
-    name: nginx_net
-    external: true
