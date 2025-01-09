@@ -297,7 +297,7 @@ ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
 # CELERY
-CELERY_BROKER_URL = 'amqp://user:password@rabbitmq:5672//'
+CELERY_BROKER_URL = 'amqp://user:password@localhost:5672//'
 # CELERY_RESULT_BACKEND = 'rpc://'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'

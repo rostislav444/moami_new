@@ -9,7 +9,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 app = Celery('project')
 
 # Using RabbitMQ as the broker
-app.conf.broker_url = 'amqp://user:password@rabbitmq:5672//'
+app.conf.broker_url = 'amqp://user:password@localhost:5672//'
 app.conf.broker_connection_retry_on_startup = True
 
 # Using a string here means the worker doesn't have to serialize
