@@ -2,11 +2,4 @@ services:
   frontend:
     container_name: frontend
     build: ./frontend
-    networks:
-      - nginx_net
     network_mode: "host"
-
-#networks:
-#  nginx_net:
-#    name: nginx_net
-#    external: true
