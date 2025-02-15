@@ -296,24 +296,6 @@ SITE_ID = 1
 ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
-# CELERY
-CELERY_BROKER_URL = 'amqp://user:password@localhost:5672//'
-# CELERY_RESULT_BACKEND = 'rpc://'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = "Europe/Kiev"
-CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 60 * 60 * 30
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_CACHE_BACKEND = 'django-cache'
-СELERY_QUEUES = {
-    'default': {
-        'exchange': 'default',
-        'exchange_type': 'direct',
-        'binding_key': 'default',
-    },
-}
 
 CACHES = {
     'default': {
