@@ -8,11 +8,11 @@ http {
     include /etc/nginx/mime.types;
 
     upstream frontend {
-        server 127.0.0.1:3000;
+        server host.docker.internal:3000;
     }
 
     upstream backend {
-        server 127.0.0.1:8000;
+        server host.docker.internal:8000;
     }
 
     server {
