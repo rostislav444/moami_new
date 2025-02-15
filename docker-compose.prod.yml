@@ -14,7 +14,6 @@ services:
       - ./backend/.env
     depends_on:
       - db
-      - rabbitmq
 
   db:
     image: postgres:13-alpine
@@ -25,37 +24,6 @@ services:
     env_file:
       - ./backend/.env
     network_mode: "host"
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    environment:
-      - RABBITMQ_DEFAULT_USER=user
-      - RABBITMQ_DEFAULT_PASS=password
-    network_mode: "host"
-
-  celery:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.prod
-    command: celery -A project worker --loglevel=info -Q default,payments
-    env_file:
-      - ./backend/.env
-    network_mode: "host"
-    depends_on:
-      - db
-      - rabbitmq
-
-  celery-beat:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.prod
-    command: celery -A project beat --loglevel=info
-    env_file:
-      - ./backend/.env
-    network_mode: "host"
-    depends_on:
-      - db
-      - rabbitmq
 
 volumes:
   postgres_data:
