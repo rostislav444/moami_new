@@ -64,11 +64,12 @@ class ProductAttributeForm(forms.ModelForm):
         self.hide_fields(attr_group)
 
         if attr_group.data_type == AttributeGroup.ATTR_TYPE_CHOICES[0][0]:
-            self.fields['value_multi_attributes'].queryset = attr_group.attributes.filter(mk_categories__mk_category__id=mk_category_id)
+            self.fields['value_multi_attributes'].queryset = attr_group.attributes.all()
             self.fields['value_single_attribute'].queryset = Attribute.objects.none()
         elif attr_group.data_type == AttributeGroup.ATTR_TYPE_CHOICES[1][0]:
+
             self.fields['value_multi_attributes'].queryset = Attribute.objects.none()
-            self.fields['value_single_attribute'].queryset = attr_group.attributes.filter(mk_categories__mk_category__id=mk_category_id)
+            self.fields['value_single_attribute'].queryset = attr_group.attributes.all()
         else:
             self.fields['value_multi_attributes'].queryset = Attribute.objects.none()
             self.fields['value_single_attribute'].queryset = Attribute.objects.none()
@@ -82,6 +83,7 @@ class ProductAttributeForm(forms.ModelForm):
 
         if group_id and mk_category_id:
             attr_group = AttributeGroup.objects.get(id=group_id)
+            print(attr_group)
             self.init_attribute_group_fields(attr_group, mk_category_id)
 
 
