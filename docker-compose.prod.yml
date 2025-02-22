@@ -25,23 +25,18 @@ services:
     env_file:
       - ./backend/.env
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     networks:
       - nginx_net
 
   frontend:
     container_name: frontend
-    build:
-      context: ./frontend
-      args:
-        - BACKEND_URL=http://web:8000
-    volumes:
-      - ./frontend/.next:/app/.next
+    build: ./frontend
     networks:
       - nginx_net
     depends_on:
       - web
+
 
 volumes:
   postgres_data:
