@@ -1,17 +1,18 @@
 #!/bin/bash
 
-# Connect to the PostgreSQL container and reset the database
-docker exec -i moami-db-1 psql -U postgres <<EOF
-DROP DATABASE moami;
-CREATE DATABASE moami;
+DOCKER_CONTAINER_NAME="moami-db-1"
+DB_NAME=$(grep "DB_NAME=" backend/.env | cut -d '=' -f2 | tr -d '[:space:]' | tr -d "'")
+
+# Закрываем соединения и очищаем базу
+docker exec -i $DOCKER_CONTAINER_NAME psql -U postgres <<EOF
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE datname = '$DB_NAME'
+AND pid <> pg_backend_pid();
+DROP DATABASE IF EXISTS "$DB_NAME";
+CREATE DATABASE "$DB_NAME";
 \q
 EOF
 
-
-# Import the dump into your database
-if [[ $(file --mime-type -b ./backend/data/dumps/moami_dump.sql) == "text/plain" ]]; then
-    cat ./backend/data/dumps/moami_dump.sql | docker exec -i moami-db-1 psql -U postgres -d moami
-else
-    docker exec -i moami-db-1 pg_restore -U postgres -d moami < ./backend/data/dumps/moami_dump.sql
-fi
-
+# Конвертируем бэкап в SQL и восстанавливаем
+pg_restore -f - ./backups/db-backup | docker exec -i $DOCKER_CONTAINER_NAME psql -U postgres -d $DB_NAME
