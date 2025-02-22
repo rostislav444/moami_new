@@ -35,7 +35,7 @@ services:
     networks:
       - nginx_net
     healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8000/api/category || exit 1" ]
+      test: [ "CMD-SHELL", "curl --fail http://localhost:8000/api/category/ || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
