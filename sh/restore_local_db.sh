@@ -15,4 +15,4 @@ CREATE DATABASE "$DB_NAME";
 EOF
 
 # Конвертируем бэкап в SQL и восстанавливаем
-pg_restore -f - ./backups/db-backup | docker exec -i $DOCKER_CONTAINER_NAME psql -U postgres -d $DB_NAME
+pg_restore -f - ./backend/backups/db-backup | docker exec -i $DOCKER_CONTAINER_NAME psql -U postgres -d $DB_NAME
