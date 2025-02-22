@@ -5,7 +5,7 @@ FROM node:20-alpine
 RUN npm install -g pm2
 
 # Set the working directory
-WORKDIR /home/app/frontend
+WORKDIR /app/frontend
 
 # Copy project files to the working directory
 COPY . .

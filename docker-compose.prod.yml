@@ -35,6 +35,8 @@ services:
       context: ./frontend
       args:
         - BACKEND_URL=http://web:8000
+    volumes:
+      - ./frontend/.next:/app/.next
     networks:
       - nginx_net
     depends_on:
