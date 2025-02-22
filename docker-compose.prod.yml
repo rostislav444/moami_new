@@ -1,20 +1,6 @@
 version: '3.8'
 
 services:
-  web:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.prod
-    command: gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3 --log-level=info
-    volumes:
-      - ./backend/static_root:/home/app/web/static_root
-      - ./backend/media:/home/app/web/media
-    network_mode: "host"
-    env_file:
-      - ./backend/.env
-    depends_on:
-      - db
-
   db:
     image: postgres:13-alpine
     volumes:
@@ -23,7 +9,41 @@ services:
       POSTGRES_PASSWORD: postgres
     env_file:
       - ./backend/.env
-    network_mode: "host"
+    networks:
+      - nginx_net
+
+  web:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    command: gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3 --log-level=info
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/static_root:/home/app/web/static_root
+      - ./backend/media:/home/app/web/media
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+    networks:
+      - nginx_net
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      args:
+        - BACKEND_URL=http://web:8000
+    networks:
+      - nginx_net
+    depends_on:
+      - web
 
 volumes:
   postgres_data:
+
+networks:
+  nginx_net:
+    name: nginx_net
+    external: true

@@ -8,11 +8,11 @@ http {
     include /etc/nginx/mime.types;
 
     upstream frontend {
-        server 185.201.252.106:3000;
+        server frontend:3000;
     }
 
     upstream backend {
-        server 185.201.252.106:8000;
+        server web:8000;
     }
 
     server {
