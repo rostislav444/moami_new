@@ -52,8 +52,9 @@ http {
 
         # Frontend routes
         location / {
-            root /app/.next;
-            try_files $uri $uri/ /index.html;
+            proxy_pass http://frontend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
         }
     }
 }
