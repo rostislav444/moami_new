@@ -34,11 +34,6 @@ services:
         condition: service_healthy
     networks:
       - nginx_net
-    healthcheck:
-      test: [ "CMD-SHELL", "curl --fail http://localhost:8000/api/category/ || exit 1" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   frontend:
     container_name: frontend
@@ -46,8 +41,8 @@ services:
     networks:
       - nginx_net
     depends_on:
-      web:
-        condition: service_healthy
+      - web
+
 
 
 volumes:
