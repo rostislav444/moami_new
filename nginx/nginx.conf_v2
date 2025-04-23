@@ -41,6 +41,10 @@ http {
             proxy_set_header X-Real-IP $remote_addr;
         }
 
+        location /ru/rozetka {
+            alias /home/app/web/media/feed/rozetka.xml;
+        }
+
         # Static and media
         location /static/ {
             alias /home/app/web/static_root/;
