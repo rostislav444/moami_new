@@ -2,3 +2,6 @@
 .idea/
 .idea/workspace.xml
 frontend/src/local.ts
+nginx/cert.pem
+nginx/key.pem
+.trunk/
