@@ -43,6 +43,8 @@ http {
 
         location /ru/rozetka {
             alias /home/app/web/media/feed/rozetka.xml;
+            add_header Content-Type "application/xml; charset=utf-8";
+            default_type application/xml;
         }
 
         # Static and media
