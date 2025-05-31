@@ -70,25 +70,26 @@ class Translatable(models.Model):
         transaction_model = self.get_translation_model()
         fields = self.get_translatable_fields
 
-        translations = self.translations.all()
-        if translations.count() > 0:
-            return
+        for lang_code, _ in settings.FOREIGN_LANGUAGES:
+            item, created = transaction_model.objects.get_or_create(
+                parent=self,
+                language_code=lang_code
+            )
 
-        for lang_code, name in settings.FOREIGN_LANGUAGES:
-            data = {}
+            needs_save = False
+
             for field in fields:
-                value = getattr(self, field)
-                if value:
-                    translator = EasyGoogleTranslate(source_language='ru', target_language=lang_code, timeout=10)
-                    data[field] = translator.translate(value)
+                current_field_value = getattr(item, field, None)
+                if not current_field_value or current_field_value.strip() == "":
+                    source_value = getattr(self, field)
+                    if source_value and source_value.strip():
+                        translator = EasyGoogleTranslate(source_language='ru', target_language=lang_code, timeout=10)
+                        translated_value = translator.translate(source_value)
+                        setattr(item, field, translated_value)
+                        needs_save = True
 
-            try:
-                item = transaction_model.objects.get(parent=self, language_code=lang_code)
-            except ObjectDoesNotExist:
-                item = transaction_model(parent=self, language_code=lang_code)
-            for k, v in data.items():
-                setattr(item, k, v)
-            item.save()
+            if needs_save:
+                item.save()
 
     def save(self, *args, **kwargs):
         super(Translatable, self).save(*args, **kwargs)
