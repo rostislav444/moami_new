@@ -3,63 +3,23 @@ events {
 }
 
 http {
-    upstream backend_app {
-        server web:8000;
-    }
-
-    upstream frontend_app {
-        server frontend:3000;
-    }
-
     server {
         listen 80;
         access_log /var/log/nginx/access.log;
         server_name moami.com.ua;
 
+        root /usr/share/nginx/html;
+
         location /.well-known {
-			# адрес certbot'a в Docker Compose на Linux
-			proxy_pass http://172.17.0.1:6000;
-		}
-
-        location ~ ^/(admin|api) {
-            # Special handling for admin and api, excluding /api/auth
-            location ~ ^/api/auth/ {
-                proxy_pass http://frontend_app;
-                proxy_set_header Host $host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Proto $scheme;
-
-                error_page 502 = /502.html;
-                proxy_intercept_errors on;
-            }
-
-            include proxy_params;
-            proxy_pass http://backend_app;
+            proxy_pass http://172.17.0.1:6000;
         }
 
         location / {
-            proxy_pass http://frontend_app;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-
-            error_page 502 = /502.html;
-            proxy_intercept_errors on;
+            try_files $uri $uri/ /maintenance.html;
         }
 
-        location /502.html {
-            root /home/app/web/templates/;
-            internal;
-        }
-
-        location /static/ {
-            alias /home/app/web/static_root/;
-        }
-
-        location /media/ {
-            alias /home/app/web/media/;
+        location = /maintenance.html {
+            add_header Cache-Control "no-cache, no-store, must-revalidate";
         }
 
         client_max_body_size 100M;
