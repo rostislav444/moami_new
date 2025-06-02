@@ -8,3 +8,5 @@ COPY nginx.conf_v2 /etc/nginx/nginx.conf
 
 # Copy proxy params if required by your configuration
 COPY proxy_params /etc/nginx/proxy_params
+
+COPY *.html /usr/share/nginx/html/

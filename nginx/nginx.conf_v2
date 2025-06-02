@@ -8,7 +8,7 @@ http {
     include /etc/nginx/mime.types;
 
     upstream frontend {
-        server frontend:3000;
+        server frontend:3000 fail_timeout=5s max_fails=1;
     }
 
     upstream backend {
@@ -27,6 +27,13 @@ http {
 
         ssl_certificate /etc/cert.pem;
         ssl_certificate_key /etc/key.pem;
+
+        root /usr/share/nginx/html;
+        error_page 502 503 504 /maintenance.html;
+
+        location = /maintenance.html {
+            internal;
+        }
 
         # Backend routes
         location /api {
@@ -56,11 +63,14 @@ http {
             alias /home/app/web/media/;
         }
 
-        # Frontend routes
+        # Frontend routes with fallback
         location / {
             proxy_pass http://frontend;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
+            proxy_connect_timeout 2s;
+            proxy_read_timeout 2s;
+            proxy_intercept_errors on;
         }
     }
 }
