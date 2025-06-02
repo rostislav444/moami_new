@@ -7,9 +7,7 @@ events {
 http {
     include /etc/nginx/mime.types;
 
-    upstream frontend {
-        server frontend:3000 fail_timeout=5s max_fails=1;
-    }
+    resolver 127.0.0.11 valid=10s;
 
     upstream backend {
         server web:8000;
@@ -65,12 +63,14 @@ http {
 
         # Frontend routes with fallback
         location / {
-            proxy_pass http://frontend;
+            set $frontend "frontend:3000";
+            proxy_pass http://$frontend;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_connect_timeout 2s;
             proxy_read_timeout 2s;
             proxy_intercept_errors on;
+            error_page 502 503 504 = /maintenance.html;
         }
     }
 }
