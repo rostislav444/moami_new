@@ -51,7 +51,7 @@ class ProductAttributeForm(forms.ModelForm):
 
         field_types = self.fields_by_data_types()
 
-        for key, field in field_types.items():
+        for _, field in field_types.items():
             if field != field_types[attr_group.data_type]:
                 if field == 'value_multi_attributes':
                     self.fields[field].widget = forms.MultipleHiddenInput()
@@ -107,6 +107,8 @@ class ProductAttributeFormSet(forms.BaseInlineFormSet):
 
     def get_form_kwargs(self, index):
         kwargs = super(ProductAttributeFormSet, self).get_form_kwargs(index)
-        if self.instance and hasattr(self.instance, 'category') and hasattr(self.instance.category, 'modna_kast_category'):
-            kwargs.update({'mk_category_id':  self.instance.category.modna_kast_category.id})
+        if (self.instance and hasattr(self.instance, 'category') and
+            hasattr(self.instance.category, 'modna_kast_category') and
+            self.instance.category.modna_kast_category):
+            kwargs.update({'mk_category_id': self.instance.category.modna_kast_category.id})
         return kwargs

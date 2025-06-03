@@ -11,8 +11,8 @@ def create_translation_model(model):
         def __str__(self):
             return self.language_code
 
-        def save(self):
-            super(TranslatableModel, self).save()
+        def save(self, *args, **kwargs):
+            super(TranslatableModel, self).save(*args, **kwargs)
 
     def create_model(model_name, fields, module_name):
         module = sys.modules[module_name]

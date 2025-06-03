@@ -4,8 +4,6 @@ from colorfield.fields import ColorField
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 from mptt.models import MPTTModel, TreeForeignKey
@@ -173,7 +171,7 @@ class ProductAttribute(models.Model):
         verbose_name_plural = 'Атрибуты'
 
     def __str__(self):
-        attr_group, attr_type = self.attribute_group, self.attribute_group.data_type
+        attr_group = self.attribute_group
         value = self.get_attribute_string_value()
         return attr_group.name + ' - ' + value if value else ''
 
