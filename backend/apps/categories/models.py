@@ -40,10 +40,7 @@ class Category(NameSlug, MPTTModel, Translatable):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.parent and not self.size_group and self.parent.size_group:
-            self.size_group = self.parent.size_group
-
-        if not self.children.exists() and not self.size_group:
+        if not self.size_group:
             raise ValidationError('У этой категории должна быть размерная сетка')
         super(Category, self).save(*args, **kwargs)
 
