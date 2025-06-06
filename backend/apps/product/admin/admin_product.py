@@ -152,7 +152,7 @@ class ProductAdmin(SortableAdminMixin, admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'slug', 'category', 'brand', 'country', 'collections',)
+            'fields': ('name', 'slug', 'code', 'category', 'brand', 'country', 'collections',)
         }),
         # ('Копировать аттрибуты Modna Kasta', {
         #     'fields': ('mk_attributes_copy_to', 'mk_attributes_copy',)

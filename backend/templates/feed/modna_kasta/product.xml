@@ -19,10 +19,10 @@
             <categoryId>{{ product.category.rozetka_id }}</categoryId>
             {% for image in variant.images %}<picture>https://moami.com.ua{{ image.image }}</picture>{% endfor %}
             <vendor>{{ product.brand }}</vendor>
-            <article>{{ variant.code }}</article>
+            <article>{{ product.product_code }}</article>
             <stock_quantity>{{ size.stock }}</stock_quantity>
-            <name>{{ product.name }} {{ product.brand }} {{ variant.code }} {{ size.size }} {{ variant.color }}</name>
-            <name_ua>{{ product.name_uk }} {{ product.brand }} {{ variant.code }} {{ size.size }} {{ variant.color_uk }}</name_ua>
+            <name>{{ product.name }} {{ product.brand }} {{ product.product_code }} {{ size.size }} {{ variant.color }}</name>
+            <name_ua>{{ product.name_uk }} {{ product.brand }} {{ product.product_code }} {{ size.size }} {{ variant.color_uk }}</name_ua>
             <description><![CDATA[{{ product.description }}]]></description>
             <description_ua><![CDATA[{{ product.description_uk }}]]></description_ua>
             <param name="Розмір">{{ size.size }}</param>

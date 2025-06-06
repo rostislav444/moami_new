@@ -1,6 +1,7 @@
 import os
 import sys
 from datetime import datetime
+from xml.dom import minidom
 
 from django.db.models import Prefetch
 from django.db.models import Q
@@ -134,7 +135,9 @@ def generate_feed(feed_type):
             })
 
             with open(final_xml_path, 'w', encoding='utf-8') as feed:
-                feed.write(rendered_template)
+                formatted_xml = minidom.parseString(rendered_template).toprettyxml(indent="  ")
+                lines = [line for line in formatted_xml.split('\n') if line.strip()]
+                feed.write('\n'.join(lines))
 
             # Remove useless files
             for path in [paths['categories_xml'], paths['products_xml']]:

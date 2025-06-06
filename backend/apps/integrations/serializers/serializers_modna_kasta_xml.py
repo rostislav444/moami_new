@@ -87,12 +87,13 @@ class ModnaKastaXMLProductSerializer(serializers.ModelSerializer):
     composition_uk = serializers.SerializerMethodField()
     attributes = ModnaKastaXMLProductAttributesSerializer(many=True)
     preferred_size_grid = serializers.CharField(source='get_preferred_size_grid')
+    product_code = serializers.CharField(source='get_product_code')
 
     class Meta:
         model = Product
         fields = ('id', 'name', 'name_uk', 'category', 'brand', 'country', 'country_uk', 'mk_category', 'description',
                   'description_uk', 'variants', 'category', 'price', 'promo_price', 'old_price', 'composition',
-                  'composition_uk', 'attributes', 'preferred_size_grid', 'rozetka_category')
+                  'composition_uk', 'attributes', 'preferred_size_grid', 'rozetka_category', 'product_code')
 
     def get_attributes(self):
         return []

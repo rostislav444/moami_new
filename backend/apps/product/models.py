@@ -77,6 +77,7 @@ class Product(Translatable):
     collections = models.ManyToManyField(Collections, blank=True, related_name='products', verbose_name='Коллекции')
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='products', verbose_name='Бренд')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='products', verbose_name='Страна')
+    code = models.CharField(max_length=255, validators=[alphanumeric], blank=True, null=True, verbose_name='Код товара')
     description = models.TextField(blank=True, null=True, verbose_name='Описание')
     extra_description = RichTextField(blank=True, null=True, verbose_name='Дополнительное описание')
     slug = models.SlugField(max_length=255, blank=True)
@@ -125,6 +126,12 @@ class Product(Translatable):
         return self.variants.aggregate(models.Sum('views__views'))['views__views__sum']
 
     get_total_variant_views.short_description = 'Просмотры'
+
+    def get_product_code(self):
+        if self.code:
+            return self.code
+        first_variant = self.variants.first()
+        return first_variant.code if first_variant else None
 
 
 class ProductVideo(models.Model):
