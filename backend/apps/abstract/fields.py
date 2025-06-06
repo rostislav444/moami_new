@@ -26,10 +26,11 @@ class DeletableMediaField(models.FileField):
         if not file_instance:
             if not add and model_instance.pk:
                 old_file = getattr(model_instance.__class__.objects.get(pk=model_instance.pk), self.name, None)
-                try:
-                    default_storage.delete(old_file.name)
-                except (OSError, IOError):
-                    pass
+                if old_file and old_file.name:
+                    try:
+                        default_storage.delete(old_file.name)
+                    except (OSError, IOError):
+                        pass
             self._prune_empty_app_directories(model_instance)
             return None
         if file_instance:
@@ -52,7 +53,7 @@ class DeletableMediaField(models.FileField):
     def _handle_file_replacement(self, model_instance):
         old_file = getattr(model_instance.__class__.objects.get(pk=model_instance.pk), self.name, None)
         new_file = getattr(model_instance, self.name, None)
-        if old_file and new_file and old_file != new_file:
+        if old_file and new_file and old_file != new_file and old_file.name:
             default_storage.delete(old_file.name)
 
     def _delete_associated_file(self, instance):
