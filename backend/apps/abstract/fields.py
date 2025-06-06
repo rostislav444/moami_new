@@ -24,11 +24,12 @@ class DeletableMediaField(models.FileField):
     def pre_save(self, model_instance, add):
         file_instance = getattr(model_instance, self.name)
         if not file_instance:
-            old_file = getattr(model_instance.__class__.objects.get(pk=model_instance.pk), self.name, None)
-            try:
-                default_storage.delete(old_file.name)
-            except:
-                pass
+            if not add and model_instance.pk:
+                old_file = getattr(model_instance.__class__.objects.get(pk=model_instance.pk), self.name, None)
+                try:
+                    default_storage.delete(old_file.name)
+                except (OSError, IOError):
+                    pass
             self._prune_empty_app_directories(model_instance)
             return None
         if file_instance:
