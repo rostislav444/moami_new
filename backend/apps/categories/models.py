@@ -40,7 +40,7 @@ class Category(NameSlug, MPTTModel, Translatable):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.size_group:
+        if self.pk and not self.size_group:
             raise ValidationError('У этой категории должна быть размерная сетка')
         super(Category, self).save(*args, **kwargs)
 
