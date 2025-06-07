@@ -20,7 +20,7 @@ class VariantViewsAdmin(admin.ModelAdmin):
     get_source.short_description = 'Источники'
 
     def get_code(self, obj):
-        return obj.variant.code
+        return obj.variant.get_effective_code
 
     get_code.short_description = 'Код'
 

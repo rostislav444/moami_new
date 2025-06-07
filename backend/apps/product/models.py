@@ -288,6 +288,12 @@ class Variant(models.Model):
         return slugify(unidecode(f'{self.code}'))
 
     @property
+    def get_effective_code(self):
+        if self.product.code:
+            return self.product.code
+        return self.code
+
+    @property
     def get_rozetka_code(self):
         if self.rozetka_code:
             return self.rozetka_code

@@ -1,4 +1,3 @@
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
 from apps.integrations.models import RozetkaCategories
@@ -30,11 +29,11 @@ class RozetkaVariantSizeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_full_id(obj):
-        return ' '.join([obj.variant.code, obj.get_size]).upper()
+        return ' '.join([obj.variant.get_effective_code, obj.get_size]).upper()
 
     @staticmethod
     def get_mk_full_id(obj):
-        return '-'.join([obj.variant.code, obj.get_size]).upper()
+        return '-'.join([obj.variant.get_effective_code, obj.get_size]).upper()
 
 
 class RozetkaVariantImageSerializer(serializers.ModelSerializer):
@@ -48,16 +47,17 @@ class RozetkaVariantSerializer(serializers.ModelSerializer):
     images = RozetkaVariantImageSerializer(many=True)
     color = serializers.CharField(source='color.name')
     color_uk = serializers.SerializerMethodField()
+    code = serializers.SerializerMethodField()
 
     class Meta:
         model = Variant
         fields = ('id', 'code', 'color', 'color_uk', 'sizes', 'images')
 
+    def get_code(self, obj):
+        return obj.get_effective_code
+
     def get_color_uk(self, obj):
-        try:
-            return obj.color.get_translation('name', 'uk')
-        except:
-            return obj.color.get_name
+        return obj.color.get_translation__name__uk or obj.color.name
 
 
 class RozetkaProductAttributesSerializer(serializers.ModelSerializer):
@@ -71,7 +71,7 @@ class RozetkaProductAttributesSerializer(serializers.ModelSerializer):
         fields = ('id', 'attribute_group', 'attribute_group_uk', 'attributes', 'attributes_uk')
 
     def get_attribute_group_uk(self, obj):
-        return getattr(obj.attribute_group, 'get_translation__name__uk')
+        return obj.attribute_group.get_translation__name__uk
 
     @staticmethod
     def get_attributes(obj):

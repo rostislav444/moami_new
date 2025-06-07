@@ -16,11 +16,11 @@ class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_full_id(obj):
-        return ' '.join([obj.variant.code, obj.get_size]).upper()
+        return ' '.join([obj.variant.get_effective_code, obj.get_size]).upper()
 
     @staticmethod
     def get_mk_full_id(obj):
-        return '-'.join([obj.variant.code, obj.get_size]).upper()
+        return '-'.join([obj.variant.get_effective_code, obj.get_size]).upper()
 
     def get_size(self, obj):
         size = obj.get_size
@@ -42,10 +42,14 @@ class ModnaKastaXMLVariantSerializer(serializers.ModelSerializer):
     images = ModnaKastaXMLVariantImageSerializer(many=True)
     color = serializers.CharField(source='color.name')
     color_uk = serializers.SerializerMethodField()
+    code = serializers.SerializerMethodField()
 
     class Meta:
         model = Variant
         fields = ('id', 'code', 'color', 'color_uk', 'sizes', 'images')
+
+    def get_code(self, obj):
+        return obj.get_effective_code
 
     def get_color_uk(self, obj):
         return obj.color.get_translation__name__uk
