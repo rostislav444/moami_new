@@ -291,6 +291,8 @@ class Variant(models.Model):
     def get_effective_code(self):
         if self.product.code:
             return self.product.code
+        if self.color.mk_id:
+            return self.code + '-' + self.color.mk_id
         return self.code
 
     @property

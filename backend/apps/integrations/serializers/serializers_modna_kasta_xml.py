@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from unidecode import unidecode
+from django.utils.text import slugify
 
 from apps.integrations.serializers.serializers_rozetka import RozetkaCategoriesSerializer
 from apps.product.models import Product, Variant, VariantSize, VariantImage, ProductAttribute
@@ -16,7 +18,7 @@ class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_full_id(obj):
-        return ' '.join([obj.variant.get_effective_code, obj.get_size]).upper()
+        return ' '.join([obj.variant.code, obj.get_size]).upper()
 
     @staticmethod
     def get_mk_full_id(obj):
