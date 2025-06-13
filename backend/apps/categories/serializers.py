@@ -23,7 +23,7 @@ class CategorySerializer(serializers.ModelSerializer):
         )
 
     def get_children(self, obj):
-        children_categories = obj.get_children().filter(products__isnull=False).distinct()
+        children_categories = obj.get_children().distinct()
         serializer = CategorySerializer(children_categories, many=True)
         serializer.context.update(self.context)
         return serializer.data

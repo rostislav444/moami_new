@@ -137,3 +137,4 @@ class Translatable(models.Model):
                 except (ObjectDoesNotExist, ValueError):
                     pass
         return super().__getattribute__(name)
+

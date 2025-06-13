@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DOCKER_CONTAINER_NAME="moami_new-db-1"
-BACKUP_FILE_PATH="./backend/backups/db-backup"  # Укажем формат custom
+BACKUP_FILE_PATH="./backups/db-backup"  # Укажем формат custom
 PASSWORD=$(grep "DB_PASSWORD=" backend/.env | cut -d '=' -f2 | tr -d '[:space:]' | tr -d "'")
 USER=$(grep "DB_USER=" backend/.env | cut -d '=' -f2 | tr -d '[:space:]' | tr -d "'")
 DB_NAME=$(grep "DB_NAME=" backend/.env | cut -d '=' -f2 | tr -d '[:space:]' | tr -d "'")
