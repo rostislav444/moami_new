@@ -71,14 +71,12 @@ interface ProductPageProps {
 
 export default function ProductPage({ variant }: ProductPageProps) {
   return (
-    <div className="max-w-7xl mx-auto px-8 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-          <ProductGallery images={variant.images} productName={variant.name} />
-        </div>
-        <div>
-          <ProductDescription variant={variant} />
-        </div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div>
+        <ProductGallery images={variant.images} productName={variant.name} />
+      </div>
+      <div>
+        <ProductDescription variant={variant} />
       </div>
     </div>
   )

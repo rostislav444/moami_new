@@ -28,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body className={`${inter.className} ${playfair.variable} ${crimson.variable}`}>
+      <body className={`${inter.className} ${playfair.variable} ${crimson.variable}`} style={{ backgroundColor: '#fefcf7' }}>
         <QueryProvider>
           {children}
         </QueryProvider>

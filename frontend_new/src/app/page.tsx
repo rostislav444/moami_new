@@ -1,22 +1,31 @@
-import { MinimalCategoriesGrid } from '@/components/home/MinimalCategoriesGrid';
-import { getCategoriesServer } from '@/lib/server-actions';
-import { mockCategories } from '@/store/categories';
+'use client'
 
-export default async function Home() {
-  console.log('🏠 Главная страница: Начинаем загрузку категорий...');
-  
-  // Пытаемся получить данные с реального API
-  const categories = await getCategoriesServer();
-  
-  console.log('📊 Результат API:', {
-    loadedFromAPI: categories.length,
-    fallbackToMock: categories.length === 0,
-    apiUrl: process.env.API_URL || process.env.NEXT_PUBLIC_API_URL
-  });
-  
-  const finalCategories = categories.length > 0 ? categories : mockCategories;
-  
-  console.log('✅ Финальные категории:', finalCategories.length, 'категорий');
+import { Layout } from '@/components/layout/Layout';
+import { CategoriesGrid } from '@/components/home/CategoriesGrid';
+import { useCategories } from '@/hooks/useCategories';
 
-  return <MinimalCategoriesGrid categories={finalCategories} />;
+export default function Home() {
+  const { data: categories = [], isLoading, error } = useCategories();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#fefcf7' }}>
+        <div className="text-2xl font-thin text-amber-900 font-serif">Завантаження...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#fefcf7' }}>
+        <div className="text-2xl font-thin text-red-600 font-serif">Помилка завантаження категорій</div>
+      </div>
+    );
+  }
+
+  return (
+    <Layout categories={categories}>
+      <CategoriesGrid categories={categories} />
+    </Layout>
+  );
 }

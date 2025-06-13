@@ -2,62 +2,96 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { useCategoriesStore } from '@/store/categories';
 import { CategoryState } from '@/types/categories';
+import { SimpleImage } from '@/components/ui/SimpleImage';
 
-export const Header = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [activeCategory, setActiveCategory] = useState<number | null>(null);
-    const categories = useCategoriesStore((state) => state.categories);
+interface HeaderProps {
+    categories: CategoryState[];
+}
+
+export function Header({ categories }: HeaderProps) {
+    const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
+    const [dropdownPosition, setDropdownPosition] = useState<{ [key: number]: 'left' | 'right' }>({});
+
+    const handleMouseEnter = (categoryId: number, event: React.MouseEvent<HTMLDivElement>) => {
+        setHoveredCategory(categoryId);
+        
+        const rect = event.currentTarget.getBoundingClientRect();
+        const dropdownWidth = 320;
+        const viewportWidth = window.innerWidth;
+        const spaceOnRight = viewportWidth - rect.right;
+        
+        const position = spaceOnRight < dropdownWidth ? 'right' : 'left';
+        
+        setDropdownPosition(prev => ({
+            ...prev,
+            [categoryId]: position
+        }));
+    };
+
+    const handleMouseLeave = () => {
+        setHoveredCategory(null);
+    };
 
     return (
-        <header className="bg-white shadow-md">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center py-4">
-                    <Link href="/" className="text-2xl font-bold text-gray-900">
+        <header className="border-b border-amber-100/50 bg-white/90 backdrop-blur-sm">
+            <div className="max-w-7xl mx-auto px-8 py-8">
+                <div className="flex items-center justify-between">
+                    <Link href="/" className="text-4xl font-thin tracking-wide text-amber-900 font-serif" style={{ letterSpacing: '0.05em' }}>
                         Moami
                     </Link>
-
-                    <nav className="hidden md:flex space-x-8">
+                    <nav className="hidden md:flex items-center space-x-16">
                         {categories.map((category) => (
-                            <div
+                            <div 
                                 key={category.id}
-                                className="relative group"
-                                onMouseEnter={() => setActiveCategory(category.id)}
-                                onMouseLeave={() => setActiveCategory(null)}
+                                className="relative"
+                                onMouseEnter={(e) => handleMouseEnter(category.id, e)}
+                                onMouseLeave={handleMouseLeave}
                             >
-                                <Link
-                                    href={`/${category.slug}`}
-                                    className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
+                                <Link 
+                                    href={`/catalogue/${category.slug}`}
+                                    className="text-sm font-light tracking-wide text-amber-800/70 hover:text-amber-900 transition-all duration-500 font-serif"
+                                    style={{ letterSpacing: '0.05em' }}
                                 >
                                     {category.name}
                                 </Link>
-
-                                {category.children.length > 0 && (
-                                    <div
-                                        className={`absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50 ${
-                                            activeCategory === category.id ? 'block' : 'hidden'
+                                
+                                {hoveredCategory === category.id && category.children.length > 0 && (
+                                    <div 
+                                        className={`absolute top-full mt-2 bg-white border border-gray-200 shadow-xl min-w-80 z-[9999] ${
+                                            dropdownPosition[category.id] === 'right' ? 'right-0' : 'left-0'
                                         }`}
+                                        style={{ borderRadius: '8px' }}
                                     >
-                                        <div className="py-2">
-                                            {category.children.map((child) => (
+                                        <div className="py-3">
+                                            {category.children.slice(0, 8).map((subcategory) => (
                                                 <Link
-                                                    key={child.id}
-                                                    href={`/${category.slug}/${child.slug}`}
-                                                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                                                    key={subcategory.id}
+                                                    href={`/catalogue/${category.slug}/${subcategory.slug}`}
+                                                    className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors duration-200"
                                                 >
-                                                    {child.image && (
-                                                        <img
-                                                            src={child.image}
-                                                            alt={child.name}
-                                                            className="w-8 h-8 rounded object-cover mr-3"
-                                                        />
-                                                    )}
-                                                    <div>
-                                                        <div className="font-medium">{child.name}</div>
-                                                        <div className="text-xs text-gray-500">
-                                                            {child.products_count} товаров
-                                                        </div>
+                                                    <div className="relative block overflow-hidden flex-shrink-0 mr-3 bg-gray-100" style={{ borderRadius: '6px', width: '48px', height: '48px' }}>
+                                                        {subcategory.image ? (
+                                                            <SimpleImage
+                                                                src={subcategory.image}
+                                                                alt={subcategory.name}
+                                                                className="absolute top-0 left-0 w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                                                <span className="text-gray-400 text-sm font-medium">
+                                                                    {subcategory.name.charAt(0)}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <h4 className="text-sm font-medium text-gray-900 mb-1">
+                                                            {subcategory.name}
+                                                        </h4>
+                                                        <p className="text-xs text-gray-500">
+                                                            {subcategory.products_count} товарів
+                                                        </p>
                                                     </div>
                                                 </Link>
                                             ))}
@@ -67,47 +101,8 @@ export const Header = () => {
                             </div>
                         ))}
                     </nav>
-
-                    <button
-                        className="md:hidden p-2"
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
                 </div>
-
-                {isMenuOpen && (
-                    <div className="md:hidden border-t border-gray-200">
-                        {categories.map((category) => (
-                            <div key={category.id} className="py-2">
-                                <Link
-                                    href={`/${category.slug}`}
-                                    className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    {category.name}
-                                </Link>
-                                {category.children.length > 0 && (
-                                    <div className="ml-4 border-l-2 border-gray-100 pl-4">
-                                        {category.children.map((child) => (
-                                            <Link
-                                                key={child.id}
-                                                href={`/${category.slug}/${child.slug}`}
-                                                className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                                                onClick={() => setIsMenuOpen(false)}
-                                            >
-                                                {child.name}
-                                            </Link>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                )}
             </div>
         </header>
     );
-}; 
+} 

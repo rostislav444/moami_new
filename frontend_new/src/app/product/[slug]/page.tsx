@@ -1,6 +1,9 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import ProductPage from '@/components/product/ProductPage'
+import { Layout } from '@/components/layout/Layout'
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
+import { CategoryState } from '@/types/categories'
 
 interface PageProps {
   params: Promise<{
@@ -81,6 +84,18 @@ async function getProduct(slug: string): Promise<ProductVariant | null> {
   return res.json()
 }
 
+async function getCategories(): Promise<CategoryState[]> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/categories/`, {
+    next: { revalidate: 3600 }
+  })
+  
+  if (!res.ok) {
+    return []
+  }
+  
+  return res.json()
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params
   const product = await getProduct(resolvedParams.slug)
@@ -104,11 +119,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductPageRoute({ params }: PageProps) {
   const resolvedParams = await params
-  const product = await getProduct(resolvedParams.slug)
+  
+  const [product, categories] = await Promise.all([
+    getProduct(resolvedParams.slug),
+    getCategories()
+  ])
   
   if (!product) {
     notFound()
   }
   
-  return <ProductPage variant={product} />
+  const breadcrumbs = [
+    { label: 'Каталог', href: '/catalogue' },
+    { label: product.name }
+  ]
+  
+  return (
+    <Layout categories={categories}>
+      <div className="py-8">
+        <Breadcrumbs items={breadcrumbs} />
+        <ProductPage variant={product} />
+      </div>
+    </Layout>
+  )
 } 

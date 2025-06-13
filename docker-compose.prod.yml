@@ -36,9 +36,9 @@ services:
       - nginx_net
 
   frontend:
-    container_name: frontend
+    container_name: frontend_new
     build:
-      context: ./frontend
+      context: ./frontend_new
       dockerfile: Dockerfile.prod
     ports:
       - 3000:3000
@@ -46,8 +46,6 @@ services:
       - nginx_net
     depends_on:
       - web
-
-
 
 volumes:
   postgres_data:
