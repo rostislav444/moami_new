@@ -91,32 +91,8 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
 
 
 export const getStaticPaths = async () => {
-    const categoriesListUrl = baseUrl + '/category/categories/'
-    const response = await fetch(categoriesListUrl)
-    const categories: CategoryState[] = await response.json()
-
-    const generateCategoriesPaths = (categories: CategoryState[], parentPath: string = ''): Array<string> => {
-        let paths: Array<string> = [];
-        categories.forEach(category => {
-            const pages = Math.ceil(category.products_count / perPage)
-
-            let newPath;
-            for (let i = 0; i < pages; i++) {
-                if (i === 0) {
-                    newPath = category.slug;
-                } else {
-                    newPath = `${category.slug}/page/${i + 1}`;
-                }
-                paths.push(newPath);
-            }
-        });
-        return paths;
-    }
-
-    const paths = generateCategoriesPaths(categories)
-
     return {
-        paths: paths.map(path => ({params: {params: path.split('/')}})),
+        paths: [],
         fallback: 'blocking'
     }
 }

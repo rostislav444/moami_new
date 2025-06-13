@@ -1,4 +1,3 @@
-import dynamic from "next/dynamic";
 import {useAppSelector} from "@/state/hooks";
 import {selectCart, updateItemInCart} from "@/state/reducers/cart";
 import {useEffect} from "react";
@@ -8,9 +7,6 @@ import {useRouter} from "next/navigation";
 import {useIsMobile} from "@/components/Shared/Header/hooks";
 import {CartMobile} from "@/components/App/Cart/CartMobile";
 import {CartPC} from "@/components/App/Cart/CartPC";
-
-const CartMobileDynamic = dynamic(() => Promise.resolve(CartMobile), {ssr: false})
-const CartPCDynamic = dynamic(() => Promise.resolve(CartPC), {ssr: false})
 
 
 export const CartPage = () => {
@@ -47,5 +43,5 @@ export const CartPage = () => {
 
     const isMobile = useIsMobile();
 
-    return isMobile ? <CartMobileDynamic {...props} /> : <CartPCDynamic {...props} />
+    return isMobile ? <CartMobile {...props} /> : <CartPC {...props} />
 }

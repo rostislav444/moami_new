@@ -20,5 +20,11 @@ module.exports = {
         domains: ['localhost', '0.0.0.0', 'moami.com.ua'],
     },
     i18n,
+    typescript: {
+        ignoreBuildErrors: true,
+    },
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
 };
 

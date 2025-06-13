@@ -57,11 +57,8 @@ export const getStaticProps: GetStaticProps = async ({params, locale}) => {
 
 
 export const getStaticPaths = async () => {
-    const api = fetchWithLocale();
-    const response = await api.get('/pages/pages/');
-
     return {
-        paths: response.data.map((data: { slug: string }) => ({params: {slug: data.slug}})),
+        paths: [],
         fallback: 'blocking'
     };
 };

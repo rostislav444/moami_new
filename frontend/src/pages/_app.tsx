@@ -99,17 +99,6 @@ MyApp.getInitialProps = async (context: AppContext) => {
 
     const _reduxStore = initializeStore(ctx.pageProps.initialReduxState || {});
 
-    // only fetch initial data when the store is first created (on server side or client side first load)
-    if (typeof window === 'undefined' || !ctx.pageProps.initialReduxState) {
-        const {dispatch} = _reduxStore;
-        const {categories, collections, sizeGrids, pages} = await fetchInitialData(locale || 'uk');
-
-        dispatch(setCategories(categories));
-        dispatch(setCollections(collections));
-        dispatch(setSizeGrids(sizeGrids));
-        dispatch(setPages(pages));
-    }
-
     return {
         ...ctx,
         initialReduxState: _reduxStore.getState(),
