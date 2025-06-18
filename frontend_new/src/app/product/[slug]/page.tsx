@@ -139,7 +139,7 @@ export default async function ProductPageRoute({ params }: PageProps) {
 
   const serverBreadcrumbs = product.product.breadcrumbs.slice(0, 2).map(breadcrumb => ({
     label: breadcrumb.title,
-    href: breadcrumb.link
+    href: `/catalogue${breadcrumb.link}`
   }));
   
   const breadcrumbs = [

@@ -27,7 +27,7 @@ export function HeaderClient({ categories }: HeaderClientProps) {
                     {categories.map((category) => (
                         <div key={category.id} className="py-2">
                             <Link
-                                href={`/${category.slug}`}
+                                href={`/catalogue/${category.slug}`}
                                 className="block px-4 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                                 onClick={() => setIsMenuOpen(false)}
                             >
@@ -38,7 +38,7 @@ export function HeaderClient({ categories }: HeaderClientProps) {
                                     {category.children.map((child) => (
                                         <Link
                                             key={child.id}
-                                            href={`/${category.slug}/${child.slug}`}
+                                            href={`/catalogue/${category.slug}/${child.slug}`}
                                             className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                                             onClick={() => setIsMenuOpen(false)}
                                         >

@@ -30,7 +30,7 @@ export const Categories = () => {
             {categories.map((category) => (
                 <section key={category.id} className="mb-16">
                     <div className="mb-8">
-                        <Link href={`/${category.slug}`}>
+                        <Link href={`/catalogue/${category.slug}`}>
                             <h2 className="text-3xl font-bold text-gray-900 hover:text-gray-700 transition-colors cursor-pointer">
                                 {category.name}
                             </h2>
@@ -42,7 +42,7 @@ export const Categories = () => {
                         {category.children.map((child) => (
                             <Link
                                 key={child.id}
-                                href={`/${category.slug}/${child.slug}`}
+                                href={`/catalogue/${category.slug}/${child.slug}`}
                                 className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
                             >
                                 <div className="aspect-w-16 aspect-h-9 relative h-64">

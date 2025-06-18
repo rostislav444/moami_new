@@ -20,7 +20,7 @@ export function HeaderServer({ categories }: HeaderServerProps) {
                         {categories.map((category) => (
                             <div key={category.id} className="relative group">
                                 <Link
-                                    href={`/${category.slug}`}
+                                    href={`/catalogue/${category.slug}`}
                                     className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
                                 >
                                     {category.name}
@@ -31,7 +31,7 @@ export function HeaderServer({ categories }: HeaderServerProps) {
                                             {category.children.map((child) => (
                                                 <Link
                                                     key={child.id}
-                                                    href={`/${category.slug}/${child.slug}`}
+                                                    href={`/catalogue/${category.slug}/${child.slug}`}
                                                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                                                 >
                                                     <SafeImage
