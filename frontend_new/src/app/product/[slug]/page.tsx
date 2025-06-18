@@ -4,6 +4,7 @@ import ProductPage from '@/components/product/ProductPage'
 import { Layout } from '@/components/layout/Layout'
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
 import { CategoryState } from '@/types/categories'
+import { ProductViewTracker } from '@/components/product/ProductViewTracker'
 
 interface PageProps {
   params: Promise<{
@@ -27,6 +28,10 @@ interface ProductVariant {
     properties: Array<{
       key: string
       value: string
+    }>
+    breadcrumbs: Array<{
+      title: string
+      link: string
     }>
     variants: Array<{
       id: number
@@ -124,18 +129,27 @@ export default async function ProductPageRoute({ params }: PageProps) {
     getProduct(resolvedParams.slug),
     getCategories()
   ])
+
+  console.log(product)
+  console.log(categories)
   
   if (!product) {
     notFound()
   }
+
+  const serverBreadcrumbs = product.product.breadcrumbs.slice(0, 2).map(breadcrumb => ({
+    label: breadcrumb.title,
+    href: breadcrumb.link
+  }));
   
   const breadcrumbs = [
-    { label: 'Каталог', href: '/catalogue' },
-    { label: product.name }
+    ...serverBreadcrumbs,
+    { label: product.product.name }
   ]
   
   return (
     <Layout categories={categories}>
+      <ProductViewTracker variant={product} />
       <div className="py-8">
         <Breadcrumbs items={breadcrumbs} />
         <ProductPage variant={product} />

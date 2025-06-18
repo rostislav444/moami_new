@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { CategoryState, CollectionState } from '@/types/categories';
+import { PageListItem, PageData } from '@/types/pages';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://moami.com.ua';
 
@@ -52,4 +53,28 @@ export const productsApi = {
         const response = await api.get(`/products/${id}`);
         return response.data;
     },
-}; 
+};
+
+export async function getPagesServer(): Promise<PageListItem[]> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pages/pages/`, {
+    next: { revalidate: 86400 }
+  })
+
+  if (!res.ok) {
+    return []
+  }
+
+  return res.json()
+}
+
+export async function getPageServer(slug: string): Promise<PageData | null> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pages/pages/${slug}/`, {
+    next: { revalidate: 86400 }
+  })
+
+  if (!res.ok) {
+    return null
+  }
+
+  return res.json()
+} 

@@ -1,30 +1,16 @@
-'use client'
-
 import { Layout } from '@/components/layout/Layout';
 import { CategoriesGrid } from '@/components/home/CategoriesGrid';
-import { useCategories } from '@/hooks/useCategories';
+import { getCategoriesServer } from '@/lib/server-actions';
+import { getPagesServer } from '@/lib/api';
 
-export default function Home() {
-  const { data: categories = [], isLoading, error } = useCategories();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#fefcf7' }}>
-        <div className="text-2xl font-thin text-amber-900 font-serif">Завантаження...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#fefcf7' }}>
-        <div className="text-2xl font-thin text-red-600 font-serif">Помилка завантаження категорій</div>
-      </div>
-    );
-  }
+export default async function Home() {
+  const [categories, pages] = await Promise.all([
+    getCategoriesServer(),
+    getPagesServer()
+  ]);
 
   return (
-    <Layout categories={categories}>
+    <Layout categories={categories} pages={pages}>
       <CategoriesGrid categories={categories} />
     </Layout>
   );

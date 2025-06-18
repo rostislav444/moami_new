@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useCartStore } from '@/store/cart'
+import { event as fbEvent } from '@/lib/FacebookPixel'
+import { event as gaEvent } from '@/components/analytics/GoogleAnalytics'
 
 interface ProductVariant {
   id: number
@@ -72,6 +75,7 @@ interface ProductDescriptionProps {
 export default function ProductDescription({ variant }: ProductDescriptionProps) {
   const [selectedSize, setSelectedSize] = useState<number | null>(null)
   const [sizeError, setSizeError] = useState(false)
+  const { addItem } = useCartStore()
   
   const handleSizeSelect = (sizeId: number) => {
     setSelectedSize(sizeId)
@@ -84,7 +88,41 @@ export default function ProductDescription({ variant }: ProductDescriptionProps)
       return
     }
     
-    console.log('Додано до кошика:', { variantId: variant.id, sizeId: selectedSize })
+    const selectedSizeData = variant.sizes.find(size => size.id === selectedSize)
+    if (!selectedSizeData) return
+    
+    const cartItem = {
+      id: selectedSize,
+      stock: selectedSizeData.stock,
+      image: variant.images[0]?.image || '',
+      size: selectedSizeData.size,
+      name: variant.name,
+      slug: variant.slug,
+      price: variant.product.price,
+      old_price: variant.product.old_price,
+      selectedGrid: 'ua',
+      variantId: variant.id,
+      sizeId: selectedSize,
+    }
+    
+    // Facebook Pixel event
+    fbEvent('AddToCart', {
+      content_name: variant.name,
+      content_ids: [variant.id.toString()],
+      content_type: 'product',
+      value: variant.product.price,
+      currency: 'UAH'
+    })
+    
+    // Google Analytics event
+    gaEvent({
+      action: 'add_to_cart',
+      category: 'ecommerce',
+      label: variant.name,
+      value: variant.product.price
+    })
+    
+    addItem(cartItem)
   }
   
   return (
@@ -176,32 +214,32 @@ export default function ProductDescription({ variant }: ProductDescriptionProps)
       )}
       
       {variant.sizes.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-light text-amber-900 font-serif">
+        <div className="space-y-4">
+          <h3 className="text-base font-light text-amber-900 font-serif tracking-wide" style={{ letterSpacing: '0.05em' }}>
             Розміри
           </h3>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="flex flex-wrap gap-3">
             {variant.sizes.map((size) => (
               <button
                 key={size.id}
                 onClick={() => size.stock > 0 && handleSizeSelect(size.id)}
                 disabled={size.stock === 0}
-                className={`py-2 px-2 text-center border transition-all duration-300 ${
+                className={`inline-flex flex-col items-center justify-center w-16 h-16 border transition-all duration-500 font-serif ${
                   size.stock === 0
-                    ? 'border-amber-200/40 text-amber-400/50 cursor-not-allowed'
+                    ? 'border-amber-200/30 text-amber-400/40 cursor-not-allowed bg-amber-50/20'
                     : selectedSize === size.id
-                    ? 'border-amber-800 bg-amber-800/10 text-amber-900'
-                    : 'border-amber-300/40 text-amber-900/70 hover:border-amber-600'
+                    ? 'border-amber-800 bg-amber-900 text-white shadow-sm'
+                    : 'border-amber-600/40 text-amber-900 hover:border-amber-800 hover:bg-amber-50/30 bg-white/50'
                 }`}
                 style={{ borderRadius: '2px' }}
               >
-                <div className="text-sm font-light">{size.size.ua}</div>
-                <div className="text-xs text-amber-700/50">{size.size.int}</div>
+                <span className="text-base font-light tracking-wide">{size.size.ua}</span>
+                <span className="text-xs font-light opacity-70">{size.size.int}</span>
               </button>
             ))}
           </div>
           {sizeError && (
-            <p className="text-amber-800/60 text-xs font-light">
+            <p className="text-amber-900/70 text-sm font-light font-serif tracking-wide" style={{ letterSpacing: '0.05em' }}>
               Будь ласка, оберіть розмір
             </p>
           )}

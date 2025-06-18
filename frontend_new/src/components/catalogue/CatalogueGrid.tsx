@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { CategoryState } from '@/types/categories'
 
 interface ProductVariant {
   id: number
@@ -38,6 +39,8 @@ interface CatalogueGridProps {
   currentPage: number
   pageSize: number
   categoryPath: string
+  categories?: CategoryState[]
+  currentCategory?: CategoryState
 }
 
 export default function CatalogueGrid({ 
@@ -45,7 +48,9 @@ export default function CatalogueGrid({
   totalCount, 
   currentPage, 
   pageSize, 
-  categoryPath 
+  categoryPath,
+  categories = [],
+  currentCategory
 }: CatalogueGridProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -65,16 +70,67 @@ export default function CatalogueGrid({
     params.delete('page')
     router.push(`/${categoryPath}?${params.toString()}`)
   }
+
+  const getSubcategories = () => {
+    if (!currentCategory || !currentCategory.children || currentCategory.children.length === 0) {
+      return []
+    }
+
+    return currentCategory.children.filter(child => child.children.length === 0 || child.children.length > 0)
+  }
+
+  const subcategories = getSubcategories()
   
   return (
     <div>
+      {subcategories.length > 0 && (
+        <div className="mb-12">
+          <h2 className="text-2xl font-light text-amber-900 mb-6 font-serif tracking-wide" style={{ letterSpacing: '0.05em' }}>
+            Категорії
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {subcategories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/${categoryPath}/${category.slug}`}
+                className="group block relative overflow-hidden rounded transition-all duration-300 hover:shadow-md"
+              >
+                <div className="relative aspect-square bg-gradient-to-br from-amber-50 to-amber-100">
+                  {category.image && (
+                    <Image
+                      src={category.image}
+                      alt={category.name}
+                      fill
+                      className="object-cover opacity-90 group-hover:opacity-70 transition-opacity duration-300"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-amber-900/50 via-amber-800/10 to-transparent"></div>
+                  <div className="absolute inset-0 flex flex-col justify-end p-4">
+                    <h3 className="text-sm font-medium text-white group-hover:text-amber-900 transition-colors duration-300 leading-tight font-serif mb-1"
+                        style={{ letterSpacing: '0.02em'}}>
+                      {category.name}
+                    </h3>
+                    {category.products_count > 0 && (
+                      <p className="text-xs text-stone-300 font-light">
+                        {category.products_count} товарів
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-4">
-          <span className="text-sm text-amber-700">Показати:</span>
+          <span className="text-base text-amber-900 font-light font-serif tracking-wide" style={{ letterSpacing: '0.05em' }}>Показати:</span>
           <select 
             value={pageSize}
             onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-            className="border border-amber-200 rounded px-3 py-1 text-sm bg-white text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-300"
+            className="border border-amber-300 rounded px-3 py-2 text-base bg-white text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 font-light font-serif"
           >
             <option value={24}>24</option>
             <option value={48}>48</option>
@@ -92,7 +148,7 @@ export default function CatalogueGrid({
             onMouseEnter={() => setHoveredProduct(variant.id)}
             onMouseLeave={() => setHoveredProduct(null)}
           >
-            <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-amber-50 rounded-lg">
+            <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-amber-50 rounded-sm">
               {variant.images.length > 0 && (
                 <Image
                   src={variant.images[0].image}
@@ -114,26 +170,20 @@ export default function CatalogueGrid({
                   sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
               )}
-              
-              {variant.product.old_price && (
-                <div className="absolute top-3 left-3 bg-amber-800 text-white text-xs px-2 py-1 rounded">
-                  ЗНИЖКА
-                </div>
-              )}
             </div>
             
-            <div className="space-y-2">
-              <h3 className="text-sm font-light text-amber-900 line-clamp-2 group-hover:text-amber-700 transition-colors duration-300"
+            <div>
+              <h3 className="text-base font-light text-amber-900 line-clamp-2 group-hover:text-amber-700 transition-colors duration-300 leading-relaxed mb-2"
                   style={{ fontFamily: 'Crimson Text, serif' }}>
                 {variant.product.name}
               </h3>
               
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-light text-amber-900">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-lg font-medium text-amber-900">
                   {variant.product.price} ₴
                 </span>
                 {variant.product.old_price && (
-                  <span className="text-sm text-amber-600 line-through">
+                  <span className="text-base text-amber-600 line-through font-light">
                     {variant.product.old_price} ₴
                   </span>
                 )}
@@ -143,7 +193,7 @@ export default function CatalogueGrid({
                 {variant.sizes.filter(size => size.stock > 0).map((size) => (
                   <span 
                     key={size.id}
-                    className="text-xs px-2 py-1 bg-amber-100 text-amber-800 rounded"
+                    className="text-sm px-2 py-1 bg-amber-100 text-amber-800 rounded font-light"
                   >
                     {size.size.ua}
                   </span>
@@ -155,16 +205,17 @@ export default function CatalogueGrid({
       </div>
       
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2">
+        <div className="flex justify-center items-center gap-8 mt-8 py-12">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage <= 1}
-            className="px-4 py-2 text-sm border border-amber-200 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-50 transition-colors duration-300"
+            className="text-base text-amber-800/70 hover:text-amber-900 disabled:text-amber-400 disabled:cursor-not-allowed transition-all duration-500 font-light tracking-wide font-serif"
+            style={{ letterSpacing: '0.05em' }}
           >
-            Попередня
+            ← Попередня
           </button>
           
-          <div className="flex gap-1">
+          <div className="flex gap-6">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNum
               if (totalPages <= 5) {
@@ -181,11 +232,12 @@ export default function CatalogueGrid({
                 <button
                   key={pageNum}
                   onClick={() => handlePageChange(pageNum)}
-                  className={`px-3 py-2 text-sm rounded transition-colors duration-300 ${
+                  className={`text-base transition-all duration-500 font-light tracking-wide font-serif ${
                     currentPage === pageNum
-                      ? 'bg-amber-800 text-white'
-                      : 'border border-amber-200 hover:bg-amber-50'
+                      ? 'text-amber-900 border-b-2 border-amber-900 pb-1'
+                      : 'text-amber-700/60 hover:text-amber-900 hover:border-b border-amber-300 pb-1'
                   }`}
+                  style={{ letterSpacing: '0.05em' }}
                 >
                   {pageNum}
                 </button>
@@ -196,9 +248,10 @@ export default function CatalogueGrid({
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage >= totalPages}
-            className="px-4 py-2 text-sm border border-amber-200 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-50 transition-colors duration-300"
+            className="text-base text-amber-800/70 hover:text-amber-900 disabled:text-amber-400 disabled:cursor-not-allowed transition-all duration-500 font-light tracking-wide font-serif"
+            style={{ letterSpacing: '0.05em' }}
           >
-            Наступна
+            Наступна →
           </button>
         </div>
       )}

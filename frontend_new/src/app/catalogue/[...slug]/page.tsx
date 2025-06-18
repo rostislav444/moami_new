@@ -94,6 +94,19 @@ function createBreadcrumbs(slugs: string[], categories: CategoryState[]) {
   return breadcrumbs
 }
 
+function findCurrentCategory(slugs: string[], categories: CategoryState[]): CategoryState | undefined {
+  let currentCategories = categories
+  let currentCategory: CategoryState | undefined
+  
+  for (const slug of slugs) {
+    currentCategory = currentCategories.find(cat => cat.slug === slug)
+    if (!currentCategory) break
+    currentCategories = currentCategory.children
+  }
+  
+  return currentCategory
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params
   const categoryPath = resolvedParams.slug.join('/')
@@ -122,6 +135,7 @@ export default async function CataloguePage({ params, searchParams }: PageProps)
   }
   
   const breadcrumbs = createBreadcrumbs(resolvedParams.slug, categories)
+  const currentCategory = findCurrentCategory(resolvedParams.slug, categories)
   
   return (
     <Layout categories={categories}>
@@ -133,6 +147,8 @@ export default async function CataloguePage({ params, searchParams }: PageProps)
           currentPage={currentPage}
           pageSize={pageSize}
           categoryPath={`catalogue/${resolvedParams.slug.join('/')}`}
+          categories={categories}
+          currentCategory={currentCategory}
         />
       </div>
     </Layout>
