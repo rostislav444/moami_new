@@ -16,7 +16,8 @@ class FeedVariantSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request:
             return [request.build_absolute_uri(image.image.url) for image in obj.images.all()]
-        return [image.image.url for image in obj.images.all()]
+        base_url = 'https://moami.com.ua'
+        return [base_url + image.image.url for image in obj.images.all()]
 
 
 __all__ = [

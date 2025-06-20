@@ -6,9 +6,9 @@
         <g:link>https://moami.com.ua/p-{{ variant.slug }}</g:link>
         {% for image in variant.images %}
             {% if forloop.counter == 1 %}
-                <g:image_link>{{ image }}</g:image_link>
+                <g:image_link>{% if 'https://' not in image %}https://moami.com.ua{% endif %}{{ image }}</g:image_link>
             {% else %}
-                <g:additional_image_link>{{ image }}</g:additional_image_link>
+                <g:additional_image_link>{% if 'https://' not in image %}https://moami.com.ua{% endif %}{{ image }}</g:additional_image_link>
             {% endif %}
         {% endfor %}
         <g:condition>new</g:condition>
