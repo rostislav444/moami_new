@@ -9,14 +9,14 @@ from django.template.loader import get_template
 from django.utils import translation
 
 from apps.integrations.models import RozetkaCategories
-from apps.integrations.serializers import RozetkaCategoriesSerializer
+from apps.integrations.serializers import RozetkaCategoriesSerializer, GoogleProductSerializer
 from apps.integrations.serializers.serializers_modna_kasta_xml import ModnaKastaXMLProductSerializer
 from apps.product.models import Product, ProductAttribute
 from project import settings
 
 feed_directory = os.path.join(settings.MEDIA_ROOT, 'feed')
 
-feed_types = ['rozetka', 'epicentr', 'leboutique', 'modna_kasta']
+feed_types = ['rozetka', 'epicentr', 'leboutique', 'modna_kasta', 'google']
 
 
 def generate_feed(feed_type):
@@ -44,6 +44,8 @@ def generate_feed(feed_type):
 
     def render_categories_xml():
         def get_categories_data():
+            if feed_type == 'google':
+                return []
             categories = RozetkaCategories.objects.all().distinct()
             categories_serializer = RozetkaCategoriesSerializer(categories, many=True)
             return categories_serializer.data
@@ -79,10 +81,15 @@ def generate_feed(feed_type):
                 'variants__color__translations',
                 'compositions__composition',
                 Prefetch('attributes', queryset=product_attributes),
-            ).filter(
-                rozetka_category__isnull=False,
-                category__modna_kast_category__isnull=False
-            ).exclude(variants__isnull=True).distinct()
+            )
+
+            if feed_type == 'google':
+                qs = qs.filter(category__google_taxonomy__isnull=False).exclude(variants__isnull=True).distinct()
+            else:
+                qs = qs.filter(
+                    rozetka_category__isnull=False,
+                    category__modna_kast_category__isnull=False
+                ).exclude(variants__isnull=True).distinct()
 
             if feed_type == 'modna_kasta':
                 qs = qs.exclude(brand__name__in=['Hasla', 'Tianqi&tianqi', 'Black Gold', 'PRL Jeans.CO']).exclude(
@@ -93,7 +100,10 @@ def generate_feed(feed_type):
 
         def get_products_data_generator(products):
             for product in products.iterator():
-                yield ModnaKastaXMLProductSerializer(product).data
+                if feed_type == 'google':
+                    yield GoogleProductSerializer(product).data
+                else:
+                    yield ModnaKastaXMLProductSerializer(product).data
 
         def render_product(product):
             template = get_template(paths['product_tpl'])
