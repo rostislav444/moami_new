@@ -5,14 +5,18 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from apps.order.models import Order
-from apps.order.serializers import OrderSerializer
+from apps.order.serializers import OrderSerializer, OrderSimpleSerializer
 from apps.product.models import VariantSize
 
 
 class OrderViewSet(viewsets.ModelViewSet, CreateModelMixin, GenericViewSet):
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer
     authentication_classes = []
+    
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return OrderSimpleSerializer
+        return OrderSerializer
 
 
 class CheckSizesAvailability(APIView):

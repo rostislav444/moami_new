@@ -40,8 +40,14 @@ services:
     build:
       context: ./frontend_new
       dockerfile: Dockerfile.prod
+      args:
+        - NEXT_PUBLIC_API_URL=https://moami.com.ua
+        - NEXT_PUBLIC_SITE_URL=https://moami.com.ua
     ports:
       - 3000:3000
+    environment:
+      - NEXT_PUBLIC_API_URL=https://moami.com.ua
+      - NEXT_PUBLIC_SITE_URL=https://moami.com.ua
     networks:
       - nginx_net
     depends_on:

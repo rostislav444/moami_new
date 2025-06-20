@@ -17,7 +17,7 @@ class Order(models.Model):
                              blank=True, null=True)
     first_name = models.CharField(max_length=100, verbose_name='Имя')
     last_name = models.CharField(max_length=100, verbose_name='Фамилия')
-    father_name = models.CharField(max_length=100, verbose_name='Отчество')
+    father_name = models.CharField(max_length=100, verbose_name='Отчество', blank=True, null=True)
     phone = models.CharField(max_length=20, verbose_name='Телефон')
     email = models.EmailField(max_length=100, verbose_name='Email', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
@@ -140,8 +140,11 @@ class OrderDeliveryNewPost(models.Model):
                                     related_name='newpost')
     area = models.ForeignKey(NewPostAreas, on_delete=models.CASCADE, verbose_name='Область', blank=True, null=True)
     region = models.ForeignKey(NewPostRegion, on_delete=models.CASCADE, verbose_name='Регион', blank=True, null=True)
-    city = models.ForeignKey(NewPostCities, on_delete=models.CASCADE, default='Киев', verbose_name='Город')
-    department = models.ForeignKey(NewPostDepartments, on_delete=models.CASCADE, verbose_name='Отделение')
+    city = models.ForeignKey(NewPostCities, on_delete=models.CASCADE, verbose_name='Город', blank=True, null=True)
+    department = models.ForeignKey(NewPostDepartments, on_delete=models.CASCADE, verbose_name='Отделение', blank=True, null=True)
+    
+    city_text = models.CharField(max_length=255, verbose_name='Город (текст)', blank=True, null=True)
+    warehouse_text = models.CharField(max_length=255, verbose_name='Склад (текст)', blank=True, null=True)
 
     def __str__(self):
         return f'Адрес доставки заказа №{self.delivery.order.id}'
