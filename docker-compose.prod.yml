@@ -46,6 +46,7 @@ services:
     ports:
       - 3000:3000
     environment:
+      - API_URL=http://web:8000
       - NEXT_PUBLIC_API_URL=https://moami.com.ua
       - NEXT_PUBLIC_SITE_URL=https://moami.com.ua
     networks:

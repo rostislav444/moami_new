@@ -28,6 +28,10 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Runtime environment variables
+ENV NEXT_PUBLIC_API_URL=https://moami.com.ua
+ENV NEXT_PUBLIC_SITE_URL=https://moami.com.ua
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 

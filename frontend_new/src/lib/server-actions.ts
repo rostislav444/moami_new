@@ -1,7 +1,8 @@
 import { CategoryState, CollectionState } from '@/types/categories';
 
 export async function getCategoriesServer(): Promise<CategoryState[]> {
-    const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
+    // Для server-side запросов используем внутренний URL контейнера
+    const API_URL = process.env.API_URL || 'http://web:8000';
     
     console.log('🌐 getCategoriesServer - API_URL:', API_URL);
     
@@ -47,7 +48,8 @@ export async function getCategoriesServer(): Promise<CategoryState[]> {
 }
 
 export async function getCollectionsServer(): Promise<CollectionState[]> {
-    const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
+    // Для server-side запросов используем внутренний URL контейнера
+    const API_URL = process.env.API_URL || 'http://web:8000';
     
     if (!API_URL) {
         console.warn('API_URL не настроен, возвращаем пустой массив');
@@ -77,7 +79,8 @@ export async function getCollectionsServer(): Promise<CollectionState[]> {
 }
 
 export async function getCategoryByIdServer(id: number): Promise<CategoryState | null> {
-    const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
+    // Для server-side запросов используем внутренний URL контейнера
+    const API_URL = process.env.API_URL || 'http://web:8000';
     
     if (!API_URL) {
         return null;
