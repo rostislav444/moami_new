@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { ImageWithFallback } from '@/components/ui/ImageWithFallback'
 
 interface ProductImage {
   image: string
@@ -37,8 +38,8 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative w-full h-96 bg-gray-100 overflow-hidden">
-        <img
+      <div className="relative w-full aspect-[4/5] bg-gray-100 overflow-hidden rounded-lg">
+        <ImageWithFallback
           src={images[selectedImageIndex].image}
           alt={`${productName} - изображение ${selectedImageIndex + 1}`}
           className="w-full h-full object-cover"
@@ -71,18 +72,18 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
 
       {/* Thumbnails */}
       {images.length > 1 && (
-        <div className="flex space-x-2 overflow-x-auto">
+        <div className="flex space-x-3 overflow-x-auto">
           {images.slice(0, 4).map((image, index) => (
             <button
               key={index}
               onClick={() => setSelectedImageIndex(index)}
-              className={`flex-shrink-0 w-16 h-16 overflow-hidden border-2 ${
+              className={`flex-shrink-0 w-20 h-20 overflow-hidden border-2 rounded-lg transition-all duration-200 ${
                 selectedImageIndex === index
-                  ? 'border-amber-500'
-                  : 'border-gray-200'
+                  ? 'border-amber-500 ring-2 ring-amber-200'
+                  : 'border-gray-200 hover:border-amber-300'
               }`}
             >
-              <img
+              <ImageWithFallback
                 src={image.image}
                 alt={`${productName} - миниатюра ${index + 1}`}
                 className="w-full h-full object-cover"

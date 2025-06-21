@@ -4,6 +4,7 @@ import React from 'react';
 import { useCartStore } from '@/store/cart';
 import { CartItem as CartItemType } from '@/types/cart';
 import Link from 'next/link';
+import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 
 interface CartItemProps {
   item: CartItemType;
@@ -24,7 +25,7 @@ export function CartItem({ item }: CartItemProps) {
     <div className="flex gap-4 py-4 border-b border-amber-100/50 last:border-b-0">
       {/* Image */}
       <Link href={`/p-${item.slug}`} className="relative w-20 h-24 flex-shrink-0 bg-amber-50 overflow-hidden" style={{ borderRadius: '2px' }}>
-        <img
+        <ImageWithFallback
           src={item.image}
           alt={item.name}
           className="w-full h-full object-cover"

@@ -4,6 +4,7 @@ import { useViewedProductsStore } from '@/store/viewed-products';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 
 export function ViewedProducts() {
   const { viewedProducts } = useViewedProductsStore();
@@ -93,16 +94,16 @@ export function ViewedProducts() {
           {viewedProducts.map((product) => (
             <Link
               key={product.id}
-              href={`/product/${product.slug}`}
+              href={`/p-${product.slug}`}
               className="flex-shrink-0 group"
             >
               <div className="w-32 space-y-3">
                 {/* Image */}
-                <div className="relative w-16 h-16 bg-gray-100 rounded">
-                  <img
+                <div className="relative w-32 h-40 bg-gray-100 rounded overflow-hidden">
+                  <ImageWithFallback
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover rounded"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 

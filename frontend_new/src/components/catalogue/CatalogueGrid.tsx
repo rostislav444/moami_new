@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CategoryState } from '@/types/categories'
+import { ImageWithFallback } from '@/components/ui/ImageWithFallback'
 
 interface ProductVariant {
   id: number
@@ -96,10 +97,10 @@ export default function CatalogueGrid({
               >
                 <div className="relative aspect-square bg-gradient-to-br from-amber-50 to-amber-100">
                   {category.image && (
-                    <img
+                    <ImageWithFallback
                       src={category.image}
                       alt={category.name}
-                      className="w-full h-48 object-cover mb-4 rounded-lg"
+                      className="w-full h-full object-cover"
                     />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-amber-900/50 via-amber-800/10 to-transparent"></div>
@@ -147,18 +148,18 @@ export default function CatalogueGrid({
           >
             <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-amber-50 rounded-sm">
               {variant.images.length > 0 && (
-                <img
+                <ImageWithFallback
                   src={variant.images[0].image}
                   alt={variant.product.name}
-                  className="w-full h-48 object-cover rounded-lg"
+                  className="w-full h-full object-cover"
                 />
               )}
               
               {variant.images.length > 1 && hoveredProduct === variant.id && (
-                <img
+                <ImageWithFallback
                   src={variant.images[1].image}
                   alt={variant.product.name}
-                  className="absolute inset-0 w-full h-48 object-cover rounded-lg transition-opacity duration-300"
+                  className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
                 />
               )}
             </div>
