@@ -36,45 +36,50 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
                             </p>
                         </div>
                         
-                        <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 md:gap-6">
+                        <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-8 gap-4 md:gap-6">
                             {category.children.map((subcategory, index) => {
                                 const patternIndex = (index + category.id * 3) % 8;
                                 let gridClass = '';
                                 let aspectClass = '';
                                 
+                                // Мобильная версия: одинаковые блоки 3:4
+                                const mobileClass = 'col-span-1';
+                                const mobileAspectClass = 'aspect-[3/4]';
+                                
+                                // Десктопная версия: сохраняем текущую логику
                                 if (patternIndex === 0) {
-                                    gridClass = 'col-span-2 md:col-span-3';
-                                    aspectClass = 'aspect-[7/6]';
+                                    gridClass = 'md:col-span-3';
+                                    aspectClass = 'md:aspect-[7/6]';
                                 } else if (patternIndex === 1) {
-                                    gridClass = 'col-span-2 md:col-span-2';
-                                    aspectClass = 'aspect-[6/7]';
+                                    gridClass = 'md:col-span-2';
+                                    aspectClass = 'md:aspect-[6/7]';
                                 } else if (patternIndex === 2) {
-                                    gridClass = 'col-span-2 md:col-span-2';
-                                    aspectClass = 'aspect-square';
+                                    gridClass = 'md:col-span-2';
+                                    aspectClass = 'md:aspect-square';
                                 } else if (patternIndex === 3) {
-                                    gridClass = 'col-span-2 md:col-span-3';
-                                    aspectClass = 'aspect-square';
+                                    gridClass = 'md:col-span-3';
+                                    aspectClass = 'md:aspect-square';
                                 } else if (patternIndex === 4) {
-                                    gridClass = 'col-span-2 md:col-span-2';
-                                    aspectClass = 'aspect-[7/6]';
+                                    gridClass = 'md:col-span-2';
+                                    aspectClass = 'md:aspect-[7/6]';
                                 } else if (patternIndex === 5) {
-                                    gridClass = 'col-span-2 md:col-span-2';
-                                    aspectClass = 'aspect-[6/7]';
+                                    gridClass = 'md:col-span-2';
+                                    aspectClass = 'md:aspect-[6/7]';
                                 } else if (patternIndex === 6) {
-                                    gridClass = 'col-span-4 md:col-span-4';
-                                    aspectClass = 'aspect-[7/5]';
+                                    gridClass = 'md:col-span-4';
+                                    aspectClass = 'md:aspect-[7/5]';
                                 } else {
-                                    gridClass = 'col-span-2 md:col-span-2';
-                                    aspectClass = 'aspect-square';
+                                    gridClass = 'md:col-span-2';
+                                    aspectClass = 'md:aspect-square';
                                 }
 
                                 return (
                                     <Link
                                         key={subcategory.id}
                                         href={`/catalogue/${category.slug}/${subcategory.slug}`}
-                                        className={`group block ${gridClass}`}
+                                        className={`group block ${mobileClass} ${gridClass}`}
                                     >
-                                        <div className={`relative ${aspectClass} overflow-hidden bg-gradient-to-br from-amber-50/20 to-amber-100/10 hover:shadow-xl transition-all duration-700 ease-out`} style={{ borderRadius: '2px' }}>
+                                        <div className={`relative ${mobileAspectClass} ${aspectClass} overflow-hidden bg-gradient-to-br from-amber-50/20 to-amber-100/10 hover:shadow-xl transition-all duration-700 ease-out`} style={{ borderRadius: '2px' }}>
                                             {subcategory.image && (
                                                 <SimpleImage
                                                     src={subcategory.image}
@@ -82,7 +87,7 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
                                                     className="w-full h-full object-cover group-hover:scale-[1.20] transition-transform duration-700 ease-out"
                                                 />
                                             )}
-                                            <div className="absolute inset-0 bg-gradient-to-t from-amber-900/20 via-transparent to-transparent"></div>
+                                            <div className="absolute inset-0 bg-gradient-to-t from-amber-900/60 via-amber-900/20 to-transparent md:from-amber-900/20 md:via-transparent md:to-transparent"></div>
                                             
                                             <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
                                                 <h4 className="text-lg md:text-xl font-thin tracking-wide text-white mb-1 md:mb-2 font-serif" style={{ letterSpacing: '0.04em' }}>

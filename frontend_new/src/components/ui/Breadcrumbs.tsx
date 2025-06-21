@@ -11,7 +11,7 @@ interface BreadcrumbsProps {
 
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
-    <nav className="py-4 pb-12 text-sm">
+    <nav className="py-4 pb-8 text-sm">
       <div className="overflow-x-auto scrollbar-hide">
         <ol className="flex items-center space-x-2 text-amber-800/60 whitespace-nowrap min-w-max">
           <li>

@@ -171,11 +171,11 @@ export default function CatalogueGrid({
               </h3>
               
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-lg font-medium text-amber-900">
+                <span className="text-sm font-medium text-amber-900">
                   {variant.product.price} ₴
                 </span>
                 {variant.product.old_price && (
-                  <span className="text-base text-amber-600 line-through font-light">
+                  <span className="text-xs text-amber-600 line-through font-light">
                     {variant.product.old_price} ₴
                   </span>
                 )}
@@ -185,7 +185,7 @@ export default function CatalogueGrid({
                 {variant.sizes.filter(size => size.stock > 0).map((size) => (
                   <span 
                     key={size.id}
-                    className="text-sm px-2 py-1 bg-amber-100 text-amber-800 rounded font-light"
+                    className="text-sm px-2 py-1 bg-white border border-amber-200 text-amber-800 rounded font-light"
                   >
                     {size.size.ua}
                   </span>

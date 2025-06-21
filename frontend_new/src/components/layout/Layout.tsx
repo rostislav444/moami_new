@@ -13,7 +13,7 @@ interface LayoutProps {
 
 export function Layout({ children, categories, pages = [] }: LayoutProps) {
     return (
-        <div className="min-h-screen pt-12 md:pt-24" style={{ backgroundColor: '#f5efe6' }}>
+        <div className="min-h-screen pt-12 md:pt-20" style={{ backgroundColor: '#f5efe6' }}>
             <Header categories={categories} />
             <main className="max-w-7xl mx-auto px-8">
                 {children}
