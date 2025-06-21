@@ -3,14 +3,13 @@
 import { useViewedProductsStore } from '@/store/viewed-products';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export function ViewedProducts() {
   const { viewedProducts } = useViewedProductsStore();
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(true);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
 
   // Скрыть на страницах корзины и заказа
   if (
@@ -99,13 +98,11 @@ export function ViewedProducts() {
             >
               <div className="w-32 space-y-3">
                 {/* Image */}
-                <div className="relative w-32 h-40 bg-white overflow-hidden group-hover:shadow-lg transition-all duration-500" style={{ borderRadius: '2px' }}>
-                  <Image
+                <div className="relative w-16 h-16 bg-gray-100 rounded">
+                  <img
                     src={product.image}
                     alt={product.name}
-                    fill
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    sizes="128px"
+                    className="w-full h-full object-cover rounded"
                   />
                 </div>
                 

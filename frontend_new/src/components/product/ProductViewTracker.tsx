@@ -25,6 +25,23 @@ interface ProductViewTrackerProps {
   variant: ProductVariant;
 }
 
+const trackVariantView = async (variantId: number) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const utmSource = urlParams.get('utm_source');
+
+  const params = new URLSearchParams({
+    variant_id: variantId.toString(),
+  });
+
+  if (utmSource) {
+    params.append('utm_source', utmSource);
+  }
+
+  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/product/variants/views/?${params}`, {
+    method: 'GET',
+  });
+};
+
 export function ProductViewTracker({ variant }: ProductViewTrackerProps) {
   const { addViewedProduct } = useViewedProductsStore();
 
@@ -40,6 +57,7 @@ export function ProductViewTracker({ variant }: ProductViewTrackerProps) {
     };
 
     addViewedProduct(viewedProduct);
+    trackVariantView(variant.id);
   }, [variant, addViewedProduct]);
 
   return null;

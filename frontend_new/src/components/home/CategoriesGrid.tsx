@@ -9,6 +9,19 @@ interface CategoriesGridProps {
 }
 
 export function CategoriesGrid({ categories }: CategoriesGridProps) {
+    console.log('🏠 CategoriesGrid получил категории:', categories?.length || 0);
+    console.log('🏠 Первая категория:', categories?.[0]?.name || 'нет категорий');
+
+    if (!categories || categories.length === 0) {
+        return (
+            <div className="py-24 text-center">
+                <p className="text-amber-900/50 text-lg font-light font-serif">
+                    Категории не загружены
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div className="py-24">
             {categories.map((category) => (

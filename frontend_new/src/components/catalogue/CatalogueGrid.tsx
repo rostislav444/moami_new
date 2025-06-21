@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CategoryState } from '@/types/categories'
@@ -97,12 +96,10 @@ export default function CatalogueGrid({
               >
                 <div className="relative aspect-square bg-gradient-to-br from-amber-50 to-amber-100">
                   {category.image && (
-                    <Image
+                    <img
                       src={category.image}
                       alt={category.name}
-                      fill
-                      className="object-cover opacity-90 group-hover:opacity-70 transition-opacity duration-300"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                      className="w-full h-48 object-cover mb-4 rounded-lg"
                     />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-amber-900/50 via-amber-800/10 to-transparent"></div>
@@ -150,24 +147,18 @@ export default function CatalogueGrid({
           >
             <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-amber-50 rounded-sm">
               {variant.images.length > 0 && (
-                <Image
+                <img
                   src={variant.images[0].image}
                   alt={variant.product.name}
-                  fill
-                  className={`object-cover transition-transform duration-700 ${
-                    hoveredProduct === variant.id ? 'scale-110' : 'scale-100'
-                  }`}
-                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="w-full h-48 object-cover rounded-lg"
                 />
               )}
               
               {variant.images.length > 1 && hoveredProduct === variant.id && (
-                <Image
+                <img
                   src={variant.images[1].image}
                   alt={variant.product.name}
-                  fill
-                  className="object-cover transition-opacity duration-500 opacity-0 group-hover:opacity-100"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="absolute inset-0 w-full h-48 object-cover rounded-lg transition-opacity duration-300"
                 />
               )}
             </div>

@@ -11,6 +11,9 @@ interface HeaderProps {
 }
 
 export function Header({ categories }: HeaderProps) {
+    console.log('🔍 Header получил категории:', categories?.length || 0);
+    console.log('🔍 Первая категория в Header:', categories?.[0]?.name || 'нет категорий');
+
     const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
     const [dropdownPosition, setDropdownPosition] = useState<{ [key: number]: 'left' | 'right' }>({});
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -69,67 +72,73 @@ export function Header({ categories }: HeaderProps) {
                     </Link>
 
                     <nav className="flex items-center space-x-12">
-                        {categories.map((category) => (
-                            <div 
-                                key={category.id}
-                                className="relative"
-                                onMouseEnter={(e) => handleMouseEnter(category.id, e)}
-                                onMouseLeave={handleMouseLeave}
-                            >
-                                <Link 
-                                    href={`/catalogue/${category.slug}`}
-                                    className="text-base font-light tracking-wide text-amber-900/80 hover:text-amber-900 transition-all duration-500 font-serif"
-                                    style={{ letterSpacing: '0.05em' }}
+                        {categories && categories.length > 0 ? (
+                            categories.map((category) => (
+                                <div 
+                                    key={category.id}
+                                    className="relative"
+                                    onMouseEnter={(e) => handleMouseEnter(category.id, e)}
+                                    onMouseLeave={handleMouseLeave}
                                 >
-                                    {category.name}
-                                </Link>
-                                
-                                {hoveredCategory === category.id && category.children.length > 0 && (
-                                    <div 
-                                        className={`absolute top-full mt-2 bg-white border border-amber-200 shadow-xl min-w-80 ${
-                                            dropdownPosition[category.id] === 'right' ? 'right-0' : 'left-0'
-                                        }`}
-                                        style={{ borderRadius: '8px', zIndex: 99999 }}
-                                        onMouseEnter={handleDropdownEnter}
-                                        onMouseLeave={handleDropdownLeave}
+                                    <Link 
+                                        href={`/catalogue/${category.slug}`}
+                                        className="text-base font-light tracking-wide text-amber-900/80 hover:text-amber-900 transition-all duration-500 font-serif"
+                                        style={{ letterSpacing: '0.05em' }}
                                     >
-                                        <div className="py-3">
-                                            {category.children.slice(0, 8).map((subcategory) => (
-                                                <Link
-                                                    key={subcategory.id}
-                                                    href={`/catalogue/${category.slug}/${subcategory.slug}`}
-                                                    className="flex items-center px-4 py-3 hover:bg-amber-50 transition-colors duration-200"
-                                                >
-                                                    <div className="relative block overflow-hidden flex-shrink-0 mr-3 bg-amber-100" style={{ borderRadius: '6px', width: '48px', height: '48px' }}>
-                                                        {subcategory.image ? (
-                                                            <SimpleImage
-                                                                src={subcategory.image}
-                                                                alt={subcategory.name}
-                                                                className="absolute top-0 left-0 w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full bg-amber-200 flex items-center justify-center">
-                                                                <span className="text-amber-800 text-sm font-light font-serif">
-                                                                    {subcategory.name.charAt(0)}
-                                                                </span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <h4 className="text-base font-light text-amber-900 mb-1 font-serif">
-                                                            {subcategory.name}
-                                                        </h4>
-                                                        <p className="text-sm text-amber-700/70 font-light font-serif">
-                                                            {subcategory.products_count} товарів
-                                                        </p>
-                                                    </div>
-                                                </Link>
-                                            ))}
+                                        {category.name}
+                                    </Link>
+                                    
+                                    {hoveredCategory === category.id && category.children.length > 0 && (
+                                        <div 
+                                            className={`absolute top-full mt-2 bg-white border border-amber-200 shadow-xl min-w-80 ${
+                                                dropdownPosition[category.id] === 'right' ? 'right-0' : 'left-0'
+                                            }`}
+                                            style={{ borderRadius: '8px', zIndex: 99999 }}
+                                            onMouseEnter={handleDropdownEnter}
+                                            onMouseLeave={handleDropdownLeave}
+                                        >
+                                            <div className="py-3">
+                                                {category.children.slice(0, 8).map((subcategory) => (
+                                                    <Link
+                                                        key={subcategory.id}
+                                                        href={`/catalogue/${category.slug}/${subcategory.slug}`}
+                                                        className="flex items-center px-4 py-3 hover:bg-amber-50 transition-colors duration-200"
+                                                    >
+                                                        <div className="relative block overflow-hidden flex-shrink-0 mr-3 bg-amber-100" style={{ borderRadius: '6px', width: '48px', height: '48px' }}>
+                                                            {subcategory.image ? (
+                                                                <SimpleImage
+                                                                    src={subcategory.image}
+                                                                    alt={subcategory.name}
+                                                                    className="absolute top-0 left-0 w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-amber-200 flex items-center justify-center">
+                                                                    <span className="text-amber-800 text-sm font-light font-serif">
+                                                                        {subcategory.name.charAt(0)}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <h4 className="text-base font-light text-amber-900 mb-1 font-serif">
+                                                                {subcategory.name}
+                                                            </h4>
+                                                            <p className="text-sm text-amber-700/70 font-light font-serif">
+                                                                {subcategory.products_count} товарів
+                                                            </p>
+                                                        </div>
+                                                    </Link>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-amber-900/50 text-sm font-light font-serif">
+                                Завантаження меню...
                             </div>
-                        ))}
+                        )}
                     </nav>
 
                     {/* Desktop Cart */}
@@ -180,31 +189,37 @@ export function Header({ categories }: HeaderProps) {
                 {mobileMenuOpen && (
                     <div className="md:hidden mt-4 pb-4 border-t border-amber-200/50">
                         <nav className="flex flex-col space-y-4 pt-4">
-                            {categories.map((category) => (
-                                <div key={category.id} className="border-b border-amber-100/50 pb-4">
-                                    <Link 
-                                        href={`/catalogue/${category.slug}`}
-                                        className="text-lg font-light text-amber-900 font-serif block mb-2"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                    >
-                                        {category.name}
-                                    </Link>
-                                    {category.children.length > 0 && (
-                                        <div className="ml-4 space-y-2">
-                                            {category.children.slice(0, 5).map((subcategory) => (
-                                                <Link
-                                                    key={subcategory.id}
-                                                    href={`/catalogue/${category.slug}/${subcategory.slug}`}
-                                                    className="text-base font-light text-amber-800/80 font-serif block"
-                                                    onClick={() => setMobileMenuOpen(false)}
-                                                >
-                                                    {subcategory.name}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    )}
+                            {categories && categories.length > 0 ? (
+                                categories.map((category) => (
+                                    <div key={category.id} className="border-b border-amber-100/50 pb-4">
+                                        <Link 
+                                            href={`/catalogue/${category.slug}`}
+                                            className="text-lg font-light text-amber-900 font-serif block mb-2"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            {category.name}
+                                        </Link>
+                                        {category.children.length > 0 && (
+                                            <div className="ml-4 space-y-2">
+                                                {category.children.slice(0, 5).map((subcategory) => (
+                                                    <Link
+                                                        key={subcategory.id}
+                                                        href={`/catalogue/${category.slug}/${subcategory.slug}`}
+                                                        className="text-base font-light text-amber-800/80 font-serif block"
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                    >
+                                                        {subcategory.name}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-amber-900/50 text-base font-light font-serif">
+                                    Завантаження меню...
                                 </div>
-                            ))}
+                            )}
                         </nav>
                     </div>
                 )}

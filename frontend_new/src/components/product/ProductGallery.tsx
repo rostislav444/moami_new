@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import Image from 'next/image'
+import { useState } from 'react'
 
 interface ProductImage {
   image: string
-  dimensions?: any
-  thumbnails?: Array<{
-    image: string
-  }>
+}
+
+interface VariantImage {
+  image: string
 }
 
 interface ProductGalleryProps {
@@ -18,97 +17,75 @@ interface ProductGalleryProps {
 
 export default function ProductGallery({ images, productName }: ProductGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
-  const sliderRef = useRef<HTMLDivElement>(null)
-  
+
   if (images.length === 0) {
     return (
-      <div className="aspect-[4/5] bg-white/50 backdrop-blur-sm flex items-center justify-center" 
-           style={{ borderRadius: '2px' }}>
-        <span className="text-amber-700/40 font-light tracking-wide font-serif" 
-              style={{ letterSpacing: '0.05em' }}>
-          Зображення відсутнє
-        </span>
+      <div className="w-full h-96 bg-gray-200 flex items-center justify-center">
+        <p className="text-gray-500">Изображение недоступно</p>
       </div>
     )
   }
-  
+
   const nextImage = () => {
     setSelectedImageIndex((prev) => (prev + 1) % images.length)
   }
-  
+
   const prevImage = () => {
     setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length)
   }
-  
+
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative group">
-        <div className="aspect-[4/5] relative overflow-hidden bg-white/30 backdrop-blur-sm" 
-             style={{ borderRadius: '2px' }}>
-          <Image
-            src={images[selectedImageIndex].image}
-            alt={productName}
-            fill
-            className="object-cover transition-all duration-300 group-hover:scale-[1.02]"
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            priority
-          />
-          
-          {/* Navigation Arrows */}
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={prevImage}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm text-amber-900 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/90 flex items-center justify-center"
-                style={{ borderRadius: '2px' }}
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M15 18l-6-6 6-6"/>
-                </svg>
-              </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm text-amber-900 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/90 flex items-center justify-center"
-                style={{ borderRadius: '2px' }}
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 18l6-6-6-6"/>
-                </svg>
-              </button>
-            </>
-          )}
-          
-          {/* Image Counter */}
-          {images.length > 1 && (
-            <div className="absolute bottom-2 right-2 bg-white/80 backdrop-blur-sm px-2 py-1 text-xs text-amber-900 font-light"
-                 style={{ borderRadius: '2px' }}>
-              {selectedImageIndex + 1}/{images.length}
-            </div>
-          )}
-        </div>
+      <div className="relative w-full h-96 bg-gray-100 overflow-hidden">
+        <img
+          src={images[selectedImageIndex].image}
+          alt={`${productName} - изображение ${selectedImageIndex + 1}`}
+          className="w-full h-full object-cover"
+        />
+
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 p-2 rounded-full shadow transition-all"
+            >
+              ←
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 p-2 rounded-full shadow transition-all"
+            >
+              →
+            </button>
+          </>
+        )}
       </div>
-      
-      {/* Thumbnail Grid */}
+
+      {/* Image Counter */}
       {images.length > 1 && (
-        <div className="grid grid-cols-4 gap-2">
+        <div className="text-center text-sm text-gray-500">
+          {selectedImageIndex + 1}/{images.length}
+        </div>
+      )}
+
+      {/* Thumbnails */}
+      {images.length > 1 && (
+        <div className="flex space-x-2 overflow-x-auto">
           {images.slice(0, 4).map((image, index) => (
             <button
               key={index}
               onClick={() => setSelectedImageIndex(index)}
-              className={`aspect-[4/5] relative overflow-hidden bg-white/30 backdrop-blur-sm transition-all duration-300 ${
-                selectedImageIndex === index 
-                  ? 'ring-1 ring-amber-800/40 opacity-100' 
-                  : 'opacity-70 hover:opacity-90'
+              className={`flex-shrink-0 w-16 h-16 overflow-hidden border-2 ${
+                selectedImageIndex === index
+                  ? 'border-amber-500'
+                  : 'border-gray-200'
               }`}
-              style={{ borderRadius: '2px' }}
             >
-              <Image
+              <img
                 src={image.image}
-                alt={`${productName} - ${index + 1}`}
-                fill
-                className="object-cover"
-                sizes="100px"
+                alt={`${productName} - миниатюра ${index + 1}`}
+                className="w-full h-full object-cover"
               />
             </button>
           ))}
