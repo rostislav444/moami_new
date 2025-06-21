@@ -5,19 +5,32 @@ import { useCartStore } from '@/store/cart';
 import { useCategories } from '@/hooks/useCategories';
 import { OrderForm } from '@/components/order/OrderForm';
 import { OrderSummary } from '@/components/order/OrderSummary';
+import { event as fbEvent } from '@/lib/FacebookPixel';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function OrderPage() {
   const { data: categories = [] } = useCategories();
-  const { quantity } = useCartStore();
+  const { quantity, items } = useCartStore();
   const router = useRouter();
 
   useEffect(() => {
     if (quantity === 0) {
       router.push('/');
+    } else {
+      // Facebook Pixel InitiateCheckout event
+      fbEvent('InitiateCheckout', {
+        content_ids: items.map(item => item.code),
+        content_type: 'product',
+        contents: items.map(item => ({
+          id: item.code,
+          quantity: item.quantity
+        })),
+        value: items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        currency: 'UAH'
+      });
     }
-  }, [quantity, router]);
+  }, [quantity, router, items]);
 
   if (quantity === 0) {
     return null;

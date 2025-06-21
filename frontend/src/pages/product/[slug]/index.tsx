@@ -6,7 +6,7 @@ import {GetStaticProps} from "next";
 import {VariantPageProps} from "@/interfaces/variant";
 import fetchWithLocale from "@/utils/fetchWrapper";
 import {useEffect} from "react";
-import {pageView} from "@/lib/FacebookPixel";
+import {pageView, event} from "@/lib/FacebookPixel";
 import {useStore} from "react-redux";
 import {addViewedProductData} from "@/state/reducers/user";
 import {useSession} from "next-auth/react";
@@ -31,6 +31,16 @@ export default function Product({variant, locale}: VariantPageProps) {
 
         if (isMounted) {
             pageView()
+            
+            // Facebook Pixel ViewContent event
+            event('ViewContent', {
+                content_name: variant.name,
+                content_ids: [variant.code],
+                content_type: 'product',
+                value: variant.product.price,
+                currency: 'UAH'
+            });
+            
             store.dispatch(addViewedProductData(variant))
 
             let url = '/product/variants/views?variant_id=' + variant.id

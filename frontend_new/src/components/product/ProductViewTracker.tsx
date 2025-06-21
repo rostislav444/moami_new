@@ -2,11 +2,13 @@
 
 import { useEffect } from 'react';
 import { useViewedProductsStore } from '@/store/viewed-products';
+import { event as fbEvent } from '@/lib/FacebookPixel';
 
 interface ProductVariant {
   id: number;
   name: string;
   slug: string;
+  code: string;
   product: {
     price: number;
     old_price?: number;
@@ -58,6 +60,19 @@ export function ProductViewTracker({ variant }: ProductViewTrackerProps) {
 
     addViewedProduct(viewedProduct);
     trackVariantView(variant.id);
+
+    // Facebook Pixel ViewContent event - избегаем дублирования
+    const timeout = setTimeout(() => {
+      fbEvent('ViewContent', {
+        content_name: variant.name,
+        content_ids: [variant.code],
+        content_type: 'product',
+        value: variant.product.price,
+        currency: 'UAH'
+      });
+    }, 100);
+
+    return () => clearTimeout(timeout);
   }, [variant, addViewedProduct]);
 
   return null;

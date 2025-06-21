@@ -10,6 +10,7 @@ export interface CartItem {
   quantity: number;
   name: string;
   slug: string;
+  code: string;
   price: number;
   old_price?: number;
   selectedGrid: string;

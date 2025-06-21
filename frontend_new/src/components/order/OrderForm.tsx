@@ -48,6 +48,19 @@ export function OrderForm() {
       });
 
       if (response.status === 201) {
+        // Сохраняем данные заказа для Facebook Pixel
+        const orderData = {
+          items: items.map(item => ({
+            content_id: item.code,
+            content_name: item.name,
+            quantity: item.quantity,
+            value: item.price
+          })),
+          total_value: items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+          currency: 'UAH'
+        };
+        localStorage.setItem('completedOrder', JSON.stringify(orderData));
+        
         clearCart();
         router.push('/order/success');
       } else {

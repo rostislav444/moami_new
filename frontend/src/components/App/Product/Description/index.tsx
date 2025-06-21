@@ -70,7 +70,7 @@ export const DescriptionBlock = ({variant}: VariantPageProps) => {
             store.dispatch(addItemToCart(data))
             event('AddToCart', {
                 content_name: variant.name,
-                content_ids: [variant.id],
+                content_ids: [variant.code],
                 content_type: 'product',
                 value: variant.product.price,
                 currency: 'UAH'

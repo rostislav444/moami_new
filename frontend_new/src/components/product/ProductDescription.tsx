@@ -98,6 +98,7 @@ export default function ProductDescription({ variant }: ProductDescriptionProps)
       size: selectedSizeData.size,
       name: variant.name,
       slug: variant.slug,
+      code: variant.code,
       price: variant.product.price,
       old_price: variant.product.old_price,
       selectedGrid: 'ua',
@@ -108,7 +109,7 @@ export default function ProductDescription({ variant }: ProductDescriptionProps)
     // Facebook Pixel event
     fbEvent('AddToCart', {
       content_name: variant.name,
-      content_ids: [variant.id.toString()],
+      content_ids: [variant.code],
       content_type: 'product',
       value: variant.product.price,
       currency: 'UAH'

@@ -2,10 +2,31 @@
 
 import { Layout } from '@/components/layout/Layout';
 import { useCategories } from '@/hooks/useCategories';
+import { event as fbEvent } from '@/lib/FacebookPixel';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 export default function OrderSuccessPage() {
   const { data: categories = [] } = useCategories();
+
+  useEffect(() => {
+    // Facebook Pixel Purchase event
+    const completedOrderData = localStorage.getItem('completedOrder');
+    if (completedOrderData) {
+      const orderData = JSON.parse(completedOrderData);
+      
+      fbEvent('Purchase', {
+        content_ids: orderData.items.map((item: any) => item.content_id),
+        content_type: 'product',
+        contents: orderData.items,
+        value: orderData.total_value,
+        currency: orderData.currency
+      });
+      
+      // Очищаем данные после отправки события
+      localStorage.removeItem('completedOrder');
+    }
+  }, []);
 
   return (
     <Layout categories={categories}>
