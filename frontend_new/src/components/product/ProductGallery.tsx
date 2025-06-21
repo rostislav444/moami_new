@@ -180,7 +180,21 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
             limitToBounds={true}
             centerZoomedOut={true}
             alignmentAnimation={{ sizeX: 0, sizeY: 0 }}
-            velocityAnimation={{ sensitivity: 1, animationTime: 300 }}
+            velocityAnimation={{ sensitivity: 0.3, animationTime: 150 }}
+            panning={{
+              disabled: false,
+              velocityDisabled: true,
+              lockAxisX: false,
+              lockAxisY: false,
+              allowLeftClickPan: true,
+              allowRightClickPan: false,
+              allowMiddleClickPan: false,
+            }}
+            onPanningStart={(ref) => {
+              if (ref.state.scale <= 1.05) {
+                return false
+              }
+            }}
           >
             {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
               <>
