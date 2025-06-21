@@ -63,7 +63,7 @@ export function Header({ categories }: HeaderProps) {
     };
 
     return (
-        <header className="border-b bg-white/90 border-amber-200/50 backdrop-blur-sm fixed w-full top-0 z-50">
+        <header className="border-b bg-white/90 backdrop-blur-sm fixed w-full top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 md:py-8">
                 {/* Desktop Header */}
                 <div className="hidden md:flex items-center justify-between">
