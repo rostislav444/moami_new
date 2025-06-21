@@ -187,8 +187,8 @@ export function Header({ categories }: HeaderProps) {
 
                 {/* Mobile Menu */}
                 {mobileMenuOpen && (
-                    <div className="md:hidden mt-4 pb-4 border-t border-amber-200/50">
-                        <nav className="flex flex-col space-y-4 pt-4">
+                    <div className="md:hidden fixed top-full left-0 right-0 bg-white border-t border-amber-200/50 shadow-lg z-40" style={{ height: 'calc(100vh - 72px)' }}>
+                        <nav className="flex flex-col space-y-4 pt-4 pb-4 px-4 overflow-y-auto h-full">
                             {categories && categories.length > 0 ? (
                                 categories.map((category) => (
                                     <div key={category.id} className="border-b border-amber-100/50 pb-4">
@@ -201,7 +201,7 @@ export function Header({ categories }: HeaderProps) {
                                         </Link>
                                         {category.children.length > 0 && (
                                             <div className="ml-4 space-y-2">
-                                                {category.children.slice(0, 5).map((subcategory) => (
+                                                {category.children.map((subcategory) => (
                                                     <Link
                                                         key={subcategory.id}
                                                         href={`/catalogue/${category.slug}/${subcategory.slug}`}
