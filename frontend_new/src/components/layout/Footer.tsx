@@ -46,11 +46,15 @@ export function Footer({ categories, pages = [] }: FooterProps) {
                         </ul>
                     </div>
                     <div>
-                        <h4 className="font-light text-amber-900 mb-6 tracking-wide font-serif" style={{ letterSpacing: '0.05em' }}>Про нас</h4>
+                        <h4 className="font-light text-amber-900 mb-6 tracking-wide font-serif" style={{ letterSpacing: '0.05em' }}>Контакти</h4>
                         <ul className="space-y-3">
+                            <li>
+                                <a href="tel:+380985402447" className="hover:text-amber-900 transition-colors duration-300 font-serif">
+                                    📞 +38 (098) 540-24-47
+                                </a>
+                            </li>
                             <li><Link href="/about" className="hover:text-amber-900 transition-colors duration-300 font-serif">Наша історія</Link></li>
                             <li><Link href="/contacts" className="hover:text-amber-900 transition-colors duration-300 font-serif">Контакти</Link></li>
-                            <li><Link href="/blog" className="hover:text-amber-900 transition-colors duration-300 font-serif">Блог</Link></li>
                         </ul>
                     </div>
                     <div>

@@ -61,8 +61,11 @@ export function OrderForm() {
         };
         localStorage.setItem('completedOrder', JSON.stringify(orderData));
         
-        clearCart();
+        // Сначала редирект, потом очистка корзины
         router.push('/order/success');
+        setTimeout(() => {
+          clearCart();
+        }, 100);
       } else {
         console.log(response);
         console.error('Ошибка создания заказа');
@@ -209,51 +212,106 @@ export function OrderForm() {
           {/* Delivery Fields */}
           {deliveryType === 'newpost' && (
             <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Місто *"
-                className="w-full px-4 py-3 border border-amber-200 rounded bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif placeholder-amber-800/60 text-amber-900"
-                style={{ borderRadius: '2px' }}
-                {...register('delivery.newpost.city', { required: 'Введіть місто' })}
-              />
+              <div>
+                <input
+                  type="text"
+                  placeholder="Місто *"
+                  className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+                    errors.delivery?.newpost?.city
+                      ? 'border-red-400 focus:ring-red-300'
+                      : 'border-amber-200 focus:ring-amber-300'
+                  } bg-white focus:outline-none focus:ring-2`}
+                  style={{ borderRadius: '2px' }}
+                  {...register('delivery.newpost.city', { required: 'Введіть місто' })}
+                />
+                {errors.delivery?.newpost?.city && (
+                  <p className="text-red-600 text-xs mt-1 font-light">
+                    {errors.delivery.newpost.city.message}
+                  </p>
+                )}
+              </div>
               
-              <input
-                type="text"
-                placeholder="Відділення Нової Пошти *"
-                className="w-full px-4 py-3 border border-amber-200 rounded bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif placeholder-amber-800/60 text-amber-900"
-                style={{ borderRadius: '2px' }}
-                {...register('delivery.newpost.warehouse', { required: 'Введіть відділення' })}
-              />
+              <div>
+                <input
+                  type="text"
+                  placeholder="Відділення Нової Пошти *"
+                  className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+                    errors.delivery?.newpost?.warehouse
+                      ? 'border-red-400 focus:ring-red-300'
+                      : 'border-amber-200 focus:ring-amber-300'
+                  } bg-white focus:outline-none focus:ring-2`}
+                  style={{ borderRadius: '2px' }}
+                  {...register('delivery.newpost.warehouse', { required: 'Введіть відділення' })}
+                />
+                {errors.delivery?.newpost?.warehouse && (
+                  <p className="text-red-600 text-xs mt-1 font-light">
+                    {errors.delivery.newpost.warehouse.message}
+                  </p>
+                )}
+              </div>
             </div>
           )}
 
           {deliveryType === 'address' && (
             <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Місто *"
-                className="w-full px-4 py-3 border border-amber-200 rounded bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif placeholder-amber-800/60 text-amber-900"
-                style={{ borderRadius: '2px' }}
-                {...register('delivery.address.city', { required: 'Введіть місто' })}
-              />
-              
-              <input
-                type="text"
-                placeholder="Вулиця *"
-                className="w-full px-4 py-3 border border-amber-200 rounded bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif placeholder-amber-800/60 text-amber-900"
-                style={{ borderRadius: '2px' }}
-                {...register('delivery.address.street', { required: 'Введіть вулицю' })}
-              />
-              
-              <div className="grid grid-cols-2 gap-4">
+              <div>
                 <input
                   type="text"
-                  placeholder="Будинок *"
-                  className="w-full px-4 py-3 border border-amber-200 rounded bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif placeholder-amber-800/60 text-amber-900"
+                  placeholder="Місто *"
+                  className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+                    errors.delivery?.address?.city
+                      ? 'border-red-400 focus:ring-red-300'
+                      : 'border-amber-200 focus:ring-amber-300'
+                  } bg-white focus:outline-none focus:ring-2`}
                   style={{ borderRadius: '2px' }}
-                  {...register('delivery.address.house', { required: 'Введіть номер будинку' })}
+                  {...register('delivery.address.city', { required: 'Введіть місто' })}
                 />
-                
+                {errors.delivery?.address?.city && (
+                  <p className="text-red-600 text-xs mt-1 font-light">
+                    {errors.delivery.address.city.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  type="text"
+                  placeholder="Вулиця *"
+                  className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+                    errors.delivery?.address?.street
+                      ? 'border-red-400 focus:ring-red-300'
+                      : 'border-amber-200 focus:ring-amber-300'
+                  } bg-white focus:outline-none focus:ring-2`}
+                  style={{ borderRadius: '2px' }}
+                  {...register('delivery.address.street', { required: 'Введіть вулицю' })}
+                />
+                {errors.delivery?.address?.street && (
+                  <p className="text-red-600 text-xs mt-1 font-light">
+                    {errors.delivery.address.street.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Будинок *"
+                    className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+                      errors.delivery?.address?.house
+                        ? 'border-red-400 focus:ring-red-300'
+                        : 'border-amber-200 focus:ring-amber-300'
+                    } bg-white focus:outline-none focus:ring-2`}
+                    style={{ borderRadius: '2px' }}
+                    {...register('delivery.address.house', { required: 'Введіть номер будинку' })}
+                  />
+                  {errors.delivery?.address?.house && (
+                    <p className="text-red-600 text-xs mt-1 font-light">
+                      {errors.delivery.address.house.message}
+                    </p>
+                  )}
+                </div>
+
                 <input
                   type="text"
                   placeholder="Квартира"

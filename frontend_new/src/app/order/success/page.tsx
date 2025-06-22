@@ -2,14 +2,18 @@
 
 import { Layout } from '@/components/layout/Layout';
 import { useCategories } from '@/hooks/useCategories';
+import { useCartStore } from '@/store/cart';
 import { event as fbEvent } from '@/lib/FacebookPixel';
 import Link from 'next/link';
 import { useEffect } from 'react';
 
 export default function OrderSuccessPage() {
   const { data: categories = [] } = useCategories();
+  const { clearCart } = useCartStore();
 
   useEffect(() => {
+    // Очищаем корзину при загрузке страницы успеха
+    clearCart();
     // Facebook Pixel Purchase event
     const completedOrderData = localStorage.getItem('completedOrder');
     if (completedOrderData) {
@@ -26,7 +30,7 @@ export default function OrderSuccessPage() {
       // Очищаем данные после отправки события
       localStorage.removeItem('completedOrder');
     }
-  }, []);
+  }, [clearCart]);
 
   return (
     <Layout categories={categories}>
@@ -88,10 +92,9 @@ export default function OrderSuccessPage() {
             <div className="text-amber-800/70 font-light font-serif space-y-2">
               <p>Зв'яжіться з нами:</p>
               <p className="text-amber-900 font-medium">
-                📞 +38 (XXX) XXX-XX-XX
-              </p>
-              <p className="text-amber-900 font-medium">
-                ✉️ info@moami.com.ua
+                <a href="tel:+380985402447">
+                  📞 +38 (098) 540-24-47
+                </a>
               </p>
             </div>
           </div>
