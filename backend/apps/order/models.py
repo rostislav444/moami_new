@@ -49,19 +49,19 @@ class Order(models.Model):
                 item.size.quantity -= item.quantity
                 item.size.save()
 
-    def set_names(self):
-        if not self.first_name and self.user.first_name:
-            self.first_name = self.user.first_name
+    # def set_names(self):
+    #     if self.user:
+    #         if not self.first_name and self.user.first_name:
+    #             self.first_name = self.user.first_name
 
-        if not self.last_name and self.user.last_name:
-            self.last_name = self.user.last_name
+    #         if not self.last_name and self.user.last_name:
+    #             self.last_name = self.user.last_name
 
-        if not self.father_name and self.user.father_name:
-            self.father_name = self.user.father_name
+    #         if not self.father_name and self.user.father_name:
+    #             self.father_name = self.user.father_name
 
     def save(self, *args, **kwargs):
         self.completed_order()
-        self.set_names()
         super().save(*args, **kwargs)
 
 
