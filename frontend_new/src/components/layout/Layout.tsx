@@ -15,7 +15,7 @@ export function Layout({ children, categories, pages = [] }: LayoutProps) {
     return (
         <div className="min-h-screen pt-12 md:pt-20" style={{ backgroundColor: '#f5efe6' }}>
             <Header categories={categories} />
-            <main className="max-w-7xl mx-auto px-8">
+            <main className="max-w-7xl mx-auto px-4 md:px-8">
                 {children}
             </main>
             <ViewedProducts />

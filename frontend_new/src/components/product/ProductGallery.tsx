@@ -71,11 +71,11 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                   e.stopPropagation()
                   prevImage()
                 }}
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 p-3 rounded-full shadow-lg transition-all z-10"
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 md:p-3 transition-all z-10 text-white hover:text-gray-200"
                 title="Предыдущее изображение"
               >
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <button
@@ -83,11 +83,11 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                   e.stopPropagation()
                   nextImage()
                 }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-80 hover:bg-opacity-100 p-3 rounded-full shadow-lg transition-all z-10"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 md:p-3 transition-all z-10 text-white hover:text-gray-200"
                 title="Следующее изображение"
               >
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
             </>

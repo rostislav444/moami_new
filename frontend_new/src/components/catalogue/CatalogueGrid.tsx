@@ -88,7 +88,7 @@ export default function CatalogueGrid({
           <h2 className="text-2xl font-light text-amber-900 mb-6 font-serif tracking-wide" style={{ letterSpacing: '0.05em' }}>
             Категорії
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
             {subcategories.map((category) => (
               <Link
                 key={category.id}
@@ -123,7 +123,7 @@ export default function CatalogueGrid({
       )}
 
       <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <span className="text-base text-amber-900 font-light font-serif tracking-wide" style={{ letterSpacing: '0.05em' }}>Показати:</span>
           <select 
             value={pageSize}
@@ -137,7 +137,7 @@ export default function CatalogueGrid({
         </div>
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-12">
         {products.map((variant) => (
           <Link
             key={variant.id}
@@ -207,7 +207,7 @@ export default function CatalogueGrid({
             ← Попередня
           </button>
           
-          <div className="flex gap-6">
+          <div className="flex gap-2">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNum
               if (totalPages <= 5) {
