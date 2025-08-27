@@ -91,10 +91,10 @@ def generate_feed(feed_type):
                     category__modna_kast_category__isnull=False
                 ).exclude(variants__isnull=True).distinct()
 
-            if feed_type == 'modna_kasta':
-                qs = qs.exclude(brand__name__in=['Hasla', 'Tianqi&tianqi', 'Black Gold', 'PRL Jeans.CO']).exclude(
-                    variants__sizes__size__interpretations__value='One size').exclude(
-                    category__id__in=[38, 39]).distinct()
+            # if feed_type == 'modna_kasta':
+            #     qs = qs.exclude(brand__name__in=['Hasla', 'Tianqi&tianqi', 'Black Gold', 'PRL Jeans.CO']).exclude(
+            #         variants__sizes__size__interpretations__value='One size').exclude(
+            #         category__id__in=[38, 39]).distinct()
 
             return qs
 
