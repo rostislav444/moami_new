@@ -24,7 +24,7 @@ export function CartItem({ item }: CartItemProps) {
   return (
     <div className="flex gap-4 py-4 border-b border-amber-100/50 last:border-b-0">
       {/* Image */}
-      <Link href={`/p-${item.slug}`} className="relative w-20 h-24 flex-shrink-0 bg-amber-50 overflow-hidden" style={{ borderRadius: '2px' }}>
+      <Link href={`/p-${item.slug}`} className="relative w-20 h-24 flex-shrink-0 bg-amber-50 overflow-hidden">
         <ImageWithFallback
           src={item.image}
           alt={item.name}
@@ -59,7 +59,7 @@ export function CartItem({ item }: CartItemProps) {
 
           {/* Quantity Controls */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center border border-amber-200 rounded" style={{ borderRadius: '2px' }}>
+            <div className="flex items-center border border-amber-200">
               <button
                 onClick={() => handleQuantityChange(item.quantity - 1)}
                 className="w-8 h-8 flex items-center justify-center text-amber-800 hover:bg-amber-50 transition-colors duration-200"

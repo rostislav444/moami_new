@@ -55,7 +55,6 @@ export function ViewedProducts() {
               <button
                 onClick={scrollLeft}
                 className="w-8 h-8 flex items-center justify-center text-amber-700/60 hover:text-amber-800 hover:bg-amber-100/50 transition-all duration-300"
-                style={{ borderRadius: '2px' }}
                 title="←"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,7 +64,6 @@ export function ViewedProducts() {
               <button
                 onClick={scrollRight}
                 className="w-8 h-8 flex items-center justify-center text-amber-700/60 hover:text-amber-800 hover:bg-amber-100/50 transition-all duration-300"
-                style={{ borderRadius: '2px' }}
                 title="→"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,7 +97,7 @@ export function ViewedProducts() {
             >
               <div className="w-32 space-y-3">
                 {/* Image */}
-                <div className="relative w-32 h-40 bg-gray-100 rounded overflow-hidden">
+                <div className="relative w-32 h-40 bg-gray-100 overflow-hidden">
                   <ImageWithFallback
                     src={product.image}
                     alt={product.name}

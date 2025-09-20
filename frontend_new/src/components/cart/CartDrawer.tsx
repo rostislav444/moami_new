@@ -69,7 +69,6 @@ export function CartDrawer() {
                     href="/cart"
                     onClick={closeCart}
                     className="block w-full bg-amber-50 text-amber-900 py-3 px-6 text-center font-light text-sm tracking-wide hover:bg-amber-100 transition-colors duration-300 font-serif border border-amber-200"
-                    style={{ borderRadius: '2px' }}
                   >
                     ПЕРЕГЛЯНУТИ КОШИК
                   </Link>
@@ -78,7 +77,6 @@ export function CartDrawer() {
                     href="/order"
                     onClick={closeCart}
                     className="block w-full bg-amber-900 text-white py-3 px-6 text-center font-light text-sm tracking-wide hover:bg-amber-800 transition-colors duration-300 font-serif"
-                    style={{ borderRadius: '2px' }}
                   >
                     ОФОРМИТИ ЗАМОВЛЕННЯ
                   </Link>

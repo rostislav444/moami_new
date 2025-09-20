@@ -26,7 +26,7 @@ export function HeaderServer({ categories }: HeaderServerProps) {
                                     {category.name}
                                 </Link>
                                 {category.children.length > 0 && (
-                                    <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                    <div className="absolute top-full left-0 mt-2 w-64 bg-white shadow-lg border border-gray-200 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                                         <div className="py-2">
                                             {category.children.map((child) => (
                                                 <Link
@@ -37,7 +37,7 @@ export function HeaderServer({ categories }: HeaderServerProps) {
                                                     <SafeImage
                                                         src={child.image || ''}
                                                         alt={child.name}
-                                                        className="w-8 h-8 rounded object-cover mr-3"
+                                                        className="w-8 h-8 object-cover mr-3"
                                                     />
                                                     <div>
                                                         <div className="font-medium">{child.name}</div>

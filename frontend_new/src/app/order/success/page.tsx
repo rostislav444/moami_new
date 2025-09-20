@@ -58,25 +58,25 @@ export default function OrderSuccessPage() {
           </div>
 
           {/* Order Details Info */}
-          <div className="bg-white/70 rounded-lg p-6 mb-8 text-left">
+          <div className="bg-white/70 p-6 mb-8 text-left">
             <h2 className="text-xl font-light text-amber-900 mb-4 font-serif">
               Що далі?
             </h2>
             <div className="space-y-3 text-amber-800/70 font-light font-serif">
               <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center text-xs font-medium text-amber-800 mt-0.5">
+                <span className="flex-shrink-0 w-6 h-6 bg-amber-100 flex items-center justify-center text-xs font-medium text-amber-800 mt-0.5">
                   1
                 </span>
                 <p>Наш менеджер зв'яжеться з вами протягом робочого дня для підтвердження замовлення</p>
               </div>
               <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center text-xs font-medium text-amber-800 mt-0.5">
+                <span className="flex-shrink-0 w-6 h-6 bg-amber-100 flex items-center justify-center text-xs font-medium text-amber-800 mt-0.5">
                   2
                 </span>
                 <p>Після підтвердження ми підготуємо ваше замовлення до відправки</p>
               </div>
               <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center text-xs font-medium text-amber-800 mt-0.5">
+                <span className="flex-shrink-0 w-6 h-6 bg-amber-100 flex items-center justify-center text-xs font-medium text-amber-800 mt-0.5">
                   3
                 </span>
                 <p>Ви отримаете повідомлення з трек-номером для відстеження посилки</p>
@@ -85,7 +85,7 @@ export default function OrderSuccessPage() {
           </div>
 
           {/* Contact Info */}
-          <div className="bg-amber-50/50 rounded-lg p-6 mb-8">
+          <div className="bg-amber-50/50 p-6 mb-8">
             <h3 className="text-lg font-light text-amber-900 mb-3 font-serif">
               Є питання?
             </h3>
@@ -104,7 +104,6 @@ export default function OrderSuccessPage() {
             <Link
               href="/"
               className="inline-block bg-amber-900 text-white py-3 px-8 font-light text-sm tracking-wide hover:bg-amber-800 transition-colors duration-300 font-serif"
-              style={{ borderRadius: '2px' }}
             >
               ПОВЕРНУТИСЯ НА ГОЛОВНУ
             </Link>
@@ -113,7 +112,6 @@ export default function OrderSuccessPage() {
               <Link
                 href="/catalogue"
                 className="inline-block bg-amber-50 text-amber-900 py-3 px-8 font-light text-sm tracking-wide hover:bg-amber-100 transition-colors duration-300 font-serif border border-amber-200"
-                style={{ borderRadius: '2px' }}
               >
                 ПРОДОВЖИТИ ПОКУПКИ
               </Link>

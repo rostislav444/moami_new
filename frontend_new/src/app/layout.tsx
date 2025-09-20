@@ -80,7 +80,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className={`${inter.className} ${playfair.variable} ${crimson.variable}`} style={{ backgroundColor: 'white' }}>
+      <body className={`${inter.className} ${playfair.variable} ${crimson.variable}`} style={{ backgroundColor: 'var(--background)' }}>
         <QueryProvider>
           {children}
         </QueryProvider>

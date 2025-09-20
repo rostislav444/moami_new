@@ -34,7 +34,7 @@ export function CategoriesServer({ initialCategories }: CategoriesServerProps) {
                             <Link
                                 key={child.id}
                                 href={`/catalogue/${category.slug}/${child.slug}`}
-                                className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+                                className="group relative overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
                             >
                                 <div className="aspect-w-16 aspect-h-9 relative h-64">
                                     {child.image ? (

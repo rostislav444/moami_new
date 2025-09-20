@@ -193,7 +193,6 @@ export default function ProductDescription({ variant }: ProductDescriptionProps)
                     ? 'ring-1 ring-amber-800/40'
                     : 'opacity-70 hover:opacity-90'
                 }`}
-                style={{ borderRadius: '2px' }}
                 title={variantOption.color.name}
               >
                 <Image
@@ -232,7 +231,6 @@ export default function ProductDescription({ variant }: ProductDescriptionProps)
                     ? 'border-amber-800 bg-amber-900 text-white shadow-sm'
                     : 'border-amber-600/40 text-amber-900 hover:border-amber-800 hover:bg-amber-50/30 bg-white/50'
                 }`}
-                style={{ borderRadius: '2px' }}
               >
                 <span className="text-base font-light tracking-wide">{size.size.ua}</span>
                 <span className="text-xs font-light opacity-70">{size.size.int}</span>
@@ -251,7 +249,6 @@ export default function ProductDescription({ variant }: ProductDescriptionProps)
         <button
           onClick={handleAddToCart}
           className="w-full bg-amber-900 text-white py-3 px-6 font-light text-sm tracking-wide hover:bg-amber-800 transition-colors duration-300 font-serif"
-          style={{ borderRadius: '2px' }}
         >
           ДОДАТИ ДО КОШИКА
         </button>

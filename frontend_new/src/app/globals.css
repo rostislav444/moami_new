@@ -12,14 +12,19 @@
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-playfair);
   --font-serif-alt: var(--font-crimson);
+  --color-amber-50: #f9fafb;
+  --color-amber-100: #f3f4f6;
+  --color-amber-200: #e5e7eb;
+  --color-amber-300: #d1d5db;
+  --color-amber-400: #9ca3af;
+  --color-amber-500: #6b7280;
+  --color-amber-600: #4b5563;
+  --color-amber-700: #374151;
+  --color-amber-800: #1f2937;
+  --color-amber-900: #111827;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* removed dark scheme override to keep white background globally */
 
 body {
   color: var(--foreground);

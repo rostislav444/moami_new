@@ -38,7 +38,7 @@ export default async function InfoIndexPage() {
                 <Link
                   key={page.slug}
                   href={`/info/${page.slug}`}
-                  className="group block p-6 bg-stone-50 hover:bg-stone-100 rounded transition-colors duration-300 border border-stone-200/50 hover:border-stone-300"
+                  className="group block p-6 bg-stone-50 hover:bg-stone-100 transition-colors duration-300 border border-stone-200/50 hover:border-stone-300"
                 >
                   <h3 className="text-lg font-medium text-stone-800 group-hover:text-stone-600 transition-colors duration-300 font-serif"
                       style={{ letterSpacing: '0.02em' }}>

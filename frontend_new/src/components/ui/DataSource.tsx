@@ -11,17 +11,17 @@ export function DataSource({ categories }: DataSourceProps) {
         (categories.length > 0 && categories[0].id === mockCategories[0].id);
 
     return (
-        <div className="mb-4 p-3 rounded-lg border">
+        <div className="mb-4 p-3 border">
             <div className="flex items-center gap-2 text-sm">
                 {isFromAPI && !isMockData ? (
                     <>
-                        <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <span className="w-2 h-2 bg-green-500"></span>
                         <span className="text-green-700">Данные загружены с API бекенда</span>
                         <span className="text-gray-500">({categories.length} категорий)</span>
                     </>
                 ) : (
                     <>
-                        <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                        <span className="w-2 h-2 bg-yellow-500"></span>
                         <span className="text-yellow-700">Используются mock данные</span>
                         <span className="text-gray-500">({categories.length} категорий)</span>
                     </>

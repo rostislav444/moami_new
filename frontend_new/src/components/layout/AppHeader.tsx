@@ -67,7 +67,7 @@ export function AppHeader() {
                     className={`absolute top-full mt-2 bg-white border border-gray-200 shadow-xl min-w-80 z-[9999] ${
                       dropdownPosition[category.id] === 'right' ? 'right-0' : 'left-0'
                     }`}
-                    style={{ borderRadius: '8px' }}
+                    style={{}}
                   >
                     <div className="py-3">
                       {category.children.slice(0, 8).map((subcategory) => (
@@ -76,7 +76,7 @@ export function AppHeader() {
                           href={`/catalogue/${category.slug}/${subcategory.slug}`}
                           className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors duration-200"
                         >
-                          <div className="relative block overflow-hidden flex-shrink-0 mr-3 bg-gray-100" style={{ borderRadius: '6px', width: '48px', height: '48px' }}>
+                          <div className="relative block overflow-hidden flex-shrink-0 mr-3 bg-gray-100" style={{ width: '48px', height: '48px' }}>
                             {subcategory.image ? (
                               <SimpleImage
                                 src={subcategory.image}

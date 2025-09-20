@@ -78,7 +78,7 @@ export function OrderForm() {
   };
 
       return (
-      <div className="rounded-sm bg-white p-6 border border-amber-200/100" >
+      <div className="bg-white p-6 border border-amber-200/100" >
       <h2 className="text-xl font-light text-amber-900 mb-6 font-serif">
         Особисті дані
       </h2>
@@ -90,12 +90,11 @@ export function OrderForm() {
             <input
               type="text"
               placeholder="Ім'я *"
-              className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+              className={`w-full px-4 py-3 border font-light font-serif placeholder-amber-800/60 text-amber-900 ${
                 errors.first_name 
                   ? 'border-red-400 focus:ring-red-300' 
                   : 'border-amber-200 focus:ring-amber-300'
               } bg-white focus:outline-none focus:ring-2`}
-              style={{ borderRadius: '2px' }}
               {...register('first_name', { required: 'Введіть ім\'я' })}
             />
             {errors.first_name && (
@@ -109,12 +108,11 @@ export function OrderForm() {
             <input
               type="text"
               placeholder="Прізвище *"
-              className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+              className={`w-full px-4 py-3 border font-light font-serif placeholder-amber-800/60 text-amber-900 ${
                 errors.last_name 
                   ? 'border-red-400 focus:ring-red-300' 
                   : 'border-amber-200 focus:ring-amber-300'
               } bg-white focus:outline-none focus:ring-2`}
-              style={{ borderRadius: '2px' }}
               {...register('last_name', { required: 'Введіть прізвище' })}
             />
             {errors.last_name && (
@@ -129,8 +127,7 @@ export function OrderForm() {
           <input
             type="text"
             placeholder="По батькові"
-            className="w-full px-4 py-3 border border-amber-200 rounded bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif placeholder-amber-800/60 text-amber-900"
-            style={{ borderRadius: '2px' }}
+            className="w-full px-4 py-3 border border-amber-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif placeholder-amber-800/60 text-amber-900"
             {...register('father_name')}
           />
         </div>
@@ -139,12 +136,11 @@ export function OrderForm() {
           <input
             type="tel"
             placeholder="Номер телефону *"
-            className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+            className={`w-full px-4 py-3 border font-light font-serif placeholder-amber-800/60 text-amber-900 ${
               errors.phone 
                 ? 'border-red-400 focus:ring-red-300' 
                 : 'border-amber-200 focus:ring-amber-300'
             } bg-white focus:outline-none focus:ring-2`}
-            style={{ borderRadius: '2px' }}
             {...register('phone', { required: 'Введіть номер телефону' })}
           />
           {errors.phone && (
@@ -158,8 +154,7 @@ export function OrderForm() {
           <input
             type="email"
             placeholder="E-mail"
-            className="w-full px-4 py-3 border border-amber-200 rounded bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif placeholder-amber-800/60 text-amber-900"
-            style={{ borderRadius: '2px' }}
+            className="w-full px-4 py-3 border border-amber-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif placeholder-amber-800/60 text-amber-900"
             {...register('email', {
               pattern: {
                 value: /^\S+@\S+$/i,
@@ -216,12 +211,11 @@ export function OrderForm() {
                 <input
                   type="text"
                   placeholder="Місто *"
-                  className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+                  className={`w-full px-4 py-3 border font-light font-serif placeholder-amber-800/60 text-amber-900 ${
                     errors.delivery?.newpost?.city
                       ? 'border-red-400 focus:ring-red-300'
                       : 'border-amber-200 focus:ring-amber-300'
                   } bg-white focus:outline-none focus:ring-2`}
-                  style={{ borderRadius: '2px' }}
                   {...register('delivery.newpost.city', { required: 'Введіть місто' })}
                 />
                 {errors.delivery?.newpost?.city && (
@@ -235,12 +229,11 @@ export function OrderForm() {
                 <input
                   type="text"
                   placeholder="Відділення Нової Пошти *"
-                  className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+                  className={`w-full px-4 py-3 border font-light font-serif placeholder-amber-800/60 text-amber-900 ${
                     errors.delivery?.newpost?.warehouse
                       ? 'border-red-400 focus:ring-red-300'
                       : 'border-amber-200 focus:ring-amber-300'
                   } bg-white focus:outline-none focus:ring-2`}
-                  style={{ borderRadius: '2px' }}
                   {...register('delivery.newpost.warehouse', { required: 'Введіть відділення' })}
                 />
                 {errors.delivery?.newpost?.warehouse && (
@@ -258,12 +251,11 @@ export function OrderForm() {
                 <input
                   type="text"
                   placeholder="Місто *"
-                  className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+                  className={`w-full px-4 py-3 border font-light font-serif placeholder-amber-800/60 text-amber-900 ${
                     errors.delivery?.address?.city
                       ? 'border-red-400 focus:ring-red-300'
                       : 'border-amber-200 focus:ring-amber-300'
                   } bg-white focus:outline-none focus:ring-2`}
-                  style={{ borderRadius: '2px' }}
                   {...register('delivery.address.city', { required: 'Введіть місто' })}
                 />
                 {errors.delivery?.address?.city && (
@@ -277,12 +269,11 @@ export function OrderForm() {
                 <input
                   type="text"
                   placeholder="Вулиця *"
-                  className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+                  className={`w-full px-4 py-3 border font-light font-serif placeholder-amber-800/60 text-amber-900 ${
                     errors.delivery?.address?.street
                       ? 'border-red-400 focus:ring-red-300'
                       : 'border-amber-200 focus:ring-amber-300'
                   } bg-white focus:outline-none focus:ring-2`}
-                  style={{ borderRadius: '2px' }}
                   {...register('delivery.address.street', { required: 'Введіть вулицю' })}
                 />
                 {errors.delivery?.address?.street && (
@@ -297,12 +288,11 @@ export function OrderForm() {
                   <input
                     type="text"
                     placeholder="Будинок *"
-                    className={`w-full px-4 py-3 border rounded font-light font-serif placeholder-amber-800/60 text-amber-900 ${
+                    className={`w-full px-4 py-3 border font-light font-serif placeholder-amber-800/60 text-amber-900 ${
                       errors.delivery?.address?.house
                         ? 'border-red-400 focus:ring-red-300'
                         : 'border-amber-200 focus:ring-amber-300'
                     } bg-white focus:outline-none focus:ring-2`}
-                    style={{ borderRadius: '2px' }}
                     {...register('delivery.address.house', { required: 'Введіть номер будинку' })}
                   />
                   {errors.delivery?.address?.house && (
@@ -315,8 +305,7 @@ export function OrderForm() {
                 <input
                   type="text"
                   placeholder="Квартира"
-                  className="w-full px-4 py-3 border border-amber-200 rounded bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif placeholder-amber-800/60 text-amber-900"
-                  style={{ borderRadius: '2px' }}
+                  className="w-full px-4 py-3 border border-amber-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif placeholder-amber-800/60 text-amber-900"
                   {...register('delivery.address.apartment')}
                 />
               </div>
@@ -327,8 +316,7 @@ export function OrderForm() {
             <textarea
               placeholder="Коментар до доставки"
               rows={3}
-              className="w-full px-4 py-3 border border-amber-200 rounded bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif resize-none placeholder-amber-800/60 text-amber-900"
-              style={{ borderRadius: '2px' }}
+              className="w-full px-4 py-3 border border-amber-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif resize-none placeholder-amber-800/60 text-amber-900"
               {...register('delivery.comment')}
             />
           </div>
@@ -339,8 +327,7 @@ export function OrderForm() {
           <textarea
             placeholder="Коментар до замовлення"
             rows={3}
-            className="w-full px-4 py-3 border border-amber-200 rounded bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif resize-none placeholder-amber-800/60 text-amber-900"
-            style={{ borderRadius: '2px' }}
+            className="w-full px-4 py-3 border border-amber-200 bg-white focus:outline-none focus:ring-2 focus:ring-amber-300 font-light font-serif resize-none placeholder-amber-800/60 text-amber-900"
             {...register('comment')}
           />
         </div>
@@ -350,7 +337,6 @@ export function OrderForm() {
           type="submit"
           disabled={isSubmitting}
           className="w-full bg-amber-900 text-white py-4 px-6 font-light text-sm tracking-wide hover:bg-amber-800 transition-colors duration-300 font-serif disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ borderRadius: '2px' }}
         >
           {isSubmitting ? 'ОФОРМЛЕННЯ...' : 'ПІДТВЕРДИТИ ЗАМОВЛЕННЯ'}
         </button>

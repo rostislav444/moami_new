@@ -79,7 +79,7 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
                                         href={`/catalogue/${category.slug}/${subcategory.slug}`}
                                         className={`group block ${mobileClass} ${gridClass}`}
                                     >
-                                        <div className={`relative ${mobileAspectClass} ${aspectClass} overflow-hidden bg-gradient-to-br from-amber-50/20 to-amber-100/10 hover:shadow-xl transition-all duration-700 ease-out`} style={{ borderRadius: '2px' }}>
+                                        <div className={`relative ${mobileAspectClass} ${aspectClass} overflow-hidden bg-gradient-to-br from-amber-50/20 to-amber-100/10 hover:shadow-xl transition-all duration-700 ease-out`}>
                                             {subcategory.image && (
                                                 <SimpleImage
                                                     src={subcategory.image}

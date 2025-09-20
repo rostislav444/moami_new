@@ -14,7 +14,7 @@ export default function NotFound() {
         </p>
         <Link 
           href="/"
-          className="inline-block bg-amber-800 text-white px-8 py-3 rounded-lg font-light tracking-wide hover:bg-amber-900 transition-colors duration-300 font-serif"
+          className="inline-block bg-amber-800 text-white px-8 py-3 font-light tracking-wide hover:bg-amber-900 transition-colors duration-300 font-serif"
         >
           До каталогу
         </Link>

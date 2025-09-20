@@ -28,7 +28,6 @@ export default function CartPage() {
           <Link
             href="/"
             className="inline-block bg-amber-900 text-white py-3 px-8 font-light text-sm tracking-wide hover:bg-amber-800 transition-colors duration-300 font-serif"
-            style={{ borderRadius: '2px' }}
           >
             ПРОДОВЖИТИ ПОКУПКИ
           </Link>
@@ -52,7 +51,7 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Items */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-sm p-6 space-y-6">
+            <div className="bg-white p-6 space-y-6">
               {items.map((item) => (
                 <CartItem key={item.id} item={item} />
               ))}
@@ -61,7 +60,7 @@ export default function CartPage() {
 
           {/* Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white/70 rounded-sm p-6 space-y-6 sticky top-8">
+            <div className="bg-white/70 p-6 space-y-6 sticky top-8">
               <h2 className="text-xl font-light text-amber-900 font-serif">
                 Підсумок замовлення
               </h2>
@@ -87,7 +86,6 @@ export default function CartPage() {
                 <Link
                   href="/order"
                   className="block w-full bg-amber-900 text-white py-3 px-6 text-center font-light text-sm tracking-wide hover:bg-amber-800 transition-colors duration-300 font-serif"
-                  style={{ borderRadius: '2px' }}
                 >
                   ОФОРМИТИ ЗАМОВЛЕННЯ
                 </Link>
@@ -95,7 +93,6 @@ export default function CartPage() {
                 <Link
                   href="/"
                   className="block w-full bg-amber-50 text-amber-900 py-3 px-6 text-center font-light text-sm tracking-wide hover:bg-amber-100 transition-colors duration-300 font-serif border border-amber-200"
-                  style={{ borderRadius: '2px' }}
                 >
                   ПРОДОВЖИТИ ПОКУПКИ
                 </Link>

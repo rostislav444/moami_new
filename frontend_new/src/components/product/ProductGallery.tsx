@@ -57,7 +57,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
     <>
       <div className="space-y-4">
         {/* Main Image */}
-        <div className="relative w-full aspect-[4/5] bg-gray-100 overflow-hidden rounded-lg cursor-zoom-in" onClick={openZoomModal}>
+        <div className="relative w-full aspect-[3/4] bg-gray-100 overflow-hidden cursor-zoom-in" onClick={openZoomModal}>
           <ImageWithFallback
             src={images[selectedImageIndex].image}
             alt={`${productName} - изображение ${selectedImageIndex + 1}`}
@@ -108,7 +108,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
               <button
                 key={index}
                 onClick={() => setSelectedImageIndex(index)}
-                className={`flex-shrink-0 w-20 h-20 overflow-hidden border-2 rounded-lg transition-all duration-200 ${
+                className={`flex-shrink-0 w-20 aspect-[3/4] overflow-hidden border-2 transition-all duration-200 ${
                   selectedImageIndex === index
                     ? 'border-amber-500 ring-2 ring-amber-200'
                     : 'border-gray-200 hover:border-amber-300'
@@ -131,7 +131,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
           {/* Close Button */}
           <button
             onClick={closeZoomModal}
-            className="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 transition-colors z-30 bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center"
+            className="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 transition-colors z-30 bg-black bg-opacity-50 w-10 h-10 flex items-center justify-center"
             title="Закрыть"
           >
             ✕
@@ -142,7 +142,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-6 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-30 bg-black bg-opacity-50 rounded-full w-14 h-14 flex items-center justify-center"
+                className="absolute left-6 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-30 bg-black bg-opacity-50 w-14 h-14 flex items-center justify-center"
                 title="Предыдущее изображение"
               >
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +151,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-6 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-30 bg-black bg-opacity-50 rounded-full w-14 h-14 flex items-center justify-center"
+                className="absolute right-6 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-30 bg-black bg-opacity-50 w-14 h-14 flex items-center justify-center"
                 title="Следующее изображение"
               >
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,7 +163,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
 
           {/* Image Counter */}
           {images.length > 1 && (
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white z-30 bg-black bg-opacity-50 px-3 py-1 rounded">
+            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white z-30 bg-black bg-opacity-50 px-3 py-1">
               {selectedImageIndex + 1} / {images.length}
             </div>
           )}
@@ -202,7 +202,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-30">
                   <button
                     onClick={() => zoomOut()}
-                    className="bg-black bg-opacity-50 text-white px-4 py-2 rounded hover:bg-opacity-70 transition-all"
+                    className="bg-black bg-opacity-50 text-white px-4 py-2 hover:bg-opacity-70 transition-all"
                     title="Уменьшить"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,7 +211,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                   </button>
                   <button
                     onClick={() => resetTransform()}
-                    className="bg-black bg-opacity-50 text-white px-4 py-2 rounded hover:bg-opacity-70 transition-all"
+                    className="bg-black bg-opacity-50 text-white px-4 py-2 hover:bg-opacity-70 transition-all"
                     title="Сбросить"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,7 +220,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                   </button>
                   <button
                     onClick={() => zoomIn()}
-                    className="bg-black bg-opacity-50 text-white px-4 py-2 rounded hover:bg-opacity-70 transition-all"
+                    className="bg-black bg-opacity-50 text-white px-4 py-2 hover:bg-opacity-70 transition-all"
                     title="Увеличить"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

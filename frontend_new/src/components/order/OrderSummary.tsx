@@ -11,7 +11,7 @@ interface OrderItemProps {
 function OrderItem({ item }: OrderItemProps) {
   return (
     <div className="flex gap-3 py-3 border-b border-amber-100/50 last:border-b-0">
-      <div className="relative w-16 h-20 flex-shrink-0 bg-amber-50 overflow-hidden" style={{ borderRadius: '2px' }}>
+      <div className="relative w-16 h-20 flex-shrink-0 bg-amber-50 overflow-hidden">
         <Image
           src={item.image}
           alt={item.name}
@@ -47,7 +47,7 @@ export function OrderSummary() {
   const { items, total, quantity } = useCartStore();
 
   return (
-    <div className="rounded-sm bg-white p-6 border border-amber-200/100 space-y-6 sticky top-8">
+    <div className="bg-white p-6 border border-amber-200/100 space-y-6 sticky top-8">
       <h2 className="text-xl font-light text-amber-900 font-serif">
         Товари у замовленні
       </h2>

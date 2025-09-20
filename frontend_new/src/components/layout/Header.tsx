@@ -93,7 +93,7 @@ export function Header({ categories }: HeaderProps) {
                                             className={`absolute top-full mt-2 bg-white border border-amber-200 shadow-xl min-w-80 ${
                                                 dropdownPosition[category.id] === 'right' ? 'right-0' : 'left-0'
                                             }`}
-                                            style={{ borderRadius: '8px', zIndex: 99999 }}
+                                            style={{ zIndex: 99999 }}
                                             onMouseEnter={handleDropdownEnter}
                                             onMouseLeave={handleDropdownLeave}
                                         >
@@ -104,7 +104,7 @@ export function Header({ categories }: HeaderProps) {
                                                         href={`/catalogue/${category.slug}/${subcategory.slug}`}
                                                         className="flex items-center px-4 py-3 hover:bg-amber-50 transition-colors duration-200"
                                                     >
-                                                        <div className="relative block overflow-hidden flex-shrink-0 mr-3 bg-amber-100" style={{ borderRadius: '6px', width: '48px', height: '48px' }}>
+                                                        <div className="relative block overflow-hidden flex-shrink-0 mr-3 bg-amber-100" style={{ width: '48px', height: '48px' }}>
                                                             {subcategory.image ? (
                                                                 <SimpleImage
                                                                     src={subcategory.image}

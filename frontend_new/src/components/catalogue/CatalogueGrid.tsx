@@ -93,7 +93,7 @@ export default function CatalogueGrid({
               <Link
                 key={category.id}
                 href={`/${categoryPath}/${category.slug}`}
-                className="group block relative overflow-hidden rounded transition-all duration-300 hover:shadow-md"
+                className="group block relative overflow-hidden transition-all duration-300 hover:shadow-md"
               >
                 <div className="relative aspect-square bg-gradient-to-br from-amber-50 to-amber-100">
                   {category.image && (
@@ -128,7 +128,7 @@ export default function CatalogueGrid({
           <select 
             value={pageSize}
             onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-            className="border border-amber-300 rounded px-3 py-2 text-base bg-white text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 font-light font-serif"
+            className="border border-amber-300 px-3 py-2 text-base bg-white text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 font-light font-serif"
           >
             <option value={24}>24</option>
             <option value={48}>48</option>
@@ -146,7 +146,7 @@ export default function CatalogueGrid({
             onMouseEnter={() => setHoveredProduct(variant.id)}
             onMouseLeave={() => setHoveredProduct(null)}
           >
-            <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-amber-50 rounded-sm">
+            <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-amber-50">
               {variant.images.length > 0 && (
                 <ImageWithFallback
                   src={variant.images[0].image}
@@ -185,7 +185,7 @@ export default function CatalogueGrid({
                 {variant.sizes.filter(size => size.stock > 0).map((size) => (
                   <span 
                     key={size.id}
-                    className="text-sm px-2 py-1 bg-white border border-amber-200 text-amber-800 rounded font-light"
+                    className="text-sm px-2 py-1 bg-white border border-amber-200 text-amber-800 font-light"
                   >
                     {size.size.ua}
                   </span>

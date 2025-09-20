@@ -1,0 +1,443 @@
+[
+    {
+        "code": "5354",
+        "parentCode": "7567",
+        "hasChild": true,
+        "attributeSets": [
+            {
+                "code": "5354"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Одежда"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Одяг"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "1784",
+        "parentCode": "7147",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "1784"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Джинсы женские"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Джинси жіночі"
+            }
+        ],
+        "deleted": true
+    },
+    {
+        "code": "5426",
+        "parentCode": "5355",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "5426"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ua",
+                "title": "Блузки"
+            },
+            {
+                "languageCode": "ru",
+                "title": "Блузки"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "5432",
+        "parentCode": "5358",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "5432"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ua",
+                "title": "Жіночі сумки"
+            },
+            {
+                "languageCode": "ru",
+                "title": "Женские сумки"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "5445",
+        "parentCode": "5355",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "5445"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Домашняя одежда женская"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Домашній одяг жіночий"
+            }
+        ],
+        "deleted": true
+    },
+    {
+        "code": "5441",
+        "parentCode": "7162",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "5441"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Свитеры женские"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Светри жіночі"
+            }
+        ],
+        "deleted": true
+    },
+    {
+        "code": "6390",
+        "parentCode": "5354",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "6390"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Платья"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Сукні"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "5414",
+        "parentCode": "5355",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "5414"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Юбки"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Спідниці"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "1784",
+        "parentCode": "7147",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "1784"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Джинсы женские"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Джинси жіночі"
+            }
+        ],
+        "deleted": true
+    },
+    {
+        "code": "1363",
+        "parentCode": "1595",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "1363"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ua",
+                "title": "Футболки та майки"
+            },
+            {
+                "languageCode": "ru",
+                "title": "Футболки и майки"
+            }
+        ],
+        "deleted": true
+    },
+    {
+        "code": "5390",
+        "parentCode": "5356",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "5390"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Ремни и пояса"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Ремені та пояси"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "9142",
+        "parentCode": "5354",
+        "hasChild": true,
+        "attributeSets": [
+            {
+                "code": "9142"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Костюмы"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Костюми"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "7163",
+        "parentCode": "1795",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "7163"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Пуховики"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Пуховики"
+            }
+        ],
+        "deleted": true
+    },
+    {
+        "code": "6575",
+        "parentCode": "1795",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "6575"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Куртки"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Куртки"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "7925",
+        "parentCode": "1795",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "7925"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Шубы"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Шуби"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "5430",
+        "parentCode": "5355",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "5430"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ua",
+                "title": "Туніки"
+            },
+            {
+                "languageCode": "ru",
+                "title": "Туники"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "1790",
+        "parentCode": "6850",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "1790"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ua",
+                "title": "Брюки"
+            },
+            {
+                "languageCode": "ru",
+                "title": "Брюки"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "6568",
+        "parentCode": "5399",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "6568"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Кепки"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Кепки"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "5394",
+        "parentCode": "7571",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "5394"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Сапоги"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Чоботи"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "5389",
+        "parentCode": "7571",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "5389"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ru",
+                "title": "Босоножки"
+            },
+            {
+                "languageCode": "ua",
+                "title": "Босоніжки"
+            }
+        ],
+        "deleted": false
+    },
+    {
+        "code": "6466",
+        "parentCode": "7571",
+        "hasChild": false,
+        "attributeSets": [
+            {
+                "code": "6466"
+            }
+        ],
+        "translations": [
+            {
+                "languageCode": "ua",
+                "title": "Туфлі"
+            },
+            {
+                "languageCode": "ru",
+                "title": "Туфли"
+            }
+        ],
+        "deleted": false
+    }
+]
