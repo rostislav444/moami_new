@@ -1,5 +1,4 @@
 from django.apps import apps
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db import transaction
 from django.utils.translation import get_language
@@ -50,16 +49,17 @@ class Translatable(models.Model):
         if lang is None:
             translations = {}
             for lang in settings.LANGUAGES:
-                try:
-                    translations[lang[0]] = getattr(self.translations.get(language_code=lang[0]), field)
-                except ObjectDoesNotExist:
+                translation_instance = self._get_translation_instance(lang[0])
+                if translation_instance:
+                    translations[lang[0]] = getattr(translation_instance, field)
+                else:
                     translations[lang[0]] = getattr(self, field)
             return translations
         else:
-            try:
-                return getattr(self.translations.get(language_code=lang), field)
-            except ObjectDoesNotExist:
-                return getattr(self, field)
+            translation_instance = self._get_translation_instance(lang)
+            if translation_instance:
+                return getattr(translation_instance, field)
+            return getattr(self, field)
 
     def get_translation_model(self):
         app = self.__class__._meta.app_label
@@ -128,13 +128,32 @@ class Translatable(models.Model):
             if name in self.translatable_fields:
                 if not transaction.get_autocommit():
                     return super().__getattribute__(name)
-                try:
-                    translated_instance = super().__getattribute__('translations').get(language_code=current_language)
+                translated_instance = self._get_translation_instance(current_language)
+                if translated_instance:
                     value = getattr(translated_instance, name)
                     if value:
                         return value
-                    return super().__getattribute__(name)
-                except (ObjectDoesNotExist, ValueError):
-                    pass
         return super().__getattribute__(name)
 
+    def _get_translation_instance(self, lang_code):
+        translations_manager = getattr(self, 'translations', None)
+        if translations_manager is None:
+            return None
+
+        try:
+            queryset = translations_manager.filter(language_code=lang_code).order_by('pk')
+            instances = list(queryset)
+            if not instances:
+                return None
+
+            primary = instances[0]
+
+            if len(instances) > 1:
+                duplicates = [item.pk for item in instances[1:]]
+                model_class = queryset.model
+                if duplicates and model_class:
+                    model_class.objects.filter(pk__in=duplicates).delete()
+
+            return primary
+        except Exception:
+            return None

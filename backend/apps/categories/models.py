@@ -27,6 +27,7 @@ class Category(NameSlug, MPTTModel, Translatable):
     image = DeletableImageField(upload_to='categories', blank=True, null=True, verbose_name='Изображение')
 
     update_mk_stock = models.BooleanField(default=False)
+    mk_append_cm = models.BooleanField(default=False, verbose_name='Добавлять суффикс "см" в MK фиде')
 
     class MPTTMeta:
         order_insertion_by = ['ordering', 'name']

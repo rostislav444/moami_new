@@ -1,9 +1,12 @@
+import re
+
 from rest_framework import serializers
-from unidecode import unidecode
-from django.utils.text import slugify
 
 from apps.integrations.serializers.serializers_rozetka import RozetkaCategoriesSerializer
 from apps.product.models import Product, Variant, VariantSize, VariantImage, ProductAttribute
+
+
+NUMERIC_SIZE_PATTERN = re.compile(r'^[0-9.,/\-]+$')
 
 
 class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
@@ -16,6 +19,10 @@ class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
         model = VariantSize
         fields = ('id', 'full_id', 'mk_full_id', 'size', 'stock', 'max_size')
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._append_cm_cache = {}
+
     @staticmethod
     def get_full_id(obj):
         return ' '.join([obj.variant.code, obj.get_size]).upper()
@@ -26,11 +33,54 @@ class ModnaKastaXMLVariantSizeSerializer(serializers.ModelSerializer):
 
     def get_size(self, obj):
         size = obj.get_size
-        return size
+        return self._format_size(size, obj)
 
     def get_max_size(self, obj):
         size = obj.get_max_size
-        return size
+        return self._format_size(size, obj) if size else size
+
+    def _format_size(self, size_value, obj):
+        if not size_value:
+            return size_value
+
+        normalized = size_value.strip()
+        if normalized.lower().endswith('см'):
+            return normalized
+
+        if not self._should_append_cm(obj):
+            return normalized
+
+        if not NUMERIC_SIZE_PATTERN.match(normalized.replace(' ', '')):
+            return normalized
+
+        return f'{normalized}см'
+
+    def _should_append_cm(self, obj):
+        product = getattr(obj.variant, 'product', None)
+        if not product:
+            return False
+
+        category = getattr(product, 'category', None)
+        if not category:
+            return False
+
+        category_id = getattr(category, 'id', None)
+        if category_id in self._append_cm_cache:
+            return self._append_cm_cache[category_id]
+
+        should_append = False
+        current_category = category
+
+        while current_category:
+            if getattr(current_category, 'mk_append_cm', False):
+                should_append = True
+                break
+            current_category = getattr(current_category, 'parent', None)
+
+        if category_id is not None:
+            self._append_cm_cache[category_id] = should_append
+
+        return should_append
 
 
 class ModnaKastaXMLVariantImageSerializer(serializers.ModelSerializer):
@@ -45,16 +95,21 @@ class ModnaKastaXMLVariantSerializer(serializers.ModelSerializer):
     color = serializers.CharField(source='color.name')
     color_uk = serializers.SerializerMethodField()
     code = serializers.SerializerMethodField()
+    article_code = serializers.SerializerMethodField()
 
     class Meta:
         model = Variant
-        fields = ('id', 'code', 'color', 'color_uk', 'sizes', 'images')
+        fields = ('id', 'code', 'article_code', 'color', 'color_uk', 'sizes', 'images')
 
     def get_code(self, obj):
         return obj.get_effective_code
 
     def get_color_uk(self, obj):
         return obj.color.get_translation__name__uk
+
+    @staticmethod
+    def get_article_code(obj):
+        return obj.code
 
 
 class ModnaKastaXMLProductAttributesSerializer(serializers.ModelSerializer):
