@@ -21,7 +21,15 @@ class CategoryFilter(AutocompleteFilter):
 @admin.register(Category)
 class CategoryAdmin(MPTTModelAdmin):
     mptt_level_indent = 20
-    list_display = ('name', 'google_taxonomy', 'facebook_category', 'modna_kast_category', 'ordering', 'size_group')
+    list_display = (
+        'name',
+        'google_taxonomy',
+        'facebook_category',
+        'modna_kast_category',
+        'ordering',
+        'size_group',
+        'mk_append_cm',
+    )
     list_filter = [CategoryFilter]
     sortable = 'ordering'
 
@@ -36,8 +44,18 @@ class CategoryAdmin(MPTTModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'parent', 'size_group', 'preferred_size_grid', 'google_taxonomy', 'facebook_category',
-                       'modna_kast_category', 'ordering', 'update_mk_stock')
+            'fields': (
+                'name',
+                'parent',
+                'size_group',
+                'preferred_size_grid',
+                'google_taxonomy',
+                'facebook_category',
+                'modna_kast_category',
+                'ordering',
+                'update_mk_stock',
+                'mk_append_cm',
+            )
         }),
         ('Изображение', {
             'fields': ('get_image', 'image',)
