@@ -22,11 +22,11 @@ class SizeGroup(NameSlug):
         verbose_name = 'Группа размеров'
         verbose_name_plural = 'Группы размеров'
 
-    def save(self, *args, **kwargs):
-        # Check if at least one grid is associated
-        if self.id and not self.grids.exists():
-            raise ValidationError("At least one grid must be selected.")
-        super(SizeGroup, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     # Check if at least one grid is associated
+    #     if self.id and not self.grids.exists():
+    #         raise ValidationError("At least one grid must be selected.")
+    #     super(SizeGroup, self).save(*args, **kwargs)
 
 
 class Size(models.Model):
