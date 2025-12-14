@@ -15,7 +15,7 @@ class SizeGrid(NameSlug):
 
 
 class SizeGroup(NameSlug):
-    grids = models.ManyToManyField(SizeGrid, related_name='groups')
+    grids = models.ManyToManyField(SizeGrid, related_name='groups', blank=True)
 
     class Meta:
         ordering = ['name']
@@ -24,7 +24,7 @@ class SizeGroup(NameSlug):
 
     def save(self, *args, **kwargs):
         # Check if at least one grid is associated
-        if not self.grids.exists():
+        if self.id and not self.grids.exists():
             raise ValidationError("At least one grid must be selected.")
         super(SizeGroup, self).save(*args, **kwargs)
 
