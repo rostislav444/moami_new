@@ -78,27 +78,35 @@ interface ProductVariant {
 }
 
 async function getProduct(slug: string): Promise<ProductVariant | null> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/product/variants/${slug}/`, {
-    next: { revalidate: 3600 }
-  })
-  
-  if (!res.ok) {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/product/variants/${slug}/`, {
+      next: { revalidate: 3600 }
+    })
+
+    if (!res.ok) {
+      return null
+    }
+
+    return res.json()
+  } catch {
     return null
   }
-  
-  return res.json()
 }
 
 async function getCategories(): Promise<CategoryState[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/categories/`, {
-    next: { revalidate: 3600 }
-  })
-  
-  if (!res.ok) {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/categories/`, {
+      next: { revalidate: 3600 }
+    })
+
+    if (!res.ok) {
+      return []
+    }
+
+    return res.json()
+  } catch {
     return []
   }
-  
-  return res.json()
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -130,9 +138,6 @@ export default async function ProductPageRoute({ params }: PageProps) {
     getCategories()
   ])
 
-  console.log(product)
-  console.log(categories)
-  
   if (!product) {
     notFound()
   }

@@ -36,8 +36,6 @@ export function OrderForm() {
       })),
     };
 
-    console.log(orderData);
-
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/`, {
         method: 'POST',
@@ -66,9 +64,6 @@ export function OrderForm() {
         setTimeout(() => {
           clearCart();
         }, 100);
-      } else {
-        console.log(response);
-        console.error('Ошибка создания заказа');
       }
     } catch (error) {
       console.error('Ошибка отправки заказа:', error);

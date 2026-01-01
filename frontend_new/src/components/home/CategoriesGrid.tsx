@@ -9,9 +9,6 @@ interface CategoriesGridProps {
 }
 
 export function CategoriesGrid({ categories }: CategoriesGridProps) {
-    console.log('🏠 CategoriesGrid получил категории:', categories?.length || 0);
-    console.log('🏠 Первая категория:', categories?.[0]?.name || 'нет категорий');
-
     if (!categories || categories.length === 0) {
         return (
             <div className="py-24 text-center">

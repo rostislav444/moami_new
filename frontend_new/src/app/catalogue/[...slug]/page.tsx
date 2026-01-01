@@ -50,27 +50,35 @@ interface CatalogueResponse {
 }
 
 async function getCatalogue(categorySlug: string, page: number = 1, pageSize: number = 24): Promise<CatalogueResponse | null> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/catalogue/?category=${categorySlug}&page=${page}&page_size=${pageSize}`, {
-    next: { revalidate: 3600 }
-  })
-  
-  if (!res.ok) {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/catalogue/?category=${categorySlug}&page=${page}&page_size=${pageSize}`, {
+      next: { revalidate: 3600 }
+    })
+
+    if (!res.ok) {
+      return null
+    }
+
+    return res.json()
+  } catch {
     return null
   }
-  
-  return res.json()
 }
 
 async function getCategories(): Promise<CategoryState[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/categories/`, {
-    next: { revalidate: 3600 }
-  })
-  
-  if (!res.ok) {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/categories/`, {
+      next: { revalidate: 3600 }
+    })
+
+    if (!res.ok) {
+      return []
+    }
+
+    return res.json()
+  } catch {
     return []
   }
-  
-  return res.json()
 }
 
 function createBreadcrumbs(slugs: string[], categories: CategoryState[]) {

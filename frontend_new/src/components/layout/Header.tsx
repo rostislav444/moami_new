@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CategoryState } from '@/types/categories';
 import { SimpleImage } from '@/components/ui/SimpleImage';
 import { useCartStore } from '@/store/cart';
@@ -11,14 +11,19 @@ interface HeaderProps {
 }
 
 export function Header({ categories }: HeaderProps) {
-    console.log('🔍 Header получил категории:', categories?.length || 0);
-    console.log('🔍 Первая категория в Header:', categories?.[0]?.name || 'нет категорий');
-
     const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
     const [dropdownPosition, setDropdownPosition] = useState<{ [key: number]: 'left' | 'right' }>({});
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [hideTimeout, setHideTimeout] = useState<NodeJS.Timeout | null>(null);
     const { quantity, toggleCart } = useCartStore();
+
+    useEffect(() => {
+        return () => {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+            }
+        };
+    }, [hideTimeout]);
 
     const handleMouseEnter = (categoryId: number, event: React.MouseEvent<HTMLDivElement>) => {
         if (hideTimeout) {

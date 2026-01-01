@@ -21,7 +21,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.prod
-    command: gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3 --log-level=info
+    command: gunicorn project.wsgi:application --bind 0.0.0.0:8000 --workers 3 --log-level=info --timeout 120
     ports:
       - 8000:8000
     volumes:
@@ -34,6 +34,7 @@ services:
         condition: service_healthy
     networks:
       - nginx_net
+    restart: unless-stopped
 
   frontend:
     container_name: frontend_new
@@ -53,6 +54,13 @@ services:
       - nginx_net
     depends_on:
       - web
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   postgres_data:

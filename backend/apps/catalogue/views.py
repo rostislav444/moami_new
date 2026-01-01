@@ -1,11 +1,11 @@
-from django.db.models import Sum
+from django.db.models import Sum, Prefetch
 from rest_framework import generics, viewsets, mixins
 from rest_framework.exceptions import NotFound
 from rest_framework.pagination import PageNumberPagination
 
 from apps.catalogue.serializers import CatalogueVariantSerializer
 from apps.categories.models import Category
-from apps.product.models import Variant
+from apps.product.models import Variant, VariantImage, VariantSize
 
 
 class CatalogueVariantsPagination(PageNumberPagination):
@@ -36,8 +36,18 @@ class CatalogueVariantsViewSet(generics.GenericAPIView, mixins.ListModelMixin, v
     def get_queryset(self):
         params = self.request.GET
 
-        variants = Variant.objects.filter(images__isnull=False, sizes__isnull=False).annotate(
-            total_sizes=Sum('sizes__stock')).exclude(total_sizes=0).distinct()
+        variants = Variant.objects.filter(
+            images__isnull=False,
+            sizes__isnull=False
+        ).select_related(
+            'product',
+            'color'
+        ).prefetch_related(
+            Prefetch('images', queryset=VariantImage.objects.all()),
+            Prefetch('sizes', queryset=VariantSize.objects.select_related('size'))
+        ).annotate(
+            total_sizes=Sum('sizes__stock')
+        ).exclude(total_sizes=0).distinct()
 
         if 'category' in params:
             return self.get_products_by_categories(variants, params['category'])
