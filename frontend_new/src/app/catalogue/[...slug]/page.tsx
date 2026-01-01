@@ -26,10 +26,7 @@ interface ProductVariant {
   }
   images: Array<{
     image: string
-    dimensions?: any
-    thumbnails?: Array<{
-      image: string
-    }>
+    thumbnail?: string | null
   }>
   sizes: Array<{
     id: number

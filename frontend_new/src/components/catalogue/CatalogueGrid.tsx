@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CategoryState } from '@/types/categories'
 import { ImageWithFallback } from '@/components/ui/ImageWithFallback'
+import { ProgressiveImage } from '@/components/ui/ProgressiveImage'
 
 interface ProductVariant {
   id: number
@@ -17,10 +18,7 @@ interface ProductVariant {
   }
   images: Array<{
     image: string
-    dimensions?: any
-    thumbnails?: Array<{
-      image: string
-    }>
+    thumbnail?: string | null
   }>
   sizes: Array<{
     id: number
@@ -148,16 +146,18 @@ export default function CatalogueGrid({
           >
             <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-amber-50">
               {variant.images.length > 0 && (
-                <ImageWithFallback
+                <ProgressiveImage
                   src={variant.images[0].image}
+                  thumbnail={variant.images[0].thumbnail}
                   alt={variant.product.name}
                   className="w-full h-full object-cover"
                 />
               )}
-              
+
               {variant.images.length > 1 && hoveredProduct === variant.id && (
-                <ImageWithFallback
+                <ProgressiveImage
                   src={variant.images[1].image}
+                  thumbnail={variant.images[1].thumbnail}
                   alt={variant.product.name}
                   className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
                 />

@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 
 from apps.product.models import Product, Variant, Color, VariantImage, VariantSize
@@ -17,10 +18,17 @@ class ColorSerializer(serializers.ModelSerializer):
 
 
 class CatalogueImageSerializer(serializers.ModelSerializer):
-    """Lightweight image serializer for catalogue - no expensive file I/O operations"""
+    """Lightweight image serializer for catalogue with thumbnail for progressive loading"""
+    thumbnail = serializers.SerializerMethodField()
+
     class Meta:
         model = VariantImage
-        fields = ('image',)
+        fields = ('image', 'thumbnail')
+
+    def get_thumbnail(self, obj):
+        if obj.thumbnails and 'xs' in obj.thumbnails:
+            return settings.MEDIA_URL + obj.thumbnails['xs']
+        return None
 
 
 class CatalogueVariantSerializer(serializers.ModelSerializer):
