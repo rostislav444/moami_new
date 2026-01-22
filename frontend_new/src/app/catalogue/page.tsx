@@ -4,6 +4,8 @@ import { getCategoriesServer } from '@/lib/server-actions'
 import { getPagesServer } from '@/lib/api'
 import { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Каталог товарів - MOAMI',
   description: 'Повний каталог жіночого одягу, аксесуарів та взуття в інтернет-магазині MOAMI',
