@@ -69,7 +69,7 @@ def generate_feed(feed_type):
         categories_data = get_categories_data()
         response = render_categories(categories_data)
 
-        with open(paths['categories_xml'], 'w') as f:
+        with open(paths['categories_xml'], 'w', encoding='utf-8') as f:
             f.write(response)
 
     def render_products_xml():
@@ -123,10 +123,10 @@ def generate_feed(feed_type):
             return rendered_template.strip()
 
         def write_file(products_data, products_qty):
-            with open(paths['products_xml'], 'w') as _:
+            with open(paths['products_xml'], 'w', encoding='utf-8') as _:
                 pass
 
-            with open(paths['products_xml'], 'w') as products_feed_file:
+            with open(paths['products_xml'], 'w', encoding='utf-8') as products_feed_file:
                 count = 0
                 for product_data in products_data:
                     count += 1
@@ -143,8 +143,8 @@ def generate_feed(feed_type):
     def write_final_feed():
         final_xml_path = paths['feed_xml']
 
-        with (open(paths['categories_xml'], 'r', encoding='utf-8') as categories_xml,
-              open(paths['products_xml'], 'r', encoding='utf-8') as products_xml):
+        with (open(paths['categories_xml'], 'r', encoding='utf-8', errors='replace') as categories_xml,
+              open(paths['products_xml'], 'r', encoding='utf-8', errors='replace') as products_xml):
 
             template = get_template(paths['feed_tpl'])
             categories_content = categories_xml.read()
