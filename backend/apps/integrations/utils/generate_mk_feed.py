@@ -1,9 +1,21 @@
 import os
+import re
 import sys
 from datetime import datetime
 from xml.dom import minidom
 
 from django.db.models import Prefetch
+
+
+def sanitize_xml(text):
+    """Remove invalid XML characters and fix unescaped ampersands."""
+    if not text:
+        return text
+    # Remove control characters except tab, newline, carriage return
+    text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', text)
+    # Fix unescaped ampersands (& not followed by entity pattern like &amp; &lt; etc)
+    text = re.sub(r'&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)', '&amp;', text)
+    return text
 from django.db.models import Q
 from django.template.loader import get_template
 from django.utils import translation
@@ -145,7 +157,8 @@ def generate_feed(feed_type):
             })
 
             with open(final_xml_path, 'w', encoding='utf-8') as feed:
-                formatted_xml = minidom.parseString(rendered_template).toprettyxml(indent="  ")
+                sanitized_template = sanitize_xml(rendered_template)
+                formatted_xml = minidom.parseString(sanitized_template).toprettyxml(indent="  ")
                 lines = [line for line in formatted_xml.split('\n') if line.strip()]
                 feed.write('\n'.join(lines))
 
