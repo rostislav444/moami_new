@@ -30,6 +30,11 @@ http {
         root /usr/share/nginx/html;
         error_page 502 503 504 /maintenance.html;
 
+        # Block malicious requests
+        location ~* (lrt|\.\./) {
+            return 444;
+        }
+
         location = /maintenance.html {
             internal;
         }
