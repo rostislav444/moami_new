@@ -30,8 +30,18 @@ http {
         root /usr/share/nginx/html;
         error_page 502 503 504 /maintenance.html;
 
-        # Block malicious requests
-        location ~* (lrt|\.\./) {
+        # Block malicious requests - path traversal and injection attempts
+        location ~* (lrt|\.\.|\.\./|%2e%2e|%00|<script|wget|curl.*sh|repositorylinux) {
+            return 444;
+        }
+
+        # Block requests with suspicious query strings
+        if ($query_string ~* "(lrt|\.\.|\.\./|<script|wget.*http|curl.*http)") {
+            return 444;
+        }
+
+        # Block requests with suspicious request body indicators in URI
+        if ($request_uri ~* "(returnNaN|\.sh\b|/etc/|/var/|/dev/)") {
             return 444;
         }
 
