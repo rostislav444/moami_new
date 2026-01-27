@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 import CatalogueGrid from '@/components/catalogue/CatalogueGrid'
 import { Layout } from '@/components/layout/Layout'
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
@@ -146,15 +147,21 @@ export default async function CataloguePage({ params, searchParams }: PageProps)
     <Layout categories={categories}>
       <div className="py-8">
         <Breadcrumbs items={breadcrumbs} />
-        <CatalogueGrid 
-          products={catalogue.results}
-          totalCount={catalogue.count}
-          currentPage={currentPage}
-          pageSize={pageSize}
-          categoryPath={`catalogue/${resolvedParams.slug.join('/')}`}
-          categories={categories}
-          currentCategory={currentCategory}
-        />
+        <Suspense fallback={<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-pulse">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="aspect-[3/4] bg-gray-200 rounded-lg" />
+          ))}
+        </div>}>
+          <CatalogueGrid
+            products={catalogue.results}
+            totalCount={catalogue.count}
+            currentPage={currentPage}
+            pageSize={pageSize}
+            categoryPath={`catalogue/${resolvedParams.slug.join('/')}`}
+            categories={categories}
+            currentCategory={currentCategory}
+          />
+        </Suspense>
       </div>
     </Layout>
   )
