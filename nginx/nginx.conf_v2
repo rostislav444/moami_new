@@ -31,12 +31,13 @@ http {
         error_page 502 503 504 /maintenance.html;
 
         # Block malicious requests - path traversal and injection attempts
-        location ~* (lrt|\.\.|\.\./|%2e%2e|%00|<script|wget|curl.*sh|repositorylinux) {
+        # Note: avoid blocking "..." as it's used in Next.js [...slug] routes
+        location ~* (lrt|\.\./|/\.\.|\.\.[?#]|%2e%2e|%00|<script|wget|curl.*sh|repositorylinux) {
             return 444;
         }
 
         # Block requests with suspicious query strings
-        if ($query_string ~* "(lrt|\.\.|\.\./|<script|wget.*http|curl.*http)") {
+        if ($query_string ~* "(lrt|\.\./|<script|wget.*http|curl.*http)") {
             return 444;
         }
 
