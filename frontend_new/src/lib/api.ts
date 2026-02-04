@@ -2,7 +2,10 @@ import axios from 'axios';
 import { CategoryState, CollectionState } from '@/types/categories';
 import { PageListItem, PageData } from '@/types/pages';
 
+// Client-side API URL (used in browser)
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://moami.com.ua';
+// Server-side API URL (used in SSR)
+const SERVER_API_URL = process.env.API_URL || (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000');
 
 export const api = axios.create({
     baseURL: `${API_BASE_URL}/api`,
@@ -56,7 +59,7 @@ export const productsApi = {
 };
 
 export async function getPagesServer(): Promise<PageListItem[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pages/pages/`, {
+  const res = await fetch(`${SERVER_API_URL}/api/pages/pages/`, {
     next: { revalidate: 86400 }
   })
 
@@ -68,7 +71,7 @@ export async function getPagesServer(): Promise<PageListItem[]> {
 }
 
 export async function getPageServer(slug: string): Promise<PageData | null> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pages/pages/${slug}/`, {
+  const res = await fetch(`${SERVER_API_URL}/api/pages/pages/${slug}/`, {
     next: { revalidate: 86400 }
   })
 

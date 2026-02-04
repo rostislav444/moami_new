@@ -1,7 +1,9 @@
 import { CategoryState, CollectionState } from '@/types/categories';
 
 const getApiUrl = () => {
-    return process.env.NEXT_PUBLIC_API_URL || process.env.API_URL ||
+    // Prefer API_URL for server-side rendering (internal Docker network)
+    // NEXT_PUBLIC_API_URL is for client-side only
+    return process.env.API_URL ||
            (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000');
 };
 
