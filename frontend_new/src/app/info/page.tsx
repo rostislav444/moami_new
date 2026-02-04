@@ -5,6 +5,9 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
 import { getPagesServer } from '@/lib/api'
 import { getCategoriesServer } from '@/lib/server-actions'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 3600
+
 export const metadata: Metadata = {
   title: 'Інформація - MOAMI',
   description: 'Корисна інформація про доставку, оплату, публічну оферту та інші умови',
