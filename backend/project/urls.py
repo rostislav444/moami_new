@@ -15,6 +15,7 @@ api = [
     path('newpost/', include('apps.newpost.urls')),
     path('sizes/', include('apps.sizes.urls')),
     path('integrations/', include('apps.integrations.urls')),
+    path('marketplaces/', include('apps.marketplaces.urls')),
     path('', include('apps.core.urls')),
 ]
 

@@ -13,6 +13,11 @@ with open(env_path) as f:
     env_vars = f.read().splitlines()
 
 for env_var in env_vars:
+    # Skip empty lines and comments
+    if not env_var or env_var.startswith('#'):
+        continue
+    if '=' not in env_var:
+        continue
     key, value = env_var.split('=', 1)
     os.environ[key] = value
 
@@ -29,13 +34,21 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '185.201.252.106',
+    '157.180.118.240',
     'moami.com.ua',
     'localhost',
     '0.0.0.0',
     '127.0.0.1',
-    'localhost:3000'
-    '127.0.0.1:3000'
+    'localhost:3000',
+    '127.0.0.1:3000',
+    'web',  # Docker service hostname for SSR requests
 ]
+
+# Site URL for building absolute URLs in API responses
+SITE_URL = os.environ.get('SITE_URL', 'https://moami.com.ua')
+
+# AI Assistant (Claude API)
+ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')
 
 # Application definition
 
@@ -62,6 +75,7 @@ INSTALLED_APPS = [
     'apps.pages.apps.PagesConfig',
     'apps.product.apps.ProductConfig',
     'apps.integrations.apps.IntegrationsConfig',
+    'apps.marketplaces.apps.MarketplacesConfig',
     'apps.newpost.apps.NewpostConfig',
     'apps.sizes.apps.SizesConfig',
     'apps.translation.apps.TranslationConfig',
