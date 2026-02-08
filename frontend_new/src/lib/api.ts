@@ -60,7 +60,11 @@ export const productsApi = {
 
 export async function getPagesServer(): Promise<PageListItem[]> {
   const res = await fetch(`${SERVER_API_URL}/api/pages/pages/`, {
-    next: { revalidate: 86400 }
+    next: { revalidate: 86400 },
+    headers: {
+      'Content-Type': 'application/json',
+      'Host': 'moami.com.ua',
+    }
   })
 
   if (!res.ok) {
@@ -72,7 +76,11 @@ export async function getPagesServer(): Promise<PageListItem[]> {
 
 export async function getPageServer(slug: string): Promise<PageData | null> {
   const res = await fetch(`${SERVER_API_URL}/api/pages/pages/${slug}/`, {
-    next: { revalidate: 86400 }
+    next: { revalidate: 86400 },
+    headers: {
+      'Content-Type': 'application/json',
+      'Host': 'moami.com.ua',
+    }
   })
 
   if (!res.ok) {

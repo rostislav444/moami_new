@@ -44,6 +44,9 @@ ALLOWED_HOSTS = [
     'web',  # Docker service hostname for SSR requests
 ]
 
+# Tell Django it's behind an HTTPS reverse proxy (nginx)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Site URL for building absolute URLs in API responses
 SITE_URL = os.environ.get('SITE_URL', 'https://moami.com.ua')
 

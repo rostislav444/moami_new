@@ -12,6 +12,11 @@ from .views import (
     SyncViewSet,
     FeedTemplateViewSet,
     AIAssistantViewSet,
+    ResearchViewSet,
+    PipelineViewSet,
+    PipelineStepViewSet,
+    PipelineRunViewSet,
+    BackgroundTaskViewSet,
 )
 from .views.product_views import ProductExportStatusViewSet
 
@@ -27,6 +32,11 @@ router.register(r'export-status', ProductExportStatusViewSet, basename='export-s
 router.register(r'sync', SyncViewSet, basename='sync')
 router.register(r'feed-templates', FeedTemplateViewSet, basename='feed-template')
 router.register(r'ai', AIAssistantViewSet, basename='ai')
+router.register(r'research', ResearchViewSet, basename='research')
+router.register(r'pipelines', PipelineViewSet, basename='pipeline')
+router.register(r'pipeline-steps', PipelineStepViewSet, basename='pipeline-step')
+router.register(r'pipeline-runs', PipelineRunViewSet, basename='pipeline-run')
+router.register(r'tasks', BackgroundTaskViewSet, basename='task')
 
 urlpatterns = [
     path('', include(router.urls)),

@@ -10,8 +10,29 @@ class MarketplaceCategorySerializer(serializers.ModelSerializer):
         fields = [
             'id', 'external_id', 'external_code', 'name', 'name_uk',
             'full_path', 'has_children', 'is_active', 'extra_data',
-            'parent', 'level'
+            'parent', 'level', 'marketplace'
         ]
+
+
+class MarketplaceCategoryWriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания/редактирования категории маркетплейса"""
+
+    class Meta:
+        model = MarketplaceCategory
+        fields = [
+            'id', 'marketplace', 'external_id', 'external_code',
+            'name', 'name_uk', 'parent', 'is_active', 'extra_data'
+        ]
+
+    def create(self, validated_data):
+        import uuid
+        # Генерируем external_id если не указан
+        if not validated_data.get('external_id'):
+            validated_data['external_id'] = f"manual_{uuid.uuid4().hex[:8]}"
+        # Копируем external_id в external_code если не указан
+        if not validated_data.get('external_code'):
+            validated_data['external_code'] = validated_data['external_id']
+        return super().create(validated_data)
 
 
 class MarketplaceCategoryTreeSerializer(serializers.ModelSerializer):

@@ -5,6 +5,9 @@ from .product_views import ProductMarketplaceConfigViewSet, ProductMarketplaceAt
 from .sync_views import SyncViewSet
 from .feed_template_views import FeedTemplateViewSet
 from .ai_views import AIAssistantViewSet
+from .research_views import ResearchViewSet
+from .pipeline_views import PipelineViewSet, PipelineStepViewSet, PipelineRunViewSet
+from .task_views import BackgroundTaskViewSet
 
 __all__ = [
     'MarketplaceViewSet',
@@ -17,4 +20,10 @@ __all__ = [
     'SyncViewSet',
     'FeedTemplateViewSet',
     'AIAssistantViewSet',
+    # Research & Pipeline
+    'ResearchViewSet',
+    'PipelineViewSet',
+    'PipelineStepViewSet',
+    'PipelineRunViewSet',
+    'BackgroundTaskViewSet',
 ]

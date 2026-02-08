@@ -17,6 +17,27 @@ from .product_serializers import (
     ProductMarketplaceAttributeSerializer,
     ProductExportStatusSerializer,
 )
+from .research_serializers import (
+    AgentConversationSerializer,
+    AgentConversationListSerializer,
+    AgentMessageSerializer,
+    StartResearchSerializer,
+    SendMessageSerializer,
+    PollMessagesSerializer,
+)
+from .pipeline_serializers import (
+    MarketplacePipelineSerializer,
+    MarketplacePipelineListSerializer,
+    PipelineStepSerializer,
+    PipelineStepCreateSerializer,
+    PipelineRunSerializer,
+    CreatePipelineSerializer,
+    ReorderStepsSerializer,
+)
+from .task_serializers import (
+    BackgroundTaskSerializer,
+    BackgroundTaskListSerializer,
+)
 
 __all__ = [
     'MarketplaceSerializer',
@@ -30,4 +51,22 @@ __all__ = [
     'ProductMarketplaceConfigSerializer',
     'ProductMarketplaceAttributeSerializer',
     'ProductExportStatusSerializer',
+    # Research
+    'AgentConversationSerializer',
+    'AgentConversationListSerializer',
+    'AgentMessageSerializer',
+    'StartResearchSerializer',
+    'SendMessageSerializer',
+    'PollMessagesSerializer',
+    # Pipeline
+    'MarketplacePipelineSerializer',
+    'MarketplacePipelineListSerializer',
+    'PipelineStepSerializer',
+    'PipelineStepCreateSerializer',
+    'PipelineRunSerializer',
+    'CreatePipelineSerializer',
+    'ReorderStepsSerializer',
+    # Tasks
+    'BackgroundTaskSerializer',
+    'BackgroundTaskListSerializer',
 ]

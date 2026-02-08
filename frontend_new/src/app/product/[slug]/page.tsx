@@ -77,9 +77,14 @@ interface ProductVariant {
   }>
 }
 
+const getApiUrl = () => {
+  return process.env.API_URL ||
+         (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000')
+}
+
 async function getProduct(slug: string): Promise<ProductVariant | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/product/variants/${slug}/`, {
+    const res = await fetch(`${getApiUrl()}/api/product/variants/${slug}/`, {
       next: { revalidate: 3600 }
     })
 
@@ -95,7 +100,7 @@ async function getProduct(slug: string): Promise<ProductVariant | null> {
 
 async function getCategories(): Promise<CategoryState[]> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/categories/`, {
+    const res = await fetch(`${getApiUrl()}/api/category/categories/`, {
       next: { revalidate: 3600 }
     })
 

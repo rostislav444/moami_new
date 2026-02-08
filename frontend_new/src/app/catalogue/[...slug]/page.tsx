@@ -47,9 +47,15 @@ interface CatalogueResponse {
   results: ProductVariant[]
 }
 
+const getApiUrl = () => {
+  // Use server-side API URL for SSR (internal Docker network)
+  return process.env.API_URL ||
+         (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000')
+}
+
 async function getCatalogue(categorySlug: string, page: number = 1, pageSize: number = 24): Promise<CatalogueResponse | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/catalogue/?category=${categorySlug}&page=${page}&page_size=${pageSize}`, {
+    const res = await fetch(`${getApiUrl()}/api/catalogue/?category=${categorySlug}&page=${page}&page_size=${pageSize}`, {
       next: { revalidate: 3600 }
     })
 
@@ -65,7 +71,7 @@ async function getCatalogue(categorySlug: string, page: number = 1, pageSize: nu
 
 async function getCategories(): Promise<CategoryState[]> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/categories/`, {
+    const res = await fetch(`${getApiUrl()}/api/category/categories/`, {
       next: { revalidate: 3600 }
     })
 

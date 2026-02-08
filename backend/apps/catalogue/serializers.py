@@ -19,13 +19,21 @@ class ColorSerializer(serializers.ModelSerializer):
 
 class CatalogueImageSerializer(serializers.ModelSerializer):
     """Lightweight image serializer for catalogue with thumbnail for progressive loading"""
+    image = serializers.SerializerMethodField()
     thumbnail = serializers.SerializerMethodField()
 
     class Meta:
         model = VariantImage
         fields = ('image', 'thumbnail')
 
-    def get_thumbnail(self, obj):
+    @staticmethod
+    def get_image(obj):
+        if obj.image:
+            return f"{settings.SITE_URL}{obj.image.url}"
+        return None
+
+    @staticmethod
+    def get_thumbnail(obj):
         if obj.thumbnails and 'xs' in obj.thumbnails:
             return settings.MEDIA_URL + obj.thumbnails['xs']
         return None

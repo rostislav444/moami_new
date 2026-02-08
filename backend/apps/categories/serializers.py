@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 
 from apps.categories.models import Category, Collections
@@ -15,6 +16,7 @@ class CategorySerializer(serializers.ModelSerializer):
     products_count = serializers.IntegerField(source='get_products_count')
     size_group = SizeGroupSerializer(read_only=True)
     preferred_size_grid = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
@@ -34,19 +36,40 @@ class CategorySerializer(serializers.ModelSerializer):
             return obj.preferred_size_grid.slug
         return None
 
+    @staticmethod
+    def get_image(obj):
+        if obj.image:
+            return f"{settings.SITE_URL}{obj.image.url}"
+        return None
+
 
 class CollectionsLiteSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Collections
         fields = ('id', 'name', 'slug', 'image')
 
+    @staticmethod
+    def get_image(obj):
+        if obj.image:
+            return f"{settings.SITE_URL}{obj.image.url}"
+        return None
+
 
 class CollectionsSerializer(serializers.ModelSerializer):
     products_count = serializers.IntegerField(source='get_products_count')
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Collections
         fields = ('id', 'name', 'slug', 'image', 'products_count')
+
+    @staticmethod
+    def get_image(obj):
+        if obj.image:
+            return f"{settings.SITE_URL}{obj.image.url}"
+        return None
 
 
 class CategoriesWithProductsCountSerializer(serializers.ModelSerializer):

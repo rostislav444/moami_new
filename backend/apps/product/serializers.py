@@ -48,9 +48,7 @@ class VariantWithImagesSerializer(serializers.ModelSerializer):
         image = obj.images.first()
         if image and 's' in image.thumbnails:
             thumb = settings.MEDIA_URL + image.thumbnails['s']
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(thumb)
+            return f"{settings.SITE_URL}{thumb}"
         return None
 
 
@@ -125,12 +123,19 @@ class VariantImageThumbnailSerializer(serializers.ModelSerializer):
 
 
 class VariantImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
     thumbnails = serializers.SerializerMethodField()
     dimensions = serializers.SerializerMethodField()
 
     class Meta:
         model = VariantImage
         fields = ('image', 'dimensions', 'thumbnails')
+
+    @staticmethod
+    def get_image(obj):
+        if obj.image:
+            return f"{settings.SITE_URL}{obj.image.url}"
+        return None
 
     @staticmethod
     def get_dimensions(obj):
@@ -142,11 +147,10 @@ class VariantImageSerializer(serializers.ModelSerializer):
 
     def get_thumbnails(self, obj):
         data = []
-        request = self.context.get('request')
-        if request and 'l' in obj.thumbnails.keys():
+        if 'l' in obj.thumbnails.keys():
             for key, _ in VariantImage.THUMBNAILS_SIZES:
                 url = settings.MEDIA_URL + obj.thumbnails[key]
-                data.append({'image': request.build_absolute_uri(url)})
+                data.append({'image': f"{settings.SITE_URL}{url}"})
         return data
 
 
@@ -171,24 +175,20 @@ class VariantSerializer(serializers.ModelSerializer):
         return obj.product.name + ' - ' + obj.color.name
 
     def get_video(self, obj):
-        request = self.context.get('request')
-
-        if request and hasattr(obj, 'video'):
+        if hasattr(obj, 'video'):
             try:
                 video_obj = obj.video
                 if video_obj.video:
-                    return request.build_absolute_uri(video_obj.video.url)
+                    return f"{settings.SITE_URL}{video_obj.video.url}"
             except Variant.video.RelatedObjectDoesNotExist:
                 return None
 
     def get_product_video(self, obj):
-        request = self.context.get('request')
-
-        if request and hasattr(obj.product, 'video'):
+        if hasattr(obj.product, 'video'):
             try:
                 video_obj = obj.product.video
                 if video_obj.video:
-                    return request.build_absolute_uri(video_obj.video.url)
+                    return f"{settings.SITE_URL}{video_obj.video.url}"
             except Product.video.RelatedObjectDoesNotExist:
                 return None
         return None

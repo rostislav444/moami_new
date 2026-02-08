@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 
 from apps.marketplaces.models import MarketplaceCategory, CategoryMapping
 from apps.marketplaces.serializers import (
@@ -11,21 +12,38 @@ from apps.marketplaces.serializers import (
 from apps.marketplaces.serializers.category_serializers import (
     CategoryMappingCreateSerializer,
     BulkCategoryMappingSerializer,
+    MarketplaceCategoryWriteSerializer,
 )
 
 
-class MarketplaceCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class CategoryPagination(PageNumberPagination):
+    page_size = 50
+    page_size_query_param = 'page_size'
+    max_page_size = 200
+
+
+class MarketplaceCategoryViewSet(viewsets.ModelViewSet):
     """
-    ViewSet для категорий маркетплейса (только чтение)
+    ViewSet для категорий маркетплейса
 
     Endpoints:
-    - GET /api/marketplace-categories/ - список категорий
+    - GET /api/marketplace-categories/ - список категорий (с пагинацией)
     - GET /api/marketplace-categories/{id}/ - детали категории
-    - GET /api/marketplace-categories/tree/ - дерево категорий
+    - POST /api/marketplace-categories/ - создать категорию
+    - PATCH /api/marketplace-categories/{id}/ - обновить категорию
+    - DELETE /api/marketplace-categories/{id}/ - удалить категорию
+    - GET /api/marketplace-categories/tree/ - дерево категорий (первый уровень)
+    - GET /api/marketplace-categories/{id}/children/ - дети категории
+    - POST /api/marketplace-categories/{id}/move/ - переместить категорию
     """
 
     queryset = MarketplaceCategory.objects.all()
-    serializer_class = MarketplaceCategorySerializer
+    pagination_class = CategoryPagination
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return MarketplaceCategoryWriteSerializer
+        return MarketplaceCategorySerializer
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related('marketplace', 'parent')
@@ -52,12 +70,30 @@ class MarketplaceCategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
         return queryset
 
+    def perform_create(self, serializer):
+        """При создании обновляем has_children у родителя"""
+        instance = serializer.save()
+        if instance.parent:
+            instance.parent.has_children = True
+            instance.parent.save(update_fields=['has_children'])
+
+    def perform_destroy(self, instance):
+        """При удалении обновляем has_children у родителя"""
+        parent = instance.parent
+        instance.delete()
+        if parent:
+            # Проверяем остались ли дети
+            parent.has_children = parent.children.exists()
+            parent.save(update_fields=['has_children'])
+
     @action(detail=False, methods=['get'])
     def tree(self, request):
         """
-        Дерево категорий
+        Дерево категорий (корневой уровень)
 
         GET /api/marketplace-categories/tree/?marketplace={id}
+        Возвращает только корневые категории. Для получения детей
+        используйте /{id}/children/
         """
         marketplace_id = request.query_params.get('marketplace')
         if not marketplace_id:
@@ -70,10 +106,110 @@ class MarketplaceCategoryViewSet(viewsets.ReadOnlyModelViewSet):
         root_categories = MarketplaceCategory.objects.filter(
             marketplace_id=marketplace_id,
             parent__isnull=True
-        ).prefetch_related('children')
+        ).order_by('name')
 
-        serializer = MarketplaceCategoryTreeSerializer(root_categories, many=True)
+        serializer = MarketplaceCategorySerializer(root_categories, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def children(self, request, pk=None):
+        """
+        Получить детей категории
+
+        GET /api/marketplace-categories/{id}/children/
+        """
+        category = self.get_object()
+        children = category.children.all().order_by('name')
+        serializer = MarketplaceCategorySerializer(children, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def flat(self, request):
+        """
+        Плоский список категорий с пагинацией (для поиска)
+
+        GET /api/marketplace-categories/flat/?marketplace={id}&search=блуз&page=1
+        """
+        marketplace_id = request.query_params.get('marketplace')
+        if not marketplace_id:
+            return Response(
+                {'error': 'marketplace parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        queryset = MarketplaceCategory.objects.filter(
+            marketplace_id=marketplace_id
+        ).select_related('parent').order_by('name')
+
+        # Поиск
+        search = request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+
+        # Только листовые
+        leaf_only = request.query_params.get('leaf_only')
+        if leaf_only and leaf_only.lower() == 'true':
+            queryset = queryset.filter(has_children=False)
+
+        # Пагинация
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = MarketplaceCategorySerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = MarketplaceCategorySerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def move(self, request, pk=None):
+        """
+        Переместить категорию к другому родителю
+
+        POST /api/marketplace-categories/{id}/move/
+        Body: {"parent_id": 123} или {"parent_id": null} для корня
+        """
+        category = self.get_object()
+        new_parent_id = request.data.get('parent_id')
+
+        old_parent = category.parent
+
+        if new_parent_id:
+            try:
+                new_parent = MarketplaceCategory.objects.get(
+                    id=new_parent_id,
+                    marketplace=category.marketplace
+                )
+                # Проверяем что не пытаемся переместить в потомка
+                if new_parent.id == category.id:
+                    return Response(
+                        {'error': 'Нельзя переместить категорию в саму себя'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                category.parent = new_parent
+            except MarketplaceCategory.DoesNotExist:
+                return Response(
+                    {'error': 'Родительская категория не найдена'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        else:
+            category.parent = None
+
+        category.save()
+
+        # Обновляем has_children у старого родителя
+        if old_parent:
+            old_parent.has_children = old_parent.children.exists()
+            old_parent.save(update_fields=['has_children'])
+
+        # Обновляем has_children у нового родителя
+        if category.parent:
+            category.parent.has_children = True
+            category.parent.save(update_fields=['has_children'])
+
+        return Response({
+            'success': True,
+            'category': MarketplaceCategorySerializer(category).data
+        })
 
 
 class CategoryMappingViewSet(viewsets.ModelViewSet):

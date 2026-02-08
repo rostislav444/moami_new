@@ -20,8 +20,8 @@ class MarketplaceCategory(MPTTModel):
         verbose_name='Родительская категория'
     )
 
-    external_id = models.CharField(max_length=100, verbose_name='Внешний ID')
-    external_code = models.CharField(max_length=100, blank=True, verbose_name='Код категории')
+    external_id = models.CharField(max_length=100, null=True, blank=True, verbose_name='Внешний ID')
+    external_code = models.CharField(max_length=100, null=True, blank=True, verbose_name='Код категории')
     name = models.CharField(max_length=500, verbose_name='Название')
     name_uk = models.CharField(max_length=500, blank=True, verbose_name='Название (укр)')
     full_path = models.CharField(max_length=1000, blank=True, verbose_name='Полный путь')

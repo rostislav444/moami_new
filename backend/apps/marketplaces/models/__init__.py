@@ -18,6 +18,9 @@ from .product_export import (
     ProductMarketplaceAttribute,
 )
 from .feed_template import FeedTemplate
+from .research import AgentConversation, AgentMessage
+from .pipeline import MarketplacePipeline, PipelineStep, PipelineRun
+from .tasks import BackgroundTask
 
 __all__ = [
     'Marketplace',
@@ -35,4 +38,11 @@ __all__ = [
     'ProductMarketplaceConfig',
     'ProductMarketplaceAttribute',
     'FeedTemplate',
+    # Research & Pipeline
+    'AgentConversation',
+    'AgentMessage',
+    'MarketplacePipeline',
+    'PipelineStep',
+    'PipelineRun',
+    'BackgroundTask',
 ]

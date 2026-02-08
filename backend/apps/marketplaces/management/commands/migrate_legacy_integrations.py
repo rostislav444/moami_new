@@ -125,6 +125,10 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING('Модели Epicentr не найдены'))
             return
 
+        if not self._table_exists('integrations_epicentrcategories'):
+            self.stdout.write(self.style.WARNING('Таблица integrations_epicentrcategories не существует'))
+            return
+
         marketplace, _ = self.get_or_create_marketplace(
             slug='epicentr',
             name='Epicentr',
@@ -263,12 +267,28 @@ class Command(BaseCommand):
             prod_attrs_migrated += 1
         self.stdout.write(f'  Значений атрибутов товаров: {prod_attrs_migrated}')
 
+    def _table_exists(self, table_name):
+        """Проверить существование таблицы в БД"""
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute(f"""
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables
+                    WHERE table_name = '{table_name}'
+                )
+            """)
+            return cursor.fetchone()[0]
+
     def migrate_rozetka(self):
         """Миграция Rozetka"""
         try:
             from apps.integrations.models.models_rozetka import RozetkaCategories
         except ImportError:
             self.stdout.write(self.style.WARNING('Модели Rozetka не найдены'))
+            return
+
+        if not self._table_exists('integrations_rozetkacategories'):
+            self.stdout.write(self.style.WARNING('Таблица integrations_rozetkacategories не существует'))
             return
 
         marketplace, _ = self.get_or_create_marketplace(
@@ -318,6 +338,10 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING('Модели Google не найдены'))
             return
 
+        if not self._table_exists('integrations_googletaxonomy'):
+            self.stdout.write(self.style.WARNING('Таблица integrations_googletaxonomy не существует'))
+            return
+
         marketplace, _ = self.get_or_create_marketplace(
             slug='google',
             name='Google Shopping',
@@ -351,6 +375,10 @@ class Command(BaseCommand):
             from apps.integrations.models.models_facebook import FacebookCategories
         except ImportError:
             self.stdout.write(self.style.WARNING('Модели Facebook не найдены'))
+            return
+
+        if not self._table_exists('integrations_facebookcategories'):
+            self.stdout.write(self.style.WARNING('Таблица integrations_facebookcategories не существует'))
             return
 
         marketplace, _ = self.get_or_create_marketplace(
@@ -405,10 +433,14 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING('Модели ModnaKasta не найдены'))
             return
 
+        if not self._table_exists('integrations_modnakastacategories'):
+            self.stdout.write(self.style.WARNING('Таблица integrations_modnakastacategories не существует'))
+            return
+
         marketplace, _ = self.get_or_create_marketplace(
-            slug='modnakasta',
+            slug='modna_kasta',
             name='ModnaKasta',
-            integration_type='api',
+            integration_type='both',  # API + XML feed
         )
 
         if self.dry_run:

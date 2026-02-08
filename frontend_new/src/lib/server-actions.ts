@@ -7,6 +7,13 @@ const getApiUrl = () => {
            (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000');
 };
 
+// Django requires Host header for proper routing
+const getHeaders = () => ({
+    'Content-Type': 'application/json',
+    'Accept-Language': 'uk',
+    'Host': 'moami.com.ua',
+});
+
 export async function getCategoriesServer(): Promise<CategoryState[]> {
     const API_URL = getApiUrl();
 
@@ -17,10 +24,7 @@ export async function getCategoriesServer(): Promise<CategoryState[]> {
     try {
         const response = await fetch(`${API_URL}/api/category/categories/`, {
             next: { revalidate: 3600 },
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept-Language': 'uk',
-            },
+            headers: getHeaders(),
         });
 
         if (!response.ok) {
@@ -43,10 +47,7 @@ export async function getCollectionsServer(): Promise<CollectionState[]> {
     try {
         const response = await fetch(`${API_URL}/api/category/collections/`, {
             next: { revalidate: 3600 },
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept-Language': 'uk',
-            },
+            headers: getHeaders(),
         });
 
         if (!response.ok) {
@@ -69,10 +70,7 @@ export async function getCategoryByIdServer(id: number): Promise<CategoryState |
     try {
         const response = await fetch(`${API_URL}/api/category/categories/${id}/`, {
             next: { revalidate: 3600 },
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept-Language': 'uk',
-            },
+            headers: getHeaders(),
         });
 
         if (!response.ok) {
