@@ -7,6 +7,16 @@ const getApiUrl = () => {
            (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000');
 };
 
+const PUBLIC_URL = process.env.NEXT_PUBLIC_API_URL || 'https://moami.com.ua';
+
+// Replace internal Docker URLs (http://web:8000) with public URL in API responses
+function fixMediaUrls<T>(data: T): T {
+    const json = JSON.stringify(data);
+    const fixed = json.replace(/http:\/\/web:8000/g, PUBLIC_URL)
+                      .replace(/http:\/\/localhost:8000/g, PUBLIC_URL);
+    return JSON.parse(fixed);
+}
+
 export async function getCategoriesServer(): Promise<CategoryState[]> {
     const API_URL = getApiUrl();
 
@@ -27,7 +37,7 @@ export async function getCategoriesServer(): Promise<CategoryState[]> {
             return [];
         }
 
-        return await response.json();
+        return fixMediaUrls(await response.json());
     } catch {
         return [];
     }
@@ -53,7 +63,7 @@ export async function getCollectionsServer(): Promise<CollectionState[]> {
             return [];
         }
 
-        return await response.json();
+        return fixMediaUrls(await response.json());
     } catch {
         return [];
     }
@@ -79,7 +89,7 @@ export async function getCategoryByIdServer(id: number): Promise<CategoryState |
             return null;
         }
 
-        return await response.json();
+        return fixMediaUrls(await response.json());
     } catch {
         return null;
     }

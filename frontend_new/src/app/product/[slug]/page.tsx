@@ -6,6 +6,14 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
 import { CategoryState } from '@/types/categories'
 import { ProductViewTracker } from '@/components/product/ProductViewTracker'
 
+const API_URL = process.env.API_URL || (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000');
+const PUBLIC_URL = process.env.NEXT_PUBLIC_API_URL || 'https://moami.com.ua';
+
+function fixMediaUrls<T>(data: T): T {
+    const json = JSON.stringify(data);
+    return JSON.parse(json.replace(/http:\/\/web:8000/g, PUBLIC_URL).replace(/http:\/\/localhost:8000/g, PUBLIC_URL));
+}
+
 interface PageProps {
   params: Promise<{
     slug: string
@@ -79,7 +87,7 @@ interface ProductVariant {
 
 async function getProduct(slug: string): Promise<ProductVariant | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/product/variants/${slug}/`, {
+    const res = await fetch(`${API_URL}/api/product/variants/${slug}/`, {
       next: { revalidate: 3600 }
     })
 
@@ -87,7 +95,7 @@ async function getProduct(slug: string): Promise<ProductVariant | null> {
       return null
     }
 
-    return res.json()
+    return fixMediaUrls(await res.json())
   } catch {
     return null
   }
@@ -95,7 +103,7 @@ async function getProduct(slug: string): Promise<ProductVariant | null> {
 
 async function getCategories(): Promise<CategoryState[]> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/categories/`, {
+    const res = await fetch(`${API_URL}/api/category/categories/`, {
       next: { revalidate: 3600 }
     })
 
@@ -103,7 +111,7 @@ async function getCategories(): Promise<CategoryState[]> {
       return []
     }
 
-    return res.json()
+    return fixMediaUrls(await res.json())
   } catch {
     return []
   }

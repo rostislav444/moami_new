@@ -28,14 +28,19 @@ PRODUCTION = os.environ.get('PRODUCTION') == 'true'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'web',
+    '157.180.118.240',
     '185.201.252.106',
     'moami.com.ua',
     'localhost',
     '0.0.0.0',
     '127.0.0.1',
-    'localhost:3000'
-    '127.0.0.1:3000'
+    'localhost:3000',
+    '127.0.0.1:3000',
 ]
+
+# Tell Django it's behind an HTTPS reverse proxy (nginx)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 

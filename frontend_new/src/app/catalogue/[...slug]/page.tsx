@@ -47,9 +47,17 @@ interface CatalogueResponse {
   results: ProductVariant[]
 }
 
+const API_URL = process.env.API_URL || (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000');
+const PUBLIC_URL = process.env.NEXT_PUBLIC_API_URL || 'https://moami.com.ua';
+
+function fixMediaUrls<T>(data: T): T {
+    const json = JSON.stringify(data);
+    return JSON.parse(json.replace(/http:\/\/web:8000/g, PUBLIC_URL).replace(/http:\/\/localhost:8000/g, PUBLIC_URL));
+}
+
 async function getCatalogue(categorySlug: string, page: number = 1, pageSize: number = 24): Promise<CatalogueResponse | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/catalogue/?category=${categorySlug}&page=${page}&page_size=${pageSize}`, {
+    const res = await fetch(`${API_URL}/api/catalogue/?category=${categorySlug}&page=${page}&page_size=${pageSize}`, {
       next: { revalidate: 3600 }
     })
 
@@ -57,7 +65,7 @@ async function getCatalogue(categorySlug: string, page: number = 1, pageSize: nu
       return null
     }
 
-    return res.json()
+    return fixMediaUrls(await res.json())
   } catch {
     return null
   }
@@ -65,7 +73,7 @@ async function getCatalogue(categorySlug: string, page: number = 1, pageSize: nu
 
 async function getCategories(): Promise<CategoryState[]> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/categories/`, {
+    const res = await fetch(`${API_URL}/api/category/categories/`, {
       next: { revalidate: 3600 }
     })
 
@@ -73,7 +81,7 @@ async function getCategories(): Promise<CategoryState[]> {
       return []
     }
 
-    return res.json()
+    return fixMediaUrls(await res.json())
   } catch {
     return []
   }

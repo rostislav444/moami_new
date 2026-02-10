@@ -7,6 +7,15 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://moami.com.ua';
 // Server-side API URL (used in SSR)
 const SERVER_API_URL = process.env.API_URL || (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000');
 
+const PUBLIC_URL = process.env.NEXT_PUBLIC_API_URL || 'https://moami.com.ua';
+
+function fixMediaUrls<T>(data: T): T {
+    const json = JSON.stringify(data);
+    const fixed = json.replace(/http:\/\/web:8000/g, PUBLIC_URL)
+                      .replace(/http:\/\/localhost:8000/g, PUBLIC_URL);
+    return JSON.parse(fixed);
+}
+
 export const api = axios.create({
     baseURL: `${API_BASE_URL}/api`,
     headers: {
@@ -67,7 +76,7 @@ export async function getPagesServer(): Promise<PageListItem[]> {
     return []
   }
 
-  return res.json()
+  return fixMediaUrls(await res.json())
 }
 
 export async function getPageServer(slug: string): Promise<PageData | null> {
@@ -79,5 +88,5 @@ export async function getPageServer(slug: string): Promise<PageData | null> {
     return null
   }
 
-  return res.json()
+  return fixMediaUrls(await res.json())
 } 
