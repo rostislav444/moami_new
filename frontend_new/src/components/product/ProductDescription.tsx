@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useCartStore } from '@/store/cart'
 import { event as fbEvent } from '@/lib/FacebookPixel'
 import { event as gaEvent } from '@/components/analytics/GoogleAnalytics'
@@ -195,13 +194,15 @@ export default function ProductDescription({ variant }: ProductDescriptionProps)
                 }`}
                 title={variantOption.color.name}
               >
-                <Image
-                  src={variantOption.image}
-                  alt={variantOption.color.name}
-                  fill
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  sizes="64px"
-                />
+                {variantOption.image ? (
+                  <img
+                    src={variantOption.image}
+                    alt={variantOption.color.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-amber-100/50" />
+                )}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-1">
                   <div className="text-white text-xs font-light text-center leading-tight">
                     {variantOption.color.name}

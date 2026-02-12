@@ -142,8 +142,14 @@ def delete_image_file(sender, instance, **kwargs):
         paths = [instance.image.name, *instance.thumbnails.values()]
 
         for path in paths:
-            default_storage.delete(path)
+            try:
+                default_storage.delete(path)
+            except FileNotFoundError:
+                pass
 
         dir_path = os.path.dirname(settings.MEDIA_ROOT + paths[0])
-        if os.listdir(dir_path) == 0:
-            default_storage.delete(dir_path)
+        try:
+            if not os.listdir(dir_path):
+                default_storage.delete(dir_path)
+        except FileNotFoundError:
+            pass
