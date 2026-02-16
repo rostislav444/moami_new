@@ -1,5 +1,8 @@
 worker_processes auto;
 
+# Load GeoIP2 module
+load_module /usr/lib/nginx/modules/ngx_http_geoip2_module.so;
+
 events {
     worker_connections 4096;
 }
@@ -9,6 +12,18 @@ http {
     client_max_body_size 120M;
 
     resolver 127.0.0.11 valid=10s;
+
+    # GeoIP2 Country blocking
+    geoip2 /usr/share/GeoIP/GeoLite2-Country.mmdb {
+        auto_reload 5m;
+        $geoip2_country_code country iso_code;
+    }
+
+    # Block all countries except Ukraine
+    map $geoip2_country_code $allowed_country {
+        default no;
+        UA yes;
+    }
 
     # Rate limiting zones - anti-DDoS
     limit_req_zone $binary_remote_addr zone=general:10m rate=10r/s;
@@ -38,6 +53,14 @@ http {
 
         root /usr/share/nginx/html;
         error_page 502 503 504 /maintenance.html;
+
+        # Access log for GoAccess dashboard
+        access_log /var/log/nginx/access.log combined;
+
+        # Block non-Ukraine countries
+        if ($allowed_country = no) {
+            return 444;
+        }
 
         # Connection and request limits - anti-DDoS
         limit_conn conn_limit 20;
