@@ -83,6 +83,8 @@ interface ProductVariant {
     }
     stock: number
   }>
+  video?: string | null
+  product_video?: string | null
 }
 
 async function getProduct(slug: string): Promise<ProductVariant | null> {

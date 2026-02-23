@@ -11,13 +11,21 @@ interface ProductImage {
 interface ProductGalleryProps {
   images: ProductImage[]
   productName: string
+  videoUrl?: string | null
 }
 
-export default function ProductGallery({ images, productName }: ProductGalleryProps) {
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+export default function ProductGallery({ images, productName, videoUrl }: ProductGalleryProps) {
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false)
 
-  if (images.length === 0) {
+  const hasVideo = !!videoUrl
+  const totalItems = images.length + (hasVideo ? 1 : 0)
+
+  // Video is index 0 when present, images shift by 1
+  const isVideoSelected = hasVideo && selectedIndex === 0
+  const imageIndex = hasVideo ? selectedIndex - 1 : selectedIndex
+
+  if (totalItems === 0) {
     return (
       <div className="w-full h-96 bg-gray-200 flex items-center justify-center">
         <p className="text-gray-500">Изображение недоступно</p>
@@ -25,16 +33,18 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
     )
   }
 
-  const nextImage = () => {
-    setSelectedImageIndex((prev) => (prev + 1) % images.length)
+  const nextItem = () => {
+    setSelectedIndex((prev) => (prev + 1) % totalItems)
   }
 
-  const prevImage = () => {
-    setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length)
+  const prevItem = () => {
+    setSelectedIndex((prev) => (prev - 1 + totalItems) % totalItems)
   }
 
   const openZoomModal = () => {
-    setIsZoomModalOpen(true)
+    if (!isVideoSelected) {
+      setIsZoomModalOpen(true)
+    }
   }
 
   const closeZoomModal = () => {
@@ -56,23 +66,37 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
   return (
     <>
       <div className="space-y-4">
-        {/* Main Image */}
-        <div className="relative w-full aspect-[3/4] bg-gray-100 overflow-hidden cursor-zoom-in" onClick={openZoomModal}>
-          <ImageWithFallback
-            src={images[selectedImageIndex].image}
-            alt={`${productName} - изображение ${selectedImageIndex + 1}`}
-            className="w-full h-full object-cover"
-          />
+        {/* Main Image / Video */}
+        <div
+          className={`relative w-full aspect-[3/4] bg-gray-100 overflow-hidden ${isVideoSelected ? '' : 'cursor-zoom-in'}`}
+          onClick={openZoomModal}
+        >
+          {isVideoSelected ? (
+            <video
+              key={videoUrl}
+              src={videoUrl!}
+              className="w-full h-full object-cover"
+              controls
+              playsInline
+              preload="metadata"
+            />
+          ) : (
+            <ImageWithFallback
+              src={images[imageIndex].image}
+              alt={`${productName} - изображение ${imageIndex + 1}`}
+              className="w-full h-full object-cover"
+            />
+          )}
 
-          {images.length > 1 && (
+          {totalItems > 1 && (
             <>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  prevImage()
+                  prevItem()
                 }}
                 className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 md:p-3 transition-all z-10 text-white hover:text-gray-200"
-                title="Предыдущее изображение"
+                title="Попереднє"
               >
                 <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -81,10 +105,10 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  nextImage()
+                  nextItem()
                 }}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 md:p-3 transition-all z-10 text-white hover:text-gray-200"
-                title="Следующее изображение"
+                title="Наступне"
               >
                 <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -94,39 +118,58 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
           )}
         </div>
 
-        {/* Image Counter */}
-        {images.length > 1 && (
+        {/* Item Counter */}
+        {totalItems > 1 && (
           <div className="text-center text-sm text-gray-500">
-            {selectedImageIndex + 1}/{images.length}
+            {selectedIndex + 1}/{totalItems}
           </div>
         )}
 
         {/* Thumbnails */}
-        {images.length > 1 && (
+        {totalItems > 1 && (
           <div className="flex space-x-3 overflow-x-auto">
-            {images.slice(0, 4).map((image, index) => (
+            {/* Video thumbnail */}
+            {hasVideo && (
               <button
-                key={index}
-                onClick={() => setSelectedImageIndex(index)}
-                className={`flex-shrink-0 w-20 aspect-[3/4] overflow-hidden border-2 transition-all duration-200 ${
-                  selectedImageIndex === index
+                onClick={() => setSelectedIndex(0)}
+                className={`flex-shrink-0 w-20 aspect-[3/4] overflow-hidden border-2 transition-all duration-200 relative bg-gray-900 flex items-center justify-center ${
+                  selectedIndex === 0
                     ? 'border-amber-500 ring-2 ring-amber-200'
                     : 'border-gray-200 hover:border-amber-300'
                 }`}
               >
-                <ImageWithFallback
-                  src={image.image}
-                  alt={`${productName} - миниатюра ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
+                <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
               </button>
-            ))}
+            )}
+            {/* Image thumbnails */}
+            {images.slice(0, hasVideo ? 3 : 4).map((image, index) => {
+              const thumbIndex = hasVideo ? index + 1 : index
+              return (
+                <button
+                  key={index}
+                  onClick={() => setSelectedIndex(thumbIndex)}
+                  className={`flex-shrink-0 w-20 aspect-[3/4] overflow-hidden border-2 transition-all duration-200 ${
+                    selectedIndex === thumbIndex
+                      ? 'border-amber-500 ring-2 ring-amber-200'
+                      : 'border-gray-200 hover:border-amber-300'
+                  }`}
+                >
+                  <ImageWithFallback
+                    src={image.image}
+                    alt={`${productName} - миниатюра ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              )
+            })}
           </div>
         )}
       </div>
 
-      {/* Zoom Modal */}
-      {isZoomModalOpen && (
+      {/* Zoom Modal (images only) */}
+      {isZoomModalOpen && !isVideoSelected && (
         <div className="fixed inset-0 w-screen h-screen bg-black bg-opacity-95 z-50 overflow-hidden">
           {/* Close Button */}
           <button
@@ -138,21 +181,21 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
           </button>
 
           {/* Navigation Buttons */}
-          {images.length > 1 && (
+          {totalItems > 1 && (
             <>
               <button
-                onClick={prevImage}
+                onClick={prevItem}
                 className="absolute left-6 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-30 bg-black bg-opacity-50 w-14 h-14 flex items-center justify-center"
-                title="Предыдущее изображение"
+                title="Попереднє"
               >
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <button
-                onClick={nextImage}
+                onClick={nextItem}
                 className="absolute right-6 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors z-30 bg-black bg-opacity-50 w-14 h-14 flex items-center justify-center"
-                title="Следующее изображение"
+                title="Наступне"
               >
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -162,9 +205,9 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
           )}
 
           {/* Image Counter */}
-          {images.length > 1 && (
+          {totalItems > 1 && (
             <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-white z-30 bg-black bg-opacity-50 px-3 py-1">
-              {selectedImageIndex + 1} / {images.length}
+              {selectedIndex + 1} / {totalItems}
             </div>
           )}
 
@@ -234,8 +277,8 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                   contentClass="!w-full !h-full !flex !items-center !justify-center"
                 >
                   <img
-                    src={images[selectedImageIndex].image}
-                    alt={`${productName} - увеличенное изображение ${selectedImageIndex + 1}`}
+                    src={images[imageIndex].image}
+                    alt={`${productName} - увеличенное изображение ${imageIndex + 1}`}
                     className="max-w-full max-h-full object-contain"
                     style={{
                       width: 'auto',
@@ -252,4 +295,4 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
       )}
     </>
   )
-} 
+}

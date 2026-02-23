@@ -63,6 +63,8 @@ interface ProductVariant {
     }
     stock: number
   }>
+  video?: string | null
+  product_video?: string | null
 }
 
 interface ProductPageProps {
@@ -73,7 +75,7 @@ export default function ProductPage({ variant }: ProductPageProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div>
-        <ProductGallery images={variant.images} productName={variant.name} />
+        <ProductGallery images={variant.images} productName={variant.name} videoUrl={variant.video || variant.product_video} />
       </div>
       <div>
         <ProductDescription variant={variant} />
