@@ -47,44 +47,14 @@ interface CatalogueResponse {
   results: ProductVariant[]
 }
 
-const API_URL = process.env.API_URL || (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000');
-const PUBLIC_URL = process.env.NEXT_PUBLIC_API_URL || 'https://moami.com.ua';
-
-function fixMediaUrls<T>(data: T): T {
-    const json = JSON.stringify(data);
-    return JSON.parse(json.replace(/http:\/\/web:8000/g, PUBLIC_URL).replace(/http:\/\/localhost:8000/g, PUBLIC_URL));
-}
+import { serverFetch } from '@/lib/server-fetch'
 
 async function getCatalogue(categorySlug: string, page: number = 1, pageSize: number = 24): Promise<CatalogueResponse | null> {
-  try {
-    const res = await fetch(`${API_URL}/api/catalogue/?category=${categorySlug}&page=${page}&page_size=${pageSize}`, {
-      next: { revalidate: 3600 }
-    })
-
-    if (!res.ok) {
-      return null
-    }
-
-    return fixMediaUrls(await res.json())
-  } catch {
-    return null
-  }
+  return serverFetch(`/api/catalogue/?category=${categorySlug}&page=${page}&page_size=${pageSize}`, null);
 }
 
 async function getCategories(): Promise<CategoryState[]> {
-  try {
-    const res = await fetch(`${API_URL}/api/category/categories/`, {
-      next: { revalidate: 3600 }
-    })
-
-    if (!res.ok) {
-      return []
-    }
-
-    return fixMediaUrls(await res.json())
-  } catch {
-    return []
-  }
+  return serverFetch('/api/category/categories/', []);
 }
 
 function createBreadcrumbs(slugs: string[], categories: CategoryState[]) {
