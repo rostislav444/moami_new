@@ -62,21 +62,9 @@ class MarketplaceViewSet(viewsets.ModelViewSet):
         """
         marketplace = self.get_object()
 
-        # Импортируем клиент
-        from apps.marketplaces.services import EpicentrClient
+        from apps.marketplaces.services import get_marketplace_client
 
-        clients = {
-            'epicentr': EpicentrClient,
-        }
-
-        client_class = clients.get(marketplace.slug)
-        if not client_class:
-            return Response(
-                {'error': f'Клиент для {marketplace.slug} не реализован'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        client = client_class(marketplace)
+        client = get_marketplace_client(marketplace)
         results = {}
 
         # Синхронизация категорий

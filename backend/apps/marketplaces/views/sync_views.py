@@ -18,22 +18,14 @@ class SyncViewSet(viewsets.ViewSet):
 
     def _get_client(self, marketplace_id):
         """Получить клиент для маркетплейса"""
-        from apps.marketplaces.services import EpicentrClient
-
-        clients = {
-            'epicentr': EpicentrClient,
-        }
+        from apps.marketplaces.services import get_marketplace_client
 
         try:
             marketplace = Marketplace.objects.get(id=marketplace_id)
         except Marketplace.DoesNotExist:
             return None, None
 
-        client_class = clients.get(marketplace.slug)
-        if not client_class:
-            return marketplace, None
-
-        return marketplace, client_class(marketplace)
+        return marketplace, get_marketplace_client(marketplace)
 
     @action(detail=False, methods=['post'])
     def categories(self, request):

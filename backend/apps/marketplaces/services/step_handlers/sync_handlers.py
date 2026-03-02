@@ -88,31 +88,50 @@ class SyncAttributesHandler(BaseStepHandler):
 
         Config:
             category_codes: List of category codes to sync (optional)
-            source: 'api' | 'data'
+            use_mapped: If true, auto-resolve codes from mapped categories (default: true)
 
         Returns:
             {
                 'synced': number of attribute sets synced,
+                'category_codes': list of codes used,
             }
         """
         from apps.marketplaces.services import get_marketplace_client
 
         config = self.resolve_config(config)
-
-        self.log_info("Syncing attribute sets")
-
-        client = get_marketplace_client(self.marketplace)
         category_codes = config.get('category_codes')
 
+        # Auto-resolve from mapped categories if not specified
+        if not category_codes and config.get('use_mapped', True):
+            category_codes = self._get_mapped_category_codes()
+            self.log_info(f"Auto-resolved {len(category_codes)} mapped category codes")
+
+        client = get_marketplace_client(self.marketplace)
+
         if category_codes:
-            total = 0
-            for code in category_codes:
-                result = client.sync_attribute_sets(category_code=code)
-                total += result
-            return {'synced': total}
+            self.log_info(f"Syncing attribute sets for {len(category_codes)} categories")
+            result = client.sync_attribute_sets(category_codes=category_codes)
+            return {
+                'synced': result,
+                'category_codes': category_codes,
+                'mode': 'mapped_only',
+            }
         else:
+            self.log_info("Syncing ALL attribute sets (no mapped categories found)")
             result = client.sync_attribute_sets()
-            return {'synced': result}
+            return {'synced': result, 'mode': 'all'}
+
+    def _get_mapped_category_codes(self) -> list[str]:
+        """Get external_code list from mapped categories"""
+        from apps.marketplaces.models import CategoryMapping
+
+        return list(
+            CategoryMapping.objects.filter(
+                marketplace_category__marketplace=self.marketplace
+            ).values_list(
+                'marketplace_category__external_code', flat=True
+            ).distinct()
+        )
 
 
 class SyncOptionsHandler(BaseStepHandler):
@@ -125,25 +144,68 @@ class SyncOptionsHandler(BaseStepHandler):
         """
         Sync attribute options from API.
 
+        Iterates over select/multiselect attributes and loads their options.
+
         Config:
-            attribute_set_id: Specific attribute set to sync (optional)
+            use_mapped: If true, only process attributes from mapped categories (default: true)
+            category_codes: Explicit list of category codes (optional)
 
         Returns:
             {
-                'synced': number of options synced,
+                'synced': total options synced,
+                'attributes_processed': number of attributes processed,
             }
         """
         from apps.marketplaces.services import get_marketplace_client
+        from apps.marketplaces.models import MarketplaceAttribute, CategoryMapping
 
         config = self.resolve_config(config)
+        category_codes = config.get('category_codes')
 
-        self.log_info("Syncing attribute options")
+        # Auto-resolve from mapped categories
+        if not category_codes and config.get('use_mapped', True):
+            category_codes = list(
+                CategoryMapping.objects.filter(
+                    marketplace_category__marketplace=self.marketplace
+                ).values_list(
+                    'marketplace_category__external_code', flat=True
+                ).distinct()
+            )
+            self.log_info(f"Auto-resolved {len(category_codes)} mapped category codes")
+
+        # Get select/multiselect attributes
+        attrs_query = MarketplaceAttribute.objects.filter(
+            attribute_set__marketplace=self.marketplace,
+            attr_type__in=['select', 'multiselect'],
+        )
+
+        if category_codes:
+            attrs_query = attrs_query.filter(
+                attribute_set__external_code__in=category_codes
+            )
+
+        attrs = list(attrs_query.select_related('attribute_set'))
+        self.log_info(f"Processing options for {len(attrs)} select/multiselect attributes")
 
         client = get_marketplace_client(self.marketplace)
-        attribute_set_id = config.get('attribute_set_id')
+        total_options = 0
 
-        result = client.sync_attribute_options(attribute_set_id=attribute_set_id)
-        return {'synced': result}
+        for i, attr in enumerate(attrs):
+            if i % 50 == 0 and i > 0:
+                self.log_info(f"Progress: {i}/{len(attrs)} attributes processed, {total_options} options loaded")
+
+            count = client.sync_attribute_options(
+                attribute_set_code=attr.attribute_set.external_code,
+                attribute_code=attr.external_code,
+            )
+            total_options += count
+
+        self.log_info(f"Synced {total_options} options for {len(attrs)} attributes")
+        return {
+            'synced': total_options,
+            'attributes_processed': len(attrs),
+            'mode': 'mapped_only' if category_codes else 'all',
+        }
 
 
 class SyncEntitiesHandler(BaseStepHandler):

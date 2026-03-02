@@ -2,15 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 from apps.marketplaces.models import Marketplace, MarketplaceAttribute
-from apps.marketplaces.services import EpicentrClient
-
-
-# Регистрация клиентов для разных маркетплейсов
-MARKETPLACE_CLIENTS = {
-    'epicentr': EpicentrClient,
-    # 'modnakasta': ModnaKastaClient,  # TODO
-    # 'rozetka': RozetkaClient,  # TODO
-}
+from apps.marketplaces.services import get_marketplace_client
 
 
 class Command(BaseCommand):
@@ -95,15 +87,7 @@ class Command(BaseCommand):
             else:
                 raise CommandError(f'Маркетплейс "{slug}" не найден')
 
-        # Получить клиент
-        client_class = MARKETPLACE_CLIENTS.get(slug)
-        if not client_class:
-            raise CommandError(
-                f'Клиент для маркетплейса "{slug}" не реализован. '
-                f'Доступные: {", ".join(MARKETPLACE_CLIENTS.keys())}'
-            )
-
-        client = client_class(marketplace)
+        client = get_marketplace_client(marketplace)
         sync_all = options['all']
         category_codes = options.get('category_codes')
 

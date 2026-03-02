@@ -1,7 +1,12 @@
-from .base_api_client import BaseMarketplaceClient
-from .epicentr_client import EpicentrClient
+from .base_api_client import MarketplaceClient
+
+
+def get_marketplace_client(marketplace) -> MarketplaceClient:
+    """Get API client for a marketplace, configured from its api_config"""
+    return MarketplaceClient(marketplace)
+
 
 __all__ = [
-    'BaseMarketplaceClient',
-    'EpicentrClient',
+    'MarketplaceClient',
+    'get_marketplace_client',
 ]
