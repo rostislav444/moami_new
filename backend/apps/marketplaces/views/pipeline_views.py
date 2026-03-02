@@ -76,6 +76,7 @@ class PipelineViewSet(viewsets.ModelViewSet):
             marketplace=marketplace,
             name=data['name'],
             description=data.get('description', ''),
+            purpose=data.get('purpose', 'other'),
             config=data.get('config', {}),
         )
 
@@ -148,6 +149,61 @@ class PipelineViewSet(viewsets.ModelViewSet):
                 'success': success,
                 'progress': pipeline_run.progress,
             })
+
+    @action(detail=True, methods=['post'], url_path='run-step')
+    def run_step(self, request, pk=None):
+        """
+        Запустить один шаг пайплайна (тест-режим)
+
+        POST /api/marketplaces/pipelines/{id}/run-step/
+        Body: {
+            "step_id": 5
+        }
+        """
+        pipeline = self.get_object()
+        step_id = request.data.get('step_id')
+
+        if not step_id:
+            return Response(
+                {'error': 'step_id is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            step = pipeline.steps.get(id=step_id)
+        except PipelineStep.DoesNotExist:
+            return Response(
+                {'error': 'Step not found in this pipeline'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Create a run and execute only this step
+        pipeline_run = PipelineRun.objects.create(pipeline=pipeline)
+
+        from apps.marketplaces.services.pipeline_executor import PipelineExecutor
+        executor = PipelineExecutor(pipeline_run)
+
+        from django.utils import timezone
+        pipeline_run.status = 'running'
+        pipeline_run.started_at = timezone.now()
+        pipeline_run.current_step = step
+        pipeline_run.progress = {str(step.id): {'status': 'running'}}
+        pipeline_run.save()
+
+        success = executor._execute_step(step)
+
+        pipeline_run.status = 'completed' if success else 'failed'
+        pipeline_run.current_step = None
+        pipeline_run.finished_at = timezone.now()
+        pipeline_run.save()
+
+        return Response({
+            'run_id': pipeline_run.id,
+            'step_id': step.id,
+            'step_name': step.name,
+            'success': success,
+            'progress': pipeline_run.progress,
+        })
 
     @action(detail=True, methods=['get'])
     def runs(self, request, pk=None):

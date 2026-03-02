@@ -4,6 +4,13 @@ from django.db import models
 class MarketplacePipeline(models.Model):
     """Пайплайн синхронизации маркетплейса"""
 
+    PURPOSE_CHOICES = [
+        ('categories', 'Categories'),
+        ('attributes', 'Attributes'),
+        ('attribute_options', 'Attribute Options'),
+        ('other', 'Other'),
+    ]
+
     marketplace = models.ForeignKey(
         'marketplaces.Marketplace',
         on_delete=models.CASCADE,
@@ -11,6 +18,12 @@ class MarketplacePipeline(models.Model):
     )
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    purpose = models.CharField(
+        max_length=20,
+        choices=PURPOSE_CHOICES,
+        default='other',
+        help_text='Pipeline purpose: categories, attributes, or other'
+    )
     is_active = models.BooleanField(default=True)
     config = models.JSONField(
         default=dict,

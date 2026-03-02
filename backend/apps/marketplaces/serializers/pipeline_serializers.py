@@ -57,6 +57,7 @@ class MarketplacePipelineSerializer(serializers.ModelSerializer):
             'marketplace_name',
             'name',
             'description',
+            'purpose',
             'is_active',
             'config',
             'steps',
@@ -98,6 +99,7 @@ class MarketplacePipelineListSerializer(serializers.ModelSerializer):
             'marketplace_name',
             'name',
             'description',
+            'purpose',
             'is_active',
             'steps_count',
             'runs_count',
@@ -155,6 +157,11 @@ class CreatePipelineSerializer(serializers.Serializer):
     marketplace_id = serializers.IntegerField()
     name = serializers.CharField(max_length=255)
     description = serializers.CharField(required=False, allow_blank=True, default='')
+    purpose = serializers.ChoiceField(
+        choices=MarketplacePipeline.PURPOSE_CHOICES,
+        required=False,
+        default='other'
+    )
     config = serializers.JSONField(required=False, default=dict)
     steps = PipelineStepCreateSerializer(many=True, required=False, default=list)
 

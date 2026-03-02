@@ -28,6 +28,7 @@ export interface Pipeline {
   marketplace_name: string;
   name: string;
   description: string;
+  purpose: 'categories' | 'attributes' | 'attribute_options' | 'other';
   is_active: boolean;
   config: Record<string, unknown>;
   steps: PipelineStep[];
@@ -48,6 +49,7 @@ export interface PipelineListItem {
   marketplace_name: string;
   name: string;
   description: string;
+  purpose: 'categories' | 'attributes' | 'attribute_options' | 'other';
   is_active: boolean;
   steps_count: number;
   runs_count: number;
@@ -198,6 +200,21 @@ export const pipelineAPI = {
         body: JSON.stringify({ run_in_background: runInBackground }),
       }
     ),
+
+  /**
+   * Запустить один шаг (тест-режим)
+   */
+  runStep: (pipelineId: number, stepId: number) =>
+    fetchAPI<{
+      run_id: number;
+      step_id: number;
+      step_name: string;
+      success: boolean;
+      progress: Record<string, { status: string; result?: Record<string, unknown>; error?: string }>;
+    }>(`/marketplaces/pipelines/${pipelineId}/run-step/`, {
+      method: 'POST',
+      body: JSON.stringify({ step_id: stepId }),
+    }),
 
   /**
    * Получить историю запусков

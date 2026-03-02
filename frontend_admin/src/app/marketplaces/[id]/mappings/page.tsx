@@ -1,12 +1,12 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { marketplacesAPI, categoriesAPI, aiAPI, type MarketplaceCategory, type CategoryMapping, type Category } from '@/lib/api';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import { marketplacesAPI, categoriesAPI, aiAPI, type MarketplaceCategory, type CategoryMapping, type Category, type PaginatedResponse } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { RefreshCw, ChevronRight, ChevronDown, Folder, FolderOpen, FileText, Loader2, Wand2, Check, Bot, ArrowRight, Search, CheckCircle2, Circle, Link as LinkIcon, Unlink } from 'lucide-react';
+import { RefreshCw, ChevronRight, ChevronDown, Folder, FolderOpen, FileText, Loader2, Wand2, Check, Bot, ArrowRight, Search, CheckCircle2, Circle, Link as LinkIcon, Unlink, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState, useEffect } from 'react';
 
@@ -77,6 +77,16 @@ export default function MappingsPage() {
     },
   });
 
+  const cleanupMutation = useMutation({
+    mutationFn: () => categoriesAPI.cleanupUnmapped(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['marketplace-category-tree'] });
+      queryClient.invalidateQueries({ queryKey: ['marketplace-categories-search-mappings'] });
+      queryClient.invalidateQueries({ queryKey: ['marketplace', id] });
+      alert(`Видалено ${data.deleted} незамаплених категорій. Залишилось: ${data.remaining}`);
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -114,8 +124,13 @@ export default function MappingsPage() {
         const result = await autoMatchMutation.mutateAsync();
         return result.matched;
       }}
+      onCleanupUnmapped={async () => {
+        const result = await cleanupMutation.mutateAsync();
+        return result.deleted;
+      }}
       isCreating={createMappingMutation.isPending}
       isDeleting={deleteMappingMutation.isPending}
+      isCleaning={cleanupMutation.isPending}
     />
   );
 }
@@ -129,8 +144,10 @@ function CategoryMappingTab({
   onCreateMapping,
   onDeleteMapping,
   onAutoMatch,
+  onCleanupUnmapped,
   isCreating,
   isDeleting,
+  isCleaning,
 }: {
   marketplace: { id: number; name: string };
   mappings: CategoryMapping[];
@@ -140,17 +157,54 @@ function CategoryMappingTab({
   onCreateMapping: (ourId: number, mpId: number) => Promise<void>;
   onDeleteMapping: (id: number) => Promise<void>;
   onAutoMatch: () => Promise<number>;
+  onCleanupUnmapped: () => Promise<number>;
   isCreating: boolean;
   isDeleting: boolean;
+  isCleaning: boolean;
 }) {
   const [selectedOurCategories, setSelectedOurCategories] = useState<Set<number>>(new Set());
   const [selectedMpCategories, setSelectedMpCategories] = useState<Set<number>>(new Set());
   const [ourSearch, setOurSearch] = useState('');
   const [mpSearch, setMpSearch] = useState('');
+  const [debouncedMpSearch, setDebouncedMpSearch] = useState('');
   const [isAutoMatching, setIsAutoMatching] = useState(false);
   const [isAIMatching, setIsAIMatching] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<AISuggestion[] | null>(null);
   const [selectedSuggestions, setSelectedSuggestions] = useState<Set<number>>(new Set());
+
+  // Debounce marketplace search
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedMpSearch(mpSearch), 300);
+    return () => clearTimeout(timer);
+  }, [mpSearch]);
+
+  // Server-side search for marketplace categories
+  const {
+    data: mpSearchResults,
+    isLoading: isMpSearching,
+    fetchNextPage: fetchNextMpPage,
+    hasNextPage: hasNextMpPage,
+    isFetchingNextPage: isFetchingNextMpPage,
+  } = useInfiniteQuery({
+    queryKey: ['marketplace-categories-search-mappings', marketplace.id, debouncedMpSearch],
+    queryFn: ({ pageParam = 1 }) =>
+      categoriesAPI.listFlat(marketplace.id, {
+        search: debouncedMpSearch,
+        page: pageParam,
+        page_size: 50,
+        leaf_only: false,
+      }),
+    getNextPageParam: (lastPage: PaginatedResponse<MarketplaceCategory>) => {
+      if (!lastPage.next) return undefined;
+      const url = new URL(lastPage.next);
+      return Number(url.searchParams.get('page'));
+    },
+    initialPageParam: 1,
+    enabled: !!debouncedMpSearch,
+  });
+
+  const flatMpSearchResults = mpSearchResults?.pages.flatMap((page) => page.results) ?? [];
+  const totalMpSearchResults = mpSearchResults?.pages[0]?.count ?? 0;
 
   // Mapped category IDs
   const mappedOurCategoryIds = new Set(mappings.map(m => m.category));
@@ -214,6 +268,12 @@ function CategoryMappingTab({
 
     setSelectedOurCategories(new Set());
     setSelectedMpCategories(new Set());
+  };
+
+  // Cleanup unmapped categories
+  const handleCleanupUnmapped = async () => {
+    if (!confirm('Видалити всі незамаплені категорії маркетплейса? Залишаться тільки замаплені та їх батьківські категорії.')) return;
+    await onCleanupUnmapped();
   };
 
   // Auto match by name
@@ -286,6 +346,17 @@ function CategoryMappingTab({
             AI маппінг
           </Button>
         )}
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCleanupUnmapped}
+          disabled={isCleaning}
+          className="border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800"
+        >
+          {isCleaning ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Trash2 className="h-4 w-4 mr-1.5 text-red-500" />}
+          Видалити зайві
+        </Button>
 
         <div className="flex-1" />
 
@@ -481,14 +552,76 @@ function CategoryMappingTab({
             </div>
           </div>
           <ScrollArea className="flex-1 bg-white">
-            {categoryTree.length > 0 ? (
+            {debouncedMpSearch ? (
+              // Server-side search results
+              <div className="p-1">
+                {isMpSearching ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : flatMpSearchResults.length > 0 ? (
+                  <>
+                    <div className="px-2 py-1.5 text-xs text-muted-foreground border-b mb-1">
+                      Знайдено: {totalMpSearchResults}
+                    </div>
+                    {flatMpSearchResults.map((cat) => {
+                      const isSelected = selectedMpCategories.has(cat.id);
+                      const isHidden = mappedMpCategoryIds.has(cat.id);
+                      return (
+                        <div
+                          key={cat.id}
+                          className={`flex items-center gap-1 px-2 py-1.5 rounded cursor-pointer text-sm transition-colors ${
+                            isHidden
+                              ? 'opacity-40 cursor-not-allowed'
+                              : isSelected
+                              ? 'bg-amber-500 text-white'
+                              : 'hover:bg-amber-50 text-gray-700'
+                          }`}
+                          onClick={() => !isHidden && toggleMpCategory(cat.id)}
+                        >
+                          <FileText className={`h-4 w-4 shrink-0 ${isSelected ? 'text-amber-200' : 'text-amber-400'}`} />
+                          <span className="truncate flex-1">{cat.name}</span>
+                          {cat.external_code && (
+                            <span className="text-xs text-muted-foreground font-mono shrink-0">
+                              {cat.external_code}
+                            </span>
+                          )}
+                          {isSelected && <Check className="h-3.5 w-3.5 shrink-0" />}
+                        </div>
+                      );
+                    })}
+                    {hasNextMpPage && (
+                      <div className="flex justify-center py-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => fetchNextMpPage()}
+                          disabled={isFetchingNextMpPage}
+                          className="text-xs h-7"
+                        >
+                          {isFetchingNextMpPage ? (
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                          ) : null}
+                          Завантажити ще
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-gray-400 text-sm">
+                    Не знайдено
+                  </div>
+                )}
+              </div>
+            ) : categoryTree.length > 0 ? (
+              // Tree view (no search)
               <div className="p-1">
                 <MappingCategoryTreeCompact
                   categories={categoryTree}
                   selectedIds={selectedMpCategories}
                   onToggle={toggleMpCategory}
                   hiddenIds={mappedMpCategoryIds}
-                  searchQuery={mpSearch}
+                  searchQuery=""
                 />
               </div>
             ) : (

@@ -134,6 +134,7 @@ class MarketplaceViewSet(viewsets.ModelViewSet):
             MarketplaceCategory,
             CategoryMapping,
             MarketplaceAttributeSet,
+            MarketplaceAttributeOption,
         )
 
         return Response({
@@ -146,6 +147,9 @@ class MarketplaceViewSet(viewsets.ModelViewSet):
                 marketplace_category__marketplace=marketplace
             ).count(),
             'attribute_sets_count': marketplace.attribute_sets.count(),
+            'attribute_options_count': MarketplaceAttributeOption.objects.filter(
+                attribute__attribute_set__marketplace=marketplace
+            ).count(),
             'last_sync': marketplace.last_sync,
             'last_feed_generated': marketplace.last_feed_generated,
         })

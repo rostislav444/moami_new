@@ -140,11 +140,44 @@ export const marketplacesAPI = {
 
   get: (id: number) => fetchAPI<Marketplace>(`/marketplaces/marketplaces/${id}/`),
 
+  create: (data: {
+    name: string;
+    slug: string;
+    integration_type: 'xml_feed' | 'api' | 'both';
+    is_active?: boolean;
+    api_config?: Record<string, unknown>;
+    feed_filename?: string;
+  }) =>
+    fetchAPI<Marketplace>('/marketplaces/marketplaces/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
   sync: (id: number, type: 'categories' | 'attributes' | 'options' | 'all') =>
     fetchAPI<{ success: boolean; synced: number }>(`/marketplaces/sync/${type}/`, {
       method: 'POST',
       body: JSON.stringify({ marketplace_id: id }),
     }),
+
+  syncAttributes: (marketplaceId: number, categoryCodes: string[]) =>
+    fetchAPI<{ success: boolean; synced: number }>('/marketplaces/sync/attributes/', {
+      method: 'POST',
+      body: JSON.stringify({ marketplace_id: marketplaceId, category_codes: categoryCodes }),
+    }),
+
+  stats: (id: number) =>
+    fetchAPI<{
+      id: number;
+      name: string;
+      categories_count: number;
+      categories_with_children: number;
+      leaf_categories: number;
+      mapped_categories: number;
+      attribute_sets_count: number;
+      attribute_options_count: number;
+      last_sync: string | null;
+      last_feed_generated: string | null;
+    }>(`/marketplaces/marketplaces/${id}/stats/`),
 };
 
 // =============================================================================
@@ -195,6 +228,10 @@ export const categoriesAPI = {
     fetchAPI<MarketplaceCategory[]>('/marketplaces/marketplace-categories/tree/', {
       params: { marketplace: marketplaceId },
     }),
+
+  // Получить категорию по ID
+  getCategory: (categoryId: number) =>
+    fetchAPI<MarketplaceCategory & { full_path?: string }>(`/marketplaces/marketplace-categories/${categoryId}/`),
 
   // Получить детей категории
   getChildren: (categoryId: number) =>
@@ -283,6 +320,12 @@ export const categoriesAPI = {
 
   autoMatch: (marketplaceId: number) =>
     fetchAPI<{ success: boolean; matched: number }>('/marketplaces/category-mappings/auto_match/', {
+      method: 'POST',
+      body: JSON.stringify({ marketplace_id: marketplaceId }),
+    }),
+
+  cleanupUnmapped: (marketplaceId: number) =>
+    fetchAPI<{ success: boolean; deleted: number; remaining: number }>('/marketplaces/category-mappings/cleanup-unmapped/', {
       method: 'POST',
       body: JSON.stringify({ marketplace_id: marketplaceId }),
     }),

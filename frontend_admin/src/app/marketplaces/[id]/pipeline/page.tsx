@@ -5,157 +5,62 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import {
   pipelineAPI,
-  STEP_TYPES,
+  type PipelineListItem,
   type Pipeline,
   type PipelineStep,
-  type PipelineRun,
 } from '@/lib/pipeline-api';
-import { taskAPI } from '@/lib/task-api';
+import { marketplacesAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Workflow,
   Play,
-  Plus,
   Trash2,
   RefreshCw,
   Loader2,
   CheckCircle2,
   XCircle,
   Clock,
-  ChevronRight,
   ChevronDown,
+  ChevronRight,
+  FolderTree,
+  ListChecks,
+  Bot,
   Settings2,
-  GripVertical,
+  FlaskConical,
+  Eye,
+  EyeOff,
+  Tags,
 } from 'lucide-react';
+import Link from 'next/link';
+
+// =============================================================================
+// Main page
+// =============================================================================
 
 export default function PipelinePage() {
   const params = useParams();
   const marketplaceId = Number(params.id);
   const queryClient = useQueryClient();
 
-  const [selectedPipeline, setSelectedPipeline] = useState<number | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showStepModal, setShowStepModal] = useState(false);
-  const [editingStep, setEditingStep] = useState<PipelineStep | null>(null);
-  const [runningPipelineId, setRunningPipelineId] = useState<number | null>(null);
+  const { data: stats } = useQuery({
+    queryKey: ['marketplace-stats', marketplaceId],
+    queryFn: () => marketplacesAPI.stats(marketplaceId),
+    enabled: !!marketplaceId,
+  });
 
-  // Fetch pipelines
   const { data: pipelines, isLoading } = useQuery({
     queryKey: ['pipelines', marketplaceId],
     queryFn: () => pipelineAPI.list(marketplaceId),
     enabled: !!marketplaceId,
   });
 
-  // Fetch selected pipeline details
-  const { data: pipeline, refetch: refetchPipeline } = useQuery({
-    queryKey: ['pipeline', selectedPipeline],
-    queryFn: () => pipelineAPI.get(selectedPipeline!),
-    enabled: !!selectedPipeline,
-  });
-
-  // Fetch pipeline runs
-  const { data: runsData, refetch: refetchRuns } = useQuery({
-    queryKey: ['pipeline-runs', selectedPipeline],
-    queryFn: () => pipelineAPI.getRuns(selectedPipeline!),
-    enabled: !!selectedPipeline,
-    refetchInterval: runningPipelineId === selectedPipeline ? 2000 : false,
-  });
-
-  // Create pipeline
-  const createPipelineMutation = useMutation({
-    mutationFn: (data: { name: string; description: string }) =>
-      pipelineAPI.create({
-        marketplace_id: marketplaceId,
-        name: data.name,
-        description: data.description,
-      }),
-    onSuccess: (newPipeline) => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines', marketplaceId] });
-      setSelectedPipeline(newPipeline.id);
-      setShowCreateModal(false);
-    },
-  });
-
-  // Delete pipeline
-  const deletePipelineMutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: (id: number) => pipelineAPI.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pipelines', marketplaceId] });
-      setSelectedPipeline(null);
     },
   });
-
-  // Run pipeline
-  const runPipelineMutation = useMutation({
-    mutationFn: (id: number) => pipelineAPI.run(id),
-    onSuccess: (result) => {
-      setRunningPipelineId(selectedPipeline);
-      refetchRuns();
-    },
-  });
-
-  // Create step
-  const createStepMutation = useMutation({
-    mutationFn: (data: { step_type: string; name: string; config: Record<string, unknown> }) =>
-      pipelineAPI.createStep({
-        pipeline: selectedPipeline!,
-        order: (pipeline?.steps.length || 0),
-        ...data,
-      }),
-    onSuccess: () => {
-      refetchPipeline();
-      setShowStepModal(false);
-    },
-  });
-
-  // Update step
-  const updateStepMutation = useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: Partial<PipelineStep>;
-    }) => pipelineAPI.updateStep(id, data),
-    onSuccess: () => {
-      refetchPipeline();
-      setEditingStep(null);
-    },
-  });
-
-  // Delete step
-  const deleteStepMutation = useMutation({
-    mutationFn: (id: number) => pipelineAPI.deleteStep(id),
-    onSuccess: () => refetchPipeline(),
-  });
-
-  // Check for running pipelines
-  useEffect(() => {
-    if (runsData?.runs.some((r) => r.status === 'running')) {
-      setRunningPipelineId(selectedPipeline);
-    } else {
-      setRunningPipelineId(null);
-    }
-  }, [runsData, selectedPipeline]);
 
   if (isLoading) {
     return (
@@ -165,512 +70,536 @@ export default function PipelinePage() {
     );
   }
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold flex items-center gap-2">
-          <Workflow className="h-5 w-5 text-blue-500" />
-          Пайплайны синхронизации
-        </h2>
-        <Button size="sm" onClick={() => setShowCreateModal(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Создать пайплайн
-        </Button>
-      </div>
+  // Classify by `purpose` field from backend
+  const categoryPipelines = pipelines?.filter((p) => p.purpose === 'categories') || [];
+  const attributePipelines = pipelines?.filter((p) => p.purpose === 'attributes') || [];
+  const optionsPipelines = pipelines?.filter((p) => p.purpose === 'attribute_options') || [];
+  const otherPipelines = pipelines?.filter((p) => p.purpose === 'other') || [];
 
-      <div className="grid grid-cols-12 gap-4">
-        {/* Pipeline list */}
-        <div className="col-span-4">
-          <Card>
-            <CardHeader className="py-3">
-              <CardTitle className="text-sm">Пайплайны</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[400px]">
-                {pipelines && pipelines.length > 0 ? (
-                  <div className="divide-y">
-                    {pipelines.map((p) => (
-                      <button
-                        key={p.id}
-                        onClick={() => setSelectedPipeline(p.id)}
-                        className={`w-full p-3 text-left hover:bg-muted/50 transition-colors ${
-                          selectedPipeline === p.id ? 'bg-muted' : ''
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">{p.name}</span>
-                          {p.last_run_status && (
-                            <Badge
-                              variant={
-                                p.last_run_status === 'completed'
-                                  ? 'default'
-                                  : p.last_run_status === 'failed'
-                                    ? 'destructive'
-                                    : p.last_run_status === 'running'
-                                      ? 'secondary'
-                                      : 'outline'
-                              }
-                              className="text-xs"
-                            >
-                              {p.last_run_status === 'running' && (
-                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                              )}
-                              {p.last_run_status}
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {p.steps_count} шагов • {p.runs_count} запусков
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-4 text-center text-muted-foreground">
-                    Нет пайплайнов
-                  </div>
+  return (
+    <div className="space-y-6">
+      {/* Section 1: Categories */}
+      <WorkflowSection
+        title="Загрузка категорий"
+        description="Загрузить дерево категорий маркетплейса"
+        icon={<FolderTree className="h-5 w-5 text-blue-500" />}
+        stats={
+          stats
+            ? {
+                loaded: stats.categories_count,
+                label: 'категорій загружено',
+                extra:
+                  stats.mapped_categories > 0
+                    ? `${stats.mapped_categories} замаплено`
+                    : undefined,
+              }
+            : undefined
+        }
+        pipelines={categoryPipelines}
+        marketplaceId={marketplaceId}
+        researchPreset="categories"
+        onDelete={(id) => {
+          if (confirm('Удалить пайплайн?')) deleteMutation.mutate(id);
+        }}
+      />
+
+      {/* Section 2: Attributes */}
+      <WorkflowSection
+        title="Загрузка атрибутів"
+        description="Загрузити атрибути (характеристики) для категорій"
+        icon={<ListChecks className="h-5 w-5 text-purple-500" />}
+        stats={
+          stats
+            ? {
+                loaded: stats.attribute_sets_count,
+                label: 'наборів атрибутів',
+              }
+            : undefined
+        }
+        pipelines={attributePipelines}
+        marketplaceId={marketplaceId}
+        researchPreset="attributes"
+        onDelete={(id) => {
+          if (confirm('Удалити пайплайн?')) deleteMutation.mutate(id);
+        }}
+      />
+
+      {/* Section 3: Attribute Options */}
+      <WorkflowSection
+        title="Загрузка значень атрибутів"
+        description="Завантажити значення (опції) для select/multiselect атрибутів"
+        icon={<Tags className="h-5 w-5 text-orange-500" />}
+        stats={
+          stats
+            ? {
+                loaded: stats.attribute_options_count ?? 0,
+                label: 'значень завантажено',
+              }
+            : undefined
+        }
+        pipelines={optionsPipelines}
+        marketplaceId={marketplaceId}
+        researchPreset="attribute_options"
+        onDelete={(id) => {
+          if (confirm('Удалити пайплайн?')) deleteMutation.mutate(id);
+        }}
+      />
+
+      {/* Other pipelines (if any) */}
+      {otherPipelines.length > 0 && (
+        <WorkflowSection
+          title="Інші пайплайни"
+          description="Пайплайни не прив'язані до конкретного типу"
+          icon={<Settings2 className="h-5 w-5 text-gray-500" />}
+          pipelines={otherPipelines}
+          marketplaceId={marketplaceId}
+          onDelete={(id) => {
+            if (confirm('Удалити пайплайн?')) deleteMutation.mutate(id);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// =============================================================================
+// Workflow section (categories / attributes)
+// =============================================================================
+
+function WorkflowSection({
+  title,
+  description,
+  icon,
+  stats,
+  pipelines,
+  marketplaceId,
+  researchPreset,
+  onDelete,
+}: {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  stats?: { loaded: number; label: string; extra?: string };
+  pipelines: PipelineListItem[];
+  marketplaceId: number;
+  researchPreset?: string;
+  onDelete: (id: number) => void;
+}) {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {icon}
+            <div>
+              <CardTitle className="text-base">{title}</CardTitle>
+              <CardDescription className="text-xs">{description}</CardDescription>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {stats && (
+              <div className="text-right">
+                <div className="text-lg font-bold">{stats.loaded.toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">{stats.label}</div>
+                {stats.extra && (
+                  <div className="text-xs text-green-600">{stats.extra}</div>
                 )}
-              </ScrollArea>
-            </CardContent>
-          </Card>
+              </div>
+            )}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {pipelines.length > 0 ? (
+          pipelines.map((p) => (
+            <PipelineCard key={p.id} pipeline={p} onDelete={() => onDelete(p.id)} />
+          ))
+        ) : (
+          <div className="flex items-center justify-between p-4 rounded-lg border border-dashed">
+            <div className="text-sm text-muted-foreground">
+              {stats && stats.loaded > 0
+                ? 'Данные загружены (пайплайн не сохранён)'
+                : 'Нет пайплайна. Запустите исследование чтобы AI создал его.'}
+            </div>
+            {researchPreset && (
+              <Link href={`/marketplaces/${marketplaceId}/research?preset=${researchPreset}`}>
+                <Button size="sm" variant="outline">
+                  <Bot className="h-4 w-4 mr-2" />
+                  Исследовать
+                </Button>
+              </Link>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// =============================================================================
+// Pipeline card with inline run + test mode
+// =============================================================================
+
+function PipelineCard({
+  pipeline: pipelineListItem,
+  onDelete,
+}: {
+  pipeline: PipelineListItem;
+  onDelete: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const [expanded, setExpanded] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+  const [testingStepId, setTestingStepId] = useState<number | null>(null);
+  const [testResult, setTestResult] = useState<Record<string, unknown> | null>(null);
+
+  // Fetch full pipeline details when expanded
+  const { data: pipeline } = useQuery({
+    queryKey: ['pipeline', pipelineListItem.id],
+    queryFn: () => pipelineAPI.get(pipelineListItem.id),
+    enabled: expanded,
+  });
+
+  // Fetch runs
+  const { data: runsData } = useQuery({
+    queryKey: ['pipeline-runs', pipelineListItem.id],
+    queryFn: () => pipelineAPI.getRuns(pipelineListItem.id),
+    enabled: expanded,
+    refetchInterval: isRunning ? 2000 : false,
+  });
+
+  // Check running status
+  useEffect(() => {
+    if (runsData?.runs.some((r) => r.status === 'running')) {
+      setIsRunning(true);
+    } else {
+      setIsRunning(false);
+    }
+  }, [runsData]);
+
+  const runMutation = useMutation({
+    mutationFn: () => pipelineAPI.run(pipelineListItem.id),
+    onSuccess: () => {
+      setIsRunning(true);
+      setExpanded(true);
+      queryClient.invalidateQueries({ queryKey: ['pipeline-runs', pipelineListItem.id] });
+    },
+  });
+
+  const testStepMutation = useMutation({
+    mutationFn: (stepId: number) => pipelineAPI.runStep(pipelineListItem.id, stepId),
+    onSuccess: (data) => {
+      setTestResult(data.progress);
+      setTestingStepId(null);
+      queryClient.invalidateQueries({ queryKey: ['pipeline-runs', pipelineListItem.id] });
+    },
+    onError: () => {
+      setTestingStepId(null);
+    },
+  });
+
+  const lastRun = runsData?.runs[0];
+
+  return (
+    <div className="border rounded-lg">
+      {/* Header */}
+      <div className="flex items-center gap-3 p-3">
+        <button
+          className="text-muted-foreground hover:text-foreground"
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </button>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-sm">{pipelineListItem.name}</span>
+            <Badge variant="outline" className="text-xs">
+              {pipelineListItem.steps_count} шагов
+            </Badge>
+            {pipelineListItem.last_run_status && (
+              <RunStatusBadge status={pipelineListItem.last_run_status} />
+            )}
+          </div>
         </div>
 
-        {/* Pipeline details */}
-        <div className="col-span-8">
-          {pipeline ? (
-            <div className="space-y-4">
-              {/* Header */}
-              <Card>
-                <CardHeader className="py-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-base">{pipeline.name}</CardTitle>
-                      {pipeline.description && (
-                        <CardDescription>{pipeline.description}</CardDescription>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => runPipelineMutation.mutate(pipeline.id)}
-                        disabled={runPipelineMutation.isPending || runningPipelineId === pipeline.id}
-                      >
-                        {runPipelineMutation.isPending || runningPipelineId === pipeline.id ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <Play className="h-4 w-4 mr-2" />
-                        )}
-                        Запустить
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-red-500"
-                        onClick={() => {
-                          if (confirm('Удалить пайплайн?')) {
-                            deletePipelineMutation.mutate(pipeline.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            onClick={() => runMutation.mutate()}
+            disabled={
+              runMutation.isPending || isRunning || pipelineListItem.steps_count === 0
+            }
+          >
+            {runMutation.isPending || isRunning ? (
+              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+            ) : (
+              <Play className="h-4 w-4 mr-1" />
+            )}
+            {isRunning ? 'Работает...' : 'Запустить все'}
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="text-red-500 h-8 w-8 p-0"
+            onClick={onDelete}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
 
-              {/* Steps */}
-              <Card>
-                <CardHeader className="py-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm">Шаги ({pipeline.steps.length})</CardTitle>
-                    <Button size="sm" variant="outline" onClick={() => setShowStepModal(true)}>
-                      <Plus className="h-4 w-4 mr-1" />
-                      Добавить шаг
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-0">
-                  {pipeline.steps.length > 0 ? (
-                    <div className="divide-y">
-                      {pipeline.steps.map((step, index) => (
-                        <StepRow
-                          key={step.id}
-                          step={step}
-                          index={index}
-                          onEdit={() => setEditingStep(step)}
-                          onDelete={() => {
-                            if (confirm('Удалить шаг?')) {
-                              deleteStepMutation.mutate(step.id);
-                            }
-                          }}
-                          onToggle={() =>
-                            updateStepMutation.mutate({
-                              id: step.id,
-                              data: { is_enabled: !step.is_enabled },
-                            })
-                          }
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-4 text-center text-muted-foreground">
-                      Добавьте шаги в пайплайн
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+      {/* Expanded: steps + runs */}
+      {expanded && pipeline && (
+        <div className="border-t px-3 pb-3">
+          {/* Steps */}
+          <div className="mt-2 space-y-1">
+            {pipeline.steps.map((step, i) => {
+              const stepProgress =
+                testResult?.[String(step.id)] as
+                  | { status: string; result?: Record<string, unknown>; error?: string }
+                  | undefined ??
+                lastRun?.progress?.[String(step.id)];
+              const isTesting = testingStepId === step.id;
 
-              {/* Run history */}
-              {runsData && runsData.runs.length > 0 && (
-                <Card>
-                  <CardHeader className="py-3">
-                    <CardTitle className="text-sm">История запусков</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <ScrollArea className="h-[200px]">
-                      <div className="divide-y">
-                        {runsData.runs.slice(0, 10).map((run) => (
-                          <RunRow key={run.id} run={run} />
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
+              return (
+                <StepRow
+                  key={step.id}
+                  step={step}
+                  index={i}
+                  progress={stepProgress}
+                  isTesting={isTesting}
+                  isRunning={isRunning}
+                  onTest={() => {
+                    setTestingStepId(step.id);
+                    setTestResult(null);
+                    testStepMutation.mutate(step.id);
+                  }}
+                />
+              );
+            })}
+          </div>
+
+          {/* Last run info */}
+          {lastRun && (
+            <div className="mt-2 pt-2 border-t flex items-center gap-2 text-xs text-muted-foreground">
+              <span>Последний запуск:</span>
+              <RunStatusBadge status={lastRun.status} />
+              {lastRun.started_at && (
+                <span>
+                  {new Date(lastRun.started_at).toLocaleString('uk-UA')}
+                </span>
+              )}
+              {lastRun.duration != null && (
+                <span className="flex items-center gap-0.5">
+                  <Clock className="h-3 w-3" />
+                  {lastRun.duration.toFixed(1)}s
+                </span>
+              )}
+              {lastRun.error_message && (
+                <span className="text-red-500 truncate">
+                  {lastRun.error_message}
+                </span>
               )}
             </div>
-          ) : (
-            <Card className="h-[400px] flex items-center justify-center">
-              <div className="text-center text-muted-foreground">
-                <Workflow className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>Выберите пайплайн</p>
-              </div>
-            </Card>
           )}
-        </div>
-      </div>
-
-      {/* Create pipeline modal */}
-      <CreatePipelineModal
-        open={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onCreate={(data) => createPipelineMutation.mutate(data)}
-        isPending={createPipelineMutation.isPending}
-      />
-
-      {/* Create/Edit step modal */}
-      <StepModal
-        open={showStepModal || !!editingStep}
-        onClose={() => {
-          setShowStepModal(false);
-          setEditingStep(null);
-        }}
-        step={editingStep}
-        onCreate={(data) => createStepMutation.mutate(data)}
-        onUpdate={(data) =>
-          editingStep && updateStepMutation.mutate({ id: editingStep.id, data })
-        }
-        isPending={createStepMutation.isPending || updateStepMutation.isPending}
-      />
-    </div>
-  );
-}
-
-function StepRow({
-  step,
-  index,
-  onEdit,
-  onDelete,
-  onToggle,
-}: {
-  step: PipelineStep;
-  index: number;
-  onEdit: () => void;
-  onDelete: () => void;
-  onToggle: () => void;
-}) {
-  const stepType = STEP_TYPES.find((t) => t.value === step.step_type);
-
-  return (
-    <div
-      className={`flex items-center gap-3 p-3 group ${!step.is_enabled ? 'opacity-50' : ''}`}
-    >
-      <div className="text-muted-foreground cursor-move">
-        <GripVertical className="h-4 w-4" />
-      </div>
-      <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
-        {index + 1}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="font-medium truncate">{step.name}</div>
-        <div className="text-xs text-muted-foreground">
-          {stepType?.label || step.step_type}
-        </div>
-      </div>
-      <Badge variant="outline" className="text-xs">
-        {step.on_error}
-      </Badge>
-      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={onToggle}>
-          {step.is_enabled ? (
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
-          ) : (
-            <XCircle className="h-4 w-4 text-muted-foreground" />
-          )}
-        </Button>
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={onEdit}>
-          <Settings2 className="h-4 w-4" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-7 w-7 text-red-500"
-          onClick={onDelete}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function RunRow({ run }: { run: PipelineRun }) {
-  return (
-    <div className="flex items-center gap-3 p-3">
-      <div
-        className={`w-2 h-2 rounded-full ${
-          run.status === 'completed'
-            ? 'bg-green-500'
-            : run.status === 'failed'
-              ? 'bg-red-500'
-              : run.status === 'running'
-                ? 'bg-blue-500 animate-pulse'
-                : 'bg-gray-300'
-        }`}
-      />
-      <div className="flex-1">
-        <div className="flex items-center gap-2">
-          <Badge
-            variant={
-              run.status === 'completed'
-                ? 'default'
-                : run.status === 'failed'
-                  ? 'destructive'
-                  : 'secondary'
-            }
-            className="text-xs"
-          >
-            {run.status === 'running' && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-            {run.status}
-          </Badge>
-          <span className="text-xs text-muted-foreground">
-            {run.completed_steps_count}/{run.total_steps_count} шагов
-          </span>
-        </div>
-        {run.error_message && (
-          <div className="text-xs text-red-500 mt-1 truncate">{run.error_message}</div>
-        )}
-      </div>
-      <div className="text-xs text-muted-foreground">
-        {run.started_at && new Date(run.started_at).toLocaleString('uk-UA')}
-      </div>
-      {run.duration !== null && (
-        <div className="text-xs text-muted-foreground flex items-center gap-1">
-          <Clock className="h-3 w-3" />
-          {run.duration.toFixed(1)}s
         </div>
       )}
     </div>
   );
 }
 
-function CreatePipelineModal({
-  open,
-  onClose,
-  onCreate,
-  isPending,
+// =============================================================================
+// Step row with expandable result
+// =============================================================================
+
+interface StepProgress {
+  status: string;
+  result?: Record<string, unknown>;
+  error?: string;
+}
+
+function StepRow({
+  step,
+  index,
+  progress,
+  isTesting,
+  isRunning,
+  onTest,
 }: {
-  open: boolean;
-  onClose: () => void;
-  onCreate: (data: { name: string; description: string }) => void;
-  isPending: boolean;
+  step: PipelineStep;
+  index: number;
+  progress?: StepProgress;
+  isTesting: boolean;
+  isRunning: boolean;
+  onTest: () => void;
 }) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [showData, setShowData] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-    onCreate({ name: name.trim(), description: description.trim() });
-  };
+  // Separate simple values from complex ones
+  const simpleEntries: [string, string | number | boolean][] = [];
+  const complexEntries: [string, unknown][] = [];
 
-  const handleClose = () => {
-    setName('');
-    setDescription('');
-    onClose();
-  };
+  if (progress?.result) {
+    for (const [k, v] of Object.entries(progress.result)) {
+      if (v === null || v === undefined) continue;
+      if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+        simpleEntries.push([k, v]);
+      } else {
+        complexEntries.push([k, v]);
+      }
+    }
+  }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Создать пайплайн</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Название</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Синхронизация категорий"
-              required
-            />
+    <div className="rounded hover:bg-muted/50 group">
+      {/* Step header line */}
+      <div className="flex items-center gap-2 text-sm py-1.5 px-2">
+        <StepStatusIcon
+          status={isTesting ? 'running' : progress?.status}
+          index={index}
+        />
+        <span className={!step.is_enabled ? 'opacity-50' : ''}>
+          {step.name}
+        </span>
+        <Badge variant="outline" className="text-xs">
+          {step.step_type}
+        </Badge>
+
+        {/* Simple result values inline */}
+        {simpleEntries.length > 0 && (
+          <div className="flex gap-1 flex-wrap">
+            {simpleEntries.map(([k, v]) => (
+              <span key={k} className="text-xs bg-muted px-1.5 py-0.5 rounded">
+                {formatResultKey(k)}: <strong>{String(v)}</strong>
+              </span>
+            ))}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">Описание</Label>
-            <Input
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Опционально"
-            />
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose}>
-              Отмена
-            </Button>
-            <Button type="submit" disabled={isPending || !name.trim()}>
-              {isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-              Создать
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        )}
+
+        {/* Show data toggle if there's complex data */}
+        {complexEntries.length > 0 && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 px-2 text-xs"
+            onClick={() => setShowData(!showData)}
+          >
+            {showData ? (
+              <EyeOff className="h-3 w-3 mr-1" />
+            ) : (
+              <Eye className="h-3 w-3 mr-1" />
+            )}
+            {showData ? 'Скрыть' : 'Данные'}
+          </Button>
+        )}
+
+        {/* Test button */}
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-6 px-2 text-xs opacity-0 group-hover:opacity-100 ml-auto"
+          disabled={isTesting || isRunning}
+          onClick={onTest}
+        >
+          {isTesting ? (
+            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+          ) : (
+            <FlaskConical className="h-3 w-3 mr-1" />
+          )}
+          Тест
+        </Button>
+
+        {/* Error */}
+        {progress?.error && (
+          <span className="text-xs text-red-500 truncate max-w-64">
+            {progress.error}
+          </span>
+        )}
+      </div>
+
+      {/* Expanded data view */}
+      {showData && complexEntries.length > 0 && (
+        <div className="px-2 pb-2 space-y-2">
+          {complexEntries.map(([k, v]) => (
+            <div key={k} className="ml-6">
+              <div className="text-xs font-medium text-muted-foreground mb-1">
+                {formatResultKey(k)}
+                {Array.isArray(v) && (
+                  <span className="text-muted-foreground/60 ml-1">
+                    ({(v as unknown[]).length} элементов)
+                  </span>
+                )}
+              </div>
+              <pre className="text-xs bg-muted p-2 rounded overflow-auto max-h-64 whitespace-pre-wrap">
+                {JSON.stringify(v, null, 2)}
+              </pre>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
-function StepModal({
-  open,
-  onClose,
-  step,
-  onCreate,
-  onUpdate,
-  isPending,
+// =============================================================================
+// Helpers
+// =============================================================================
+
+function StepStatusIcon({
+  status,
+  index,
 }: {
-  open: boolean;
-  onClose: () => void;
-  step: PipelineStep | null;
-  onCreate: (data: { step_type: string; name: string; config: Record<string, unknown> }) => void;
-  onUpdate: (data: Partial<PipelineStep>) => void;
-  isPending: boolean;
+  status?: string;
+  index: number;
 }) {
-  const [stepType, setStepType] = useState(step?.step_type || '');
-  const [name, setName] = useState(step?.name || '');
-  const [configJson, setConfigJson] = useState(
-    step?.config ? JSON.stringify(step.config, null, 2) : '{}'
-  );
-
-  useEffect(() => {
-    if (step) {
-      setStepType(step.step_type);
-      setName(step.name);
-      setConfigJson(JSON.stringify(step.config, null, 2));
-    } else {
-      setStepType('');
-      setName('');
-      setConfigJson('{}');
-    }
-  }, [step]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!stepType || !name.trim()) return;
-
-    let config = {};
-    try {
-      config = JSON.parse(configJson);
-    } catch {
-      alert('Invalid JSON in config');
-      return;
-    }
-
-    if (step) {
-      onUpdate({ step_type: stepType, name: name.trim(), config });
-    } else {
-      onCreate({ step_type: stepType, name: name.trim(), config });
-    }
-  };
-
-  const handleClose = () => {
-    setStepType('');
-    setName('');
-    setConfigJson('{}');
-    onClose();
-  };
-
-  const selectedType = STEP_TYPES.find((t) => t.value === stepType);
-
+  if (status === 'completed')
+    return <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />;
+  if (status === 'failed')
+    return <XCircle className="h-4 w-4 text-red-500 shrink-0" />;
+  if (status === 'running')
+    return <Loader2 className="h-4 w-4 text-blue-500 animate-spin shrink-0" />;
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{step ? 'Редактировать шаг' : 'Добавить шаг'}</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="step_type">Тип шага</Label>
-            <Select value={stepType} onValueChange={setStepType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите тип" />
-              </SelectTrigger>
-              <SelectContent>
-                {STEP_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    <div>
-                      <div>{type.label}</div>
-                      <div className="text-xs text-muted-foreground">{type.description}</div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="step_name">Название</Label>
-            <Input
-              id="step_name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={selectedType?.label || 'Название шага'}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="config">Конфигурация (JSON)</Label>
-            <textarea
-              id="config"
-              value={configJson}
-              onChange={(e) => setConfigJson(e.target.value)}
-              className="w-full h-32 p-2 text-sm font-mono border rounded-md"
-              placeholder='{"url": "https://..."}'
-            />
-          </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose}>
-              Отмена
-            </Button>
-            <Button type="submit" disabled={isPending || !stepType || !name.trim()}>
-              {isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-              {step ? 'Сохранить' : 'Добавить'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <span className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium shrink-0">
+      {index + 1}
+    </span>
   );
+}
+
+function RunStatusBadge({ status }: { status: string }) {
+  const map: Record<
+    string,
+    { variant: 'default' | 'destructive' | 'secondary' | 'outline'; label: string }
+  > = {
+    completed: { variant: 'default', label: 'OK' },
+    failed: { variant: 'destructive', label: 'Ошибка' },
+    running: { variant: 'secondary', label: 'Работает' },
+    pending: { variant: 'outline', label: 'Ожидание' },
+    cancelled: { variant: 'outline', label: 'Отменён' },
+  };
+  const c = map[status] || { variant: 'outline' as const, label: status };
+  return (
+    <Badge variant={c.variant} className="text-xs">
+      {status === 'running' && (
+        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+      )}
+      {c.label}
+    </Badge>
+  );
+}
+
+function formatResultKey(key: string): string {
+  const map: Record<string, string> = {
+    synced: 'синхр.',
+    created: 'создано',
+    updated: 'обновлено',
+    source: 'источник',
+    entity_type: 'тип',
+    items_count: 'элементов',
+  };
+  return map[key] || key;
 }

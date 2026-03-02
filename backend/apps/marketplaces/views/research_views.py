@@ -277,8 +277,9 @@ class ResearchViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        purpose = request.data.get('purpose', 'other')
         agent = MarketplaceResearchAgent(conversation)
-        changes = agent.apply_findings()
+        changes = agent.apply_findings(purpose=purpose)
 
         return Response({
             'success': True,

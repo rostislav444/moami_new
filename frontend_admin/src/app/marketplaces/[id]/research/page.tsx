@@ -1,12 +1,11 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { researchAPI, type AgentMessage, type AgentConversation } from '@/lib/research-api';
-import { taskAPI } from '@/lib/task-api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,25 +20,121 @@ import {
   AlertCircle,
   MessageSquare,
   Sparkles,
-  Play,
   Paperclip,
   X,
+  FolderTree,
+  ListChecks,
+  ArrowRight,
+  Tags,
 } from 'lucide-react';
+
+// =============================================================================
+// Preset research actions
+// =============================================================================
+
+interface ResearchPreset {
+  id: string;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  systemContext: string;
+  inputPlaceholder: string;
+  inputHint: string;
+}
+
+const RESEARCH_PRESETS: ResearchPreset[] = [
+  {
+    id: 'categories',
+    label: 'Загрузка категорий',
+    description: 'Исследовать как загрузить дерево категорий',
+    icon: <FolderTree className="h-5 w-5" />,
+    color: 'border-blue-200 bg-blue-50 hover:border-blue-400',
+    systemContext: `Исследуй как загрузить категории этого маркетплейса.
+
+Мне нужно знать:
+1. Есть ли API для получения списка категорий? Эндпоинт, метод, параметры?
+2. Категории загружаются списком или по одной (нужен parent_id)?
+3. Структура ответа (JSON/XML)? Поля: id, name, parent_id, code?
+4. Пагинация? Лимиты?
+5. Иерархия (дерево или плоский список)?
+
+По результатам сформируй pipeline шаги для загрузки.
+ВАЖНО: Создай finding с типом "pipeline" содержащий готовые шаги которые можно запустить.`,
+    inputPlaceholder: 'Добавьте ссылки на документацию, API, примеры...',
+    inputHint: 'Дайте ссылки на документацию маркетплейса, примеры API, или прикрепите файлы. Потом нажмите "Начать исследование".',
+  },
+  {
+    id: 'attributes',
+    label: 'Загрузка атрибутов',
+    description: 'Исследовать как загрузить атрибуты категорий',
+    icon: <ListChecks className="h-5 w-5" />,
+    color: 'border-purple-200 bg-purple-50 hover:border-purple-400',
+    systemContext: `Исследуй как загрузить атрибуты (характеристики товаров) для категорий этого маркетплейса.
+
+Мне нужно знать:
+1. Есть ли API для получения атрибутов категории? Эндпоинт, параметры?
+2. Атрибуты привязаны к категориям? Нужно указывать category_id/code?
+3. Структура: id, name, type (string/select/multiselect/int/float/boolean), обязательность, возможные значения?
+4. По одной категории или все сразу?
+5. Есть ли файлы (XLSX/CSV) с атрибутами для скачивания?
+
+По результатам сформируй pipeline шаги для загрузки атрибутов. Категории уже загружены.
+ВАЖНО: Создай finding с типом "pipeline" содержащий готовые шаги которые можно запустить.`,
+    inputPlaceholder: 'Добавьте ссылки на документацию атрибутов, файлы XLSX...',
+    inputHint: 'Дайте ссылки, прикрепите файлы с атрибутами (XLSX, CSV), или опишите как получить данные. Потом нажмите "Начать исследование".',
+  },
+  {
+    id: 'attribute_options',
+    label: 'Загрузка значений атрибутов',
+    description: 'Исследовать как загрузить значения (опции) для select/multiselect атрибутов',
+    icon: <Tags className="h-5 w-5" />,
+    color: 'border-orange-200 bg-orange-50 hover:border-orange-400',
+    systemContext: `Исследуй как загрузить значения (опции) для select/multiselect атрибутов этого маркетплейса.
+
+Контекст: атрибуты уже загружены, у многих тип select или multiselect, но значения (options) пустые.
+
+Мне нужно знать:
+1. Есть ли API эндпоинт для получения возможных значений атрибута? Параметры (attribute_id, category_code)?
+2. Значения привязаны к конкретному атрибуту или к категории?
+3. Структура ответа: id/code, name, порядок?
+4. Можно ли получить значения для всех атрибутов сразу или только по одному?
+5. Есть ли пагинация?
+
+По результатам сформируй pipeline шаги для загрузки значений атрибутов.
+ВАЖНО: Создай finding с типом "pipeline" содержащий готовые шаги которые можно запустить.
+Используй тип шага "sync_options" для сохранения опций в БД.`,
+    inputPlaceholder: 'Добавьте ссылки на документацию API атрибутов/опций...',
+    inputHint: 'Дайте ссылки на документацию API опций атрибутов, или опишите как получить данные. Потом нажмите "Начать исследование".',
+  },
+];
+
+// =============================================================================
+// Main component
+// =============================================================================
 
 export default function ResearchPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const marketplaceId = Number(params.id);
   const queryClient = useQueryClient();
+
+  // Auto-select preset from ?preset= query param
+  const presetParam = searchParams.get('preset');
+  const initialPreset = presetParam
+    ? RESEARCH_PRESETS.find((p) => p.id === presetParam) || null
+    : null;
 
   const [conversationId, setConversationId] = useState<number | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [isPolling, setIsPolling] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [activePreset, setActivePreset] = useState<ResearchPreset | null>(initialPreset);
+  const [conversationPurpose, setConversationPurpose] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const lastMessageTime = useRef<string | null>(null);
+  const prepFileInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch conversation if we have an ID
   const { data: conversation, refetch: refetchConversation } = useQuery({
     queryKey: ['research-conversation', conversationId],
     queryFn: () => researchAPI.get(conversationId!),
@@ -47,24 +142,23 @@ export default function ResearchPage() {
     refetchInterval: isPolling ? 2000 : false,
   });
 
-  // Fetch existing conversations
   const { data: conversations } = useQuery({
     queryKey: ['research-conversations', marketplaceId],
     queryFn: () => researchAPI.list(marketplaceId),
     enabled: !!marketplaceId && !conversationId,
   });
 
-  // Start new research
   const startMutation = useMutation({
-    mutationFn: (query: string) => researchAPI.start(marketplaceId, query),
-    onSuccess: (data) => {
+    mutationFn: ({ query, purpose }: { query: string; purpose?: string }) =>
+      researchAPI.start(marketplaceId, query),
+    onSuccess: (data, variables) => {
       setConversationId(data.conversation_id);
+      setConversationPurpose(variables.purpose || null);
       setIsPolling(true);
       setInputValue('');
     },
   });
 
-  // Send message
   const sendMutation = useMutation({
     mutationFn: (message: string) => researchAPI.send(conversationId!, message),
     onSuccess: () => {
@@ -73,9 +167,8 @@ export default function ResearchPage() {
     },
   });
 
-  // Apply findings
   const applyMutation = useMutation({
-    mutationFn: () => researchAPI.apply(conversationId!),
+    mutationFn: () => researchAPI.apply(conversationId!, conversationPurpose || undefined),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['marketplace', marketplaceId] });
       queryClient.invalidateQueries({ queryKey: ['pipelines', marketplaceId] });
@@ -83,7 +176,6 @@ export default function ResearchPage() {
     },
   });
 
-  // Upload file
   const uploadMutation = useMutation({
     mutationFn: ({ file, message }: { file: File; message?: string }) =>
       researchAPI.uploadFile(conversationId!, file, message),
@@ -94,7 +186,6 @@ export default function ResearchPage() {
     },
   });
 
-  // Handle polling status
   useEffect(() => {
     if (conversation) {
       if (conversation.status === 'completed' || conversation.status === 'error') {
@@ -107,7 +198,6 @@ export default function ResearchPage() {
     }
   }, [conversation?.status]);
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -117,7 +207,6 @@ export default function ResearchPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // If file is selected, upload it
     if (selectedFile && conversationId) {
       uploadMutation.mutate({ file: selectedFile, message: inputValue || undefined });
       return;
@@ -128,14 +217,13 @@ export default function ResearchPage() {
     if (conversationId) {
       sendMutation.mutate(inputValue);
     } else {
-      startMutation.mutate(inputValue);
+      startMutation.mutate({ query: inputValue });
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Check file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         alert('Файл слишком большой. Максимальный размер 10MB');
         return;
@@ -146,23 +234,130 @@ export default function ResearchPage() {
 
   const handleRemoveFile = () => {
     setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleSelectConversation = (id: number) => {
-    setConversationId(id);
-  };
+  const handleSelectConversation = (id: number) => setConversationId(id);
 
   const handleNewConversation = () => {
     setConversationId(null);
     setInputValue('');
     setSelectedFile(null);
+    setActivePreset(null);
   };
 
-  // Show conversation list if no active conversation
+  const handleStartPresetResearch = () => {
+    if (!activePreset) return;
+    const userInput = inputValue.trim();
+    const fullQuery = userInput
+      ? `${activePreset.systemContext}\n\nМатериалы от пользователя:\n${userInput}`
+      : activePreset.systemContext;
+    startMutation.mutate({ query: fullQuery, purpose: activePreset.id });
+  };
+
+  const handlePrepFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Файл слишком большой. Максимальный размер 10MB');
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  // =========================================================================
+  // Conversation list view (no active conversation)
+  // =========================================================================
+
   if (!conversationId) {
+    // Active preset — preparation form
+    if (activePreset) {
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bot className="h-5 w-5 text-violet-500" />
+              <h2 className="text-xl font-semibold">AI Research Agent</h2>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => { setActivePreset(null); setInputValue(''); setSelectedFile(null); }}>
+              Назад
+            </Button>
+          </div>
+
+          <Card className={`border-2 ${activePreset.color.split(' ').slice(0, 2).join(' ')}`}>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                {activePreset.icon}
+                {activePreset.label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                {activePreset.inputHint}
+              </p>
+
+              {/* File attachment */}
+              <input
+                type="file"
+                ref={prepFileInputRef}
+                onChange={handlePrepFileSelect}
+                className="hidden"
+                accept=".xml,.json,.csv,.txt,.html,.md,.yaml,.yml,.pdf,.xlsx,.xls"
+              />
+
+              {selectedFile && (
+                <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+                  <Paperclip className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm flex-1 truncate">{selectedFile.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {(selectedFile.size / 1024).toFixed(1)} KB
+                  </span>
+                  <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => { setSelectedFile(null); if (prepFileInputRef.current) prepFileInputRef.current.value = ''; }}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+
+              {/* User input */}
+              <textarea
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder={activePreset.inputPlaceholder}
+                className="w-full h-32 p-3 text-sm border rounded-md resize-none"
+                disabled={startMutation.isPending}
+              />
+
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => prepFileInputRef.current?.click()}
+                  disabled={startMutation.isPending}
+                >
+                  <Paperclip className="h-4 w-4 mr-2" />
+                  Прикрепить файл
+                </Button>
+                <div className="flex-1" />
+                <Button
+                  onClick={handleStartPresetResearch}
+                  disabled={startMutation.isPending}
+                >
+                  {startMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-2" />
+                  )}
+                  Начать исследование
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    // Default — preset selection + free form
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -172,9 +367,32 @@ export default function ResearchPage() {
           </h2>
         </div>
 
+        {/* Research actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {RESEARCH_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              onClick={() => setActivePreset(preset)}
+              className={`p-4 rounded-lg border-2 text-left transition-all cursor-pointer ${preset.color}`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-muted-foreground">{preset.icon}</span>
+                <div className="flex-1">
+                  <div className="font-medium text-sm">{preset.label}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    {preset.description}
+                  </div>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Free-form research */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Начать исследование</CardTitle>
+          <CardHeader className="py-3">
+            <CardTitle className="text-sm">Свободный запрос</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="flex gap-2">
@@ -196,17 +414,14 @@ export default function ResearchPage() {
                 )}
               </Button>
             </form>
-            <p className="text-sm text-muted-foreground mt-2">
-              Например: &quot;Исследуй как интегрироваться с Rozetka&quot; или &quot;Найди документацию для
-              Prom.ua API&quot;
-            </p>
           </CardContent>
         </Card>
 
+        {/* Previous conversations */}
         {conversations && conversations.length > 0 && (
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Предыдущие исследования</CardTitle>
+            <CardHeader className="py-3">
+              <CardTitle className="text-sm">Предыдущие исследования</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {conversations.map((conv) => (
@@ -216,25 +431,27 @@ export default function ResearchPage() {
                   className="w-full p-3 text-left border rounded-lg hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">
-                        {conv.last_message?.content || 'Исследование'}
+                    <div className="flex items-center gap-2 min-w-0">
+                      <MessageSquare className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="font-medium text-sm truncate">
+                        {conv.last_message?.content?.slice(0, 80) || 'Исследование'}
                       </span>
                     </div>
                     <Badge
                       variant={
-                        conv.status === 'completed'
-                          ? 'default'
-                          : conv.status === 'error'
-                            ? 'destructive'
+                        conv.status === 'completed' ? 'default'
+                          : conv.status === 'error' ? 'destructive'
                             : 'secondary'
                       }
+                      className="shrink-0 ml-2"
                     >
-                      {conv.status}
+                      {conv.status === 'completed' ? 'Готово'
+                        : conv.status === 'error' ? 'Ошибка'
+                          : conv.status === 'waiting_input' ? 'Ожидает ответ'
+                            : conv.status}
                     </Badge>
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">
+                  <div className="text-xs text-muted-foreground mt-1">
                     {conv.messages_count} сообщений •{' '}
                     {new Date(conv.created_at).toLocaleDateString('uk-UA')}
                   </div>
@@ -247,7 +464,14 @@ export default function ResearchPage() {
     );
   }
 
-  // Show chat interface
+  // =========================================================================
+  // Chat view (active conversation)
+  // =========================================================================
+
+  const hasFindings = conversation?.context && Object.keys(conversation.context).length > 0;
+  const pipelineSteps = (conversation?.context?.pipeline_steps ?? []) as Record<string, unknown>[];
+  const hasPipelineSteps = pipelineSteps.length > 0;
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -258,26 +482,25 @@ export default function ResearchPage() {
           {conversation && (
             <Badge
               variant={
-                conversation.status === 'completed'
-                  ? 'default'
-                  : conversation.status === 'error'
-                    ? 'destructive'
-                    : conversation.status === 'waiting_input'
-                      ? 'outline'
+                conversation.status === 'completed' ? 'default'
+                  : conversation.status === 'error' ? 'destructive'
+                    : conversation.status === 'waiting_input' ? 'outline'
                       : 'secondary'
               }
             >
               {conversation.status === 'processing' && (
                 <Loader2 className="h-3 w-3 mr-1 animate-spin" />
               )}
-              {conversation.status}
+              {conversation.status === 'completed' ? 'Готово'
+                : conversation.status === 'error' ? 'Ошибка'
+                  : conversation.status === 'waiting_input' ? 'Ожидает ответ'
+                    : conversation.status === 'processing' ? 'Думает...'
+                      : conversation.status}
             </Badge>
           )}
         </div>
         <div className="flex gap-2">
-          {conversation?.status === 'completed' ||
-          (conversation?.status === 'waiting_input' &&
-            Object.keys(conversation.context || {}).length > 0) ? (
+          {hasFindings && conversation?.status !== 'completed' && (
             <Button
               variant="default"
               size="sm"
@@ -290,8 +513,14 @@ export default function ResearchPage() {
                 <CheckCircle2 className="h-4 w-4 mr-2" />
               )}
               Применить результаты
+              {hasPipelineSteps && ' → Создать пайплайн'}
             </Button>
-          ) : null}
+          )}
+          {applyMutation.isSuccess && (
+            <Badge variant="default" className="bg-green-600">
+              Результаты применены
+            </Badge>
+          )}
           <Button variant="outline" size="sm" onClick={handleNewConversation}>
             Новое исследование
           </Button>
@@ -300,10 +529,7 @@ export default function ResearchPage() {
 
       {/* Messages */}
       <Card>
-        <div
-          ref={scrollRef}
-          className="max-h-[400px] overflow-y-auto p-4"
-        >
+        <div ref={scrollRef} className="max-h-[400px] overflow-y-auto p-4">
           <div className="space-y-4">
             {conversation?.messages.map((msg) => (
               <ChatMessage key={msg.id} message={msg} />
@@ -319,9 +545,8 @@ export default function ResearchPage() {
           </div>
         </div>
 
-        {/* Input - always visible */}
+        {/* Input */}
         <div className="p-4 border-t bg-background">
-          {/* Selected file preview */}
           {selectedFile && (
             <div className="flex items-center gap-2 mb-2 p-2 bg-muted rounded-lg">
               <Paperclip className="h-4 w-4 text-muted-foreground" />
@@ -329,20 +554,13 @@ export default function ResearchPage() {
               <span className="text-xs text-muted-foreground">
                 {(selectedFile.size / 1024).toFixed(1)} KB
               </span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0"
-                onClick={handleRemoveFile}
-              >
+              <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={handleRemoveFile}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="flex gap-2">
-            {/* Hidden file input */}
             <input
               type="file"
               ref={fileInputRef}
@@ -351,17 +569,12 @@ export default function ResearchPage() {
               accept=".xml,.json,.csv,.txt,.html,.md,.yaml,.yml,.pdf,.xlsx,.xls"
             />
 
-            {/* File upload button */}
             <Button
               type="button"
               variant="outline"
               size="icon"
               onClick={() => fileInputRef.current?.click()}
-              disabled={
-                sendMutation.isPending ||
-                uploadMutation.isPending ||
-                conversation?.status === 'processing'
-              }
+              disabled={sendMutation.isPending || uploadMutation.isPending || conversation?.status === 'processing'}
               title="Прикрепить файл"
             >
               <Paperclip className="h-4 w-4" />
@@ -371,33 +584,22 @@ export default function ResearchPage() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={
-                selectedFile
-                  ? 'Комментарий к файлу (опционально)...'
-                  : conversation?.status === 'waiting_input'
-                    ? 'Ваш ответ...'
+                selectedFile ? 'Комментарий к файлу (опционально)...'
+                  : conversation?.status === 'waiting_input' ? 'Ваш ответ...'
                     : 'Напишите сообщение...'
               }
-              disabled={
-                sendMutation.isPending ||
-                uploadMutation.isPending ||
-                conversation?.status === 'processing'
-              }
+              disabled={sendMutation.isPending || uploadMutation.isPending || conversation?.status === 'processing'}
               autoFocus={conversation?.status === 'waiting_input'}
             />
             <Button
               type="submit"
               disabled={
-                sendMutation.isPending ||
-                uploadMutation.isPending ||
+                sendMutation.isPending || uploadMutation.isPending ||
                 (!inputValue.trim() && !selectedFile) ||
                 conversation?.status === 'processing'
               }
             >
-              {uploadMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
+              {uploadMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </form>
           {conversation?.status === 'waiting_input' && (
@@ -408,8 +610,8 @@ export default function ResearchPage() {
         </div>
       </Card>
 
-      {/* Context/Findings */}
-      {conversation?.context && Object.keys(conversation.context).length > 0 && (
+      {/* Findings / Context */}
+      {hasFindings && (
         <Card>
           <CardHeader className="py-3">
             <CardTitle className="text-sm flex items-center gap-2">
@@ -417,16 +619,55 @@ export default function ResearchPage() {
               Обнаруженные данные
             </CardTitle>
           </CardHeader>
-          <CardContent className="py-2">
-            <pre className="text-xs bg-muted p-2 rounded overflow-auto max-h-32">
-              {JSON.stringify(conversation.context, null, 2)}
-            </pre>
+          <CardContent className="py-2 space-y-2">
+            {conversation.context.api_config != null && (
+              <div>
+                <div className="text-xs font-medium text-muted-foreground mb-1">API конфигурация</div>
+                <pre className="text-xs bg-muted p-2 rounded overflow-auto max-h-24">
+                  {JSON.stringify(conversation.context.api_config as Record<string, unknown>, null, 2)}
+                </pre>
+              </div>
+            )}
+            {hasPipelineSteps && (
+              <div>
+                <div className="text-xs font-medium text-muted-foreground mb-1">
+                  Шаги пайплайна ({pipelineSteps.length})
+                </div>
+                <div className="space-y-1">
+                  {pipelineSteps.map((step, i) => {
+                    const stepName = String(step.name || step.type || `Step ${i + 1}`);
+                    const stepType = step.type ? String(step.type) : null;
+                    return (
+                      <div key={i} className="text-xs bg-muted p-2 rounded flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-background flex items-center justify-center font-medium shrink-0">
+                          {i + 1}
+                        </span>
+                        <span className="font-medium">{stepName}</span>
+                        {stepType && <Badge variant="outline" className="text-xs">{stepType}</Badge>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            {conversation.context.discovered_urls != null && (
+              <div>
+                <div className="text-xs font-medium text-muted-foreground mb-1">URL</div>
+                <pre className="text-xs bg-muted p-2 rounded overflow-auto max-h-16">
+                  {JSON.stringify(conversation.context.discovered_urls as unknown[], null, 2)}
+                </pre>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
     </div>
   );
 }
+
+// =============================================================================
+// Chat message
+// =============================================================================
 
 function ChatMessage({ message }: { message: AgentMessage }) {
   const isUser = message.role === 'user';
@@ -450,27 +691,19 @@ function ChatMessage({ message }: { message: AgentMessage }) {
 
       <div
         className={`max-w-[80%] rounded-lg p-3 ${
-          isUser
-            ? 'bg-primary text-primary-foreground'
-            : isSystem
-              ? 'bg-yellow-50 border border-yellow-200'
+          isUser ? 'bg-primary text-primary-foreground'
+            : isSystem ? 'bg-yellow-50 border border-yellow-200'
               : 'bg-muted'
         }`}
       >
         {message.message_type === 'question' && (
-          <Badge variant="outline" className="mb-2 text-xs">
-            Требуется ответ
-          </Badge>
+          <Badge variant="outline" className="mb-2 text-xs">Требуется ответ</Badge>
         )}
         {message.message_type === 'findings' && (
-          <Badge variant="default" className="mb-2 text-xs bg-green-600">
-            Найдено
-          </Badge>
+          <Badge variant="default" className="mb-2 text-xs bg-green-600">Найдено</Badge>
         )}
         {message.message_type === 'progress' && (
-          <Badge variant="secondary" className="mb-2 text-xs">
-            Прогресс
-          </Badge>
+          <Badge variant="secondary" className="mb-2 text-xs">Прогресс</Badge>
         )}
 
         {isUser ? (

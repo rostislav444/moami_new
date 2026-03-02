@@ -103,11 +103,12 @@ class MarketplaceResearchAgent:
 
         return [user_msg] + messages
 
-    def apply_findings(self) -> dict:
+    def apply_findings(self, purpose: str = 'other') -> dict:
         """
         Apply research findings to marketplace configuration.
 
-        Updates marketplace.api_config and creates initial pipeline.
+        Args:
+            purpose: Pipeline purpose ('categories', 'attributes', 'other')
 
         Returns:
             Dict with applied changes
@@ -126,13 +127,22 @@ class MarketplaceResearchAgent:
             changes['api_config_updated'] = True
             changes['api_config'] = context['api_config']
 
+        # Determine pipeline name based on purpose
+        purpose_names = {
+            'categories': f"{self.marketplace.name} — Загрузка категорій",
+            'attributes': f"{self.marketplace.name} — Загрузка атрибутів",
+            'attribute_options': f"{self.marketplace.name} — Загрузка значень атрибутів",
+        }
+        pipeline_name = purpose_names.get(purpose, f"{self.marketplace.name} Sync Pipeline")
+
         # Create pipeline if we have steps
         if 'pipeline_steps' in context:
             # Create pipeline
             pipeline = MarketplacePipeline.objects.create(
                 marketplace=self.marketplace,
-                name=f"{self.marketplace.name} Sync Pipeline",
+                name=pipeline_name,
                 description="Auto-generated from AI research",
+                purpose=purpose,
                 config=context.get('pipeline_config', {})
             )
 
@@ -165,10 +175,86 @@ class MarketplaceResearchAgent:
 
 Твоя роль:
 1. Исследовать документацию маркетплейса и спецификации API
-2. Определить как синхронизировать категории, атрибуты и товары
+2. Определить как синхронизировать категории и атрибуты
 3. Найти форматы фидов (XML, JSON, CSV) и URL для скачивания
-4. Помочь настроить интеграцию пошагово
+4. Сформировать РАБОЧИЙ пайплайн для загрузки данных
 5. Анализировать файлы с атрибутами и характеристиками
+
+## ГЛАВНАЯ ЗАДАЧА: Создать работающий пайплайн
+
+После исследования ты ОБЯЗАН создать finding с pipeline шагами, которые можно запустить.
+
+### Доступные типы шагов пайплайна:
+
+1. **api_call** — HTTP запрос к API
+   ```json
+   {"type": "api_call", "name": "Получить категории", "config": {
+     "url": "https://api.example.com/categories",
+     "method": "GET",
+     "headers": {"Authorization": "Bearer {marketplace.api_config.token}"},
+     "extract_path": "data.items"
+   }}
+   ```
+
+2. **download_file** — Скачать файл
+   ```json
+   {"type": "download_file", "name": "Скачать каталог", "config": {
+     "url": "https://example.com/catalog.xml",
+     "save_as": "catalog.xml"
+   }}
+   ```
+
+3. **parse_xml / parse_json / parse_csv** — Парсинг файла
+   ```json
+   {"type": "parse_json", "name": "Парсить ответ", "config": {
+     "items_path": "data.categories"
+   }}
+   ```
+
+4. **sync_categories** — Сохранить категории в БД
+   ```json
+   {"type": "sync_categories", "name": "Сохранить категории", "config": {
+     "source": "api"
+   }}
+   ```
+   - source: "api" — берёт данные через marketplace client (если есть)
+   - source: "data" — берёт данные из предыдущего шага (use_previous)
+
+5. **sync_attributes** — Загрузить атрибуты
+   ```json
+   {"type": "sync_attributes", "name": "Загрузить атрибуты", "config": {
+     "category_codes": ["code1", "code2"]
+   }}
+   ```
+
+6. **sync_options** — Загрузить опции атрибутов
+7. **sync_entities** — Загрузить сущности (brand, color, country, size, measure)
+
+### Переменные в конфигурации:
+- `{marketplace.api_config.base_url}` — Base URL из настроек маркетплейса
+- `{marketplace.api_config.token}` — Токен из настроек
+- `{env.SOME_VAR}` — Переменная окружения
+
+### Формат finding для пайплайна:
+
+```json
+{"type": "finding", "category": "pipeline", "data": [
+  {"type": "api_call", "name": "Получить категории", "config": {"url": "...", "method": "GET"}},
+  {"type": "sync_categories", "name": "Сохранить категории", "config": {"source": "data"}}
+]}
+```
+
+### Формат finding для API конфигурации:
+
+```json
+{"type": "finding", "category": "api", "data": {
+  "base_url": "https://api.example.com",
+  "auth_type": "bearer",
+  "token": "...",
+  "categories_endpoint": "/categories",
+  "attributes_endpoint": "/attributes"
+}}
+```
 
 ## КРИТИЧЕСКИ ВАЖНО: Анализ Excel/XLSX файлов
 
@@ -189,114 +275,40 @@ Excel файлы маркетплейсов ВСЕГДА содержат нес
 4. "Інструкція" - инструкция по заполнению
 ```
 
-**НЕ ПРОПУСКАЙ ЭТОТ ШАГ!** Если ты видишь только данные о товарах - значит ты смотришь не ту вкладку.
+### ШАГ 2: Найди вкладки с атрибутами
 
-### ШАГ 2: Найди вкладки с атрибутами/характеристиками
+Атрибуты обычно на вкладках с названиями категорий ("Одяг", "Взуття") или "Атрибуты", "Характеристики".
 
-Атрибуты обычно находятся на вкладках с названиями:
-- Категорий товаров: "Одяг", "Взуття", "Аксесуари", "Косметика"
-- "Атрибуты", "Характеристики", "Attributes", "Properties"
-- "Довідник", "Справочник", "Dictionary"
+**НЕ ПУТАЙ** шаблон товаров с атрибутами!
 
-**НЕ ПУТАЙ** шаблон товаров с атрибутами! Шаблон содержит примеры товаров, атрибуты - список характеристик.
+### ШАГ 3: Определи формат данных
 
-**УКАЖИ ТОЧНОЕ НАЗВАНИЕ ВКЛАДКИ** - это критически важно для парсинга!
+**Формат A - в СТРОКАХ:** каждая строка = один атрибут (ID, Название, Тип)
+**Формат B - в КОЛОНКАХ:** каждая колонка = один атрибут, строки = возможные значения
 
-### ШАГ 3: Определи формат данных на этой вкладке
-
-**Формат A - Атрибуты в СТРОКАХ (вертикально):**
-```
-| ID  | Название атрибута | Тип    |
-|-----|-------------------|--------|
-| 51  | Бренд             | select |
-| 52  | Вес               | float  |
-```
-Каждая строка = один атрибут
-
-**Формат B - Атрибуты в КОЛОНКАХ (горизонтально):**
-```
-| Розмір | Колір     | Матеріал |
-|--------|-----------|----------|
-| S      | Червоний  | Бавовна  |
-| M      | Синій     | Шовк     |
-```
-Каждая колонка = один атрибут, строки ниже = возможные значения
-
-### ШАГ 4: ОБЯЗАТЕЛЬНО создай finding с ТОЧНЫМИ данными
+### ШАГ 4: Создай finding
 
 ```json
 {"type": "finding", "category": "excel_structure", "data": {
-  "all_sheets": ["Вкладка1", "Вкладка2", "Вкладка3"],
-  "format_type": "attributes_as_columns",
-  "parsing_instructions": {
-    "sheet_name": "ТОЧНОЕ название вкладки (копируй как есть!)",
-    "header_row": 1,
-    "format": "columns",
-    "attribute_id_column": null,
-    "attribute_name_row": 1,
-    "data_starts_row": 2,
-    "skip_columns": ["A"]
-  }
-}}
-```
-
-Или для формата "в строках":
-```json
-{"type": "finding", "category": "excel_structure", "data": {
-  "all_sheets": ["Sheet1", "Sheet2"],
+  "all_sheets": ["Вкладка1", "Вкладка2"],
   "format_type": "attributes_as_rows",
   "parsing_instructions": {
-    "sheet_name": "Атрибуты",
-    "header_row": 1,
+    "sheet_name": "ТОЧНОЕ название вкладки",
     "format": "rows",
     "attribute_id_column": "A",
     "attribute_name_column": "B",
-    "attribute_type_column": "C",
-    "category_id_column": "D",
-    "data_starts_row": 2
+    "attribute_type_column": "C"
   }
 }}
 ```
 
-### ПРИМЕРЫ:
-
-**Epicentr:** sheet_name: "Атрибути", format: "rows", attribute_id_column: "A"
-
-**ModnaKasta:** sheet_name: "Одяг", format: "columns", header_row: 1, каждая колонка = атрибут
-
-**Rozetka:** может быть несколько вкладок по категориям
-
-### ВАЖНО:
-- **sheet_name** - ОБЯЗАТЕЛЬНОЕ поле! Копируй название вкладки ТОЧНО как в файле
-- Если вкладок много - укажи какие из них содержат атрибуты
-- Если не понимаешь структуру - СПРОСИ пользователя!
-- Лучше уточнить, чем дать неправильные данные
-
-### ⚠️ ЕСЛИ ВИДИШЬ ДАННЫЕ О ТОВАРАХ (артикулы, цены, названия товаров):
-**ЭТО НЕ АТРИБУТЫ!** Это шаблон для загрузки товаров.
-1. Перечисли ВСЕ вкладки файла
-2. Найди вкладки с названиями категорий (Одяг, Взуття, etc.) или "Характеристики"
-3. Там будут атрибуты в формате: название атрибута → возможные значения
-
 ## Общие инструкции
 
-Когда находишь полезную информацию, структурируй её чётко:
-- API эндпоинты и методы аутентификации
-- Процедуры синхронизации категорий и атрибутов
-- Форматы файлов и URL для скачивания
-- Обязательные поля и маппинги данных
-
-Если нужна дополнительная информация от пользователя, задавай конкретные вопросы.
-
-ВАЖНО: Когда задаёшь вопрос, требующий ответа пользователя, форматируй ответ так:
-[QUESTION] Твой вопрос здесь
-
-Для API конфигурации:
-```json
-{"type": "finding", "category": "api", "data": {...}}
-```
-
-Используй markdown для форматирования: заголовки, списки, выделение жирным/курсивом, блоки кода."""
+- Когда задаёшь вопрос: [QUESTION] Твой вопрос
+- Для API конфигурации: finding с category "api"
+- Для пайплайна: finding с category "pipeline" (data = массив шагов)
+- Используй markdown для форматирования
+- Если не уверен — СПРОСИ пользователя, не угадывай"""
 
     def _build_marketplace_context(self) -> str:
         """Build context about the marketplace"""

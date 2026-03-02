@@ -147,9 +147,10 @@ export const researchAPI = {
   /**
    * Применить результаты исследования
    */
-  apply: (conversationId: number) =>
+  apply: (conversationId: number, purpose?: string) =>
     fetchAPI<ApplyFindingsResponse>(`/marketplaces/research/${conversationId}/apply/`, {
       method: 'POST',
+      body: JSON.stringify({ purpose: purpose || 'other' }),
     }),
 
   /**

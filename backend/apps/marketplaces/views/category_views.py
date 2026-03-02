@@ -275,6 +275,65 @@ class CategoryMappingViewSet(viewsets.ModelViewSet):
             'created': len(mappings)
         }, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=['post'], url_path='cleanup-unmapped')
+    def cleanup_unmapped(self, request):
+        """
+        Удалить незамапленные категории маркетплейса
+
+        POST /api/category-mappings/cleanup-unmapped/
+        Body: { "marketplace_id": 1 }
+        """
+        marketplace_id = request.data.get('marketplace_id')
+        if not marketplace_id:
+            return Response(
+                {'error': 'marketplace_id is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        from apps.marketplaces.models import Marketplace
+        try:
+            marketplace = Marketplace.objects.get(id=marketplace_id)
+        except Marketplace.DoesNotExist:
+            return Response(
+                {'error': 'Marketplace not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Collect mapped category IDs
+        mapped_ids = set(CategoryMapping.objects.filter(
+            marketplace_category__marketplace=marketplace
+        ).values_list('marketplace_category_id', flat=True))
+
+        # Collect ancestor IDs to preserve tree structure
+        keep_ids = set(mapped_ids)
+        for cat_id in mapped_ids:
+            try:
+                cat = MarketplaceCategory.objects.get(id=cat_id)
+                parent = cat.parent
+                while parent:
+                    keep_ids.add(parent.id)
+                    parent = parent.parent
+            except MarketplaceCategory.DoesNotExist:
+                pass
+
+        # Delete unmapped categories
+        to_delete = marketplace.categories.exclude(id__in=keep_ids)
+        deleted_count = to_delete.count()
+        to_delete.delete()
+
+        # Update has_children flags
+        for cat in marketplace.categories.all():
+            actual = cat.children.exists()
+            if cat.has_children != actual:
+                cat.has_children = actual
+                cat.save(update_fields=['has_children'])
+
+        return Response({
+            'success': True,
+            'deleted': deleted_count,
+            'remaining': marketplace.categories.count(),
+        })
+
     @action(detail=False, methods=['post'])
     def auto_match(self, request):
         """
