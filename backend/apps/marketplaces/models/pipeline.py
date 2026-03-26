@@ -63,6 +63,7 @@ class PipelineStep(models.Model):
         ('transform_data', 'Transform Data'),
         ('ai_process', 'AI Processing'),
         ('validate', 'Validate Data'),
+        ('generate_feed', 'Generate Feed'),
         ('custom', 'Custom Handler'),
     ]
 

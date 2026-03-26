@@ -9,6 +9,7 @@ from .sync_handlers import (
     SyncEntitiesHandler,
 )
 from .api_handler import APICallHandler
+from .feed_handler import GenerateFeedHandler
 
 # Registry of all handlers by step type
 STEP_HANDLERS = {
@@ -22,6 +23,7 @@ STEP_HANDLERS = {
     'sync_options': SyncOptionsHandler,
     'sync_entities': SyncEntitiesHandler,
     'api_call': APICallHandler,
+    'generate_feed': GenerateFeedHandler,
 }
 
 
@@ -45,6 +47,7 @@ __all__ = [
     'SyncOptionsHandler',
     'SyncEntitiesHandler',
     'APICallHandler',
+    'GenerateFeedHandler',
     'STEP_HANDLERS',
     'get_handler',
 ]

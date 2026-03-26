@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.template import Template, Context
+from django.http import HttpResponse
 
 from apps.marketplaces.models import FeedTemplate, Marketplace
 from apps.marketplaces.serializers.feed_template_serializers import (
@@ -15,11 +15,14 @@ class FeedTemplateViewSet(viewsets.ModelViewSet):
     ViewSet для шаблонов фидов
 
     Endpoints:
-    - GET /api/feed-templates/ - список шаблонов
-    - POST /api/feed-templates/ - создать шаблон
-    - PATCH /api/feed-templates/{id}/ - обновить шаблон
-    - DELETE /api/feed-templates/{id}/ - удалить шаблон
-    - POST /api/feed-templates/preview/ - предпросмотр фида
+    - GET /feed-templates/?marketplace=X — список шаблонов
+    - POST /feed-templates/ — создать шаблон
+    - PATCH /feed-templates/{id}/ — обновить
+    - DELETE /feed-templates/{id}/ — удалить
+    - POST /feed-templates/preview/ — предпросмотр (1 товар)
+    - POST /feed-templates/generate/ — сгенерировать полный фид
+    - GET /feed-templates/download/?marketplace_id=X — скачать XML
+    - GET /feed-templates/variables/ — справочник переменных
     """
 
     queryset = FeedTemplate.objects.all()
@@ -27,24 +30,17 @@ class FeedTemplateViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related('marketplace')
-
-        # Фильтр по маркетплейсу
         marketplace_id = self.request.query_params.get('marketplace')
         if marketplace_id:
             queryset = queryset.filter(marketplace_id=marketplace_id)
-
         return queryset
 
     @action(detail=False, methods=['post'])
     def preview(self, request):
         """
-        Предпросмотр сгенерированного фида
-
-        POST /api/feed-templates/preview/
-        Body: {
-            "marketplace_id": 1,
-            "product_id": 123  // опционально
-        }
+        Предпросмотр фида для одного товара.
+        POST /feed-templates/preview/
+        Body: {"marketplace_id": 1, "product_id": 123}
         """
         serializer = FeedPreviewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -55,88 +51,78 @@ class FeedTemplateViewSet(viewsets.ModelViewSet):
         try:
             marketplace = Marketplace.objects.get(id=marketplace_id)
         except Marketplace.DoesNotExist:
-            return Response(
-                {'error': 'Marketplace not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({'error': 'Marketplace not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Получить шаблоны
-        templates = {
-            t.template_type: t.content
-            for t in FeedTemplate.objects.filter(marketplace=marketplace, is_active=True)
-        }
+        from apps.marketplaces.services.feed_generator import FeedGenerator
+        generator = FeedGenerator(marketplace)
+        result = generator.generate(product_id=product_id)
 
-        # Сгенерировать превью
-        xml_parts = []
+        return Response(result)
 
-        # Header
-        if 'header' in templates:
-            context = {
-                'shop_name': 'MOAMI',
-                'company_name': 'MOAMI Store',
-                'shop_url': 'https://moami.com.ua',
-            }
-            xml_parts.append(self._render_template(templates['header'], context))
+    @action(detail=False, methods=['post'])
+    def generate(self, request):
+        """
+        Сгенерировать полный фид.
+        POST /feed-templates/generate/
+        Body: {"marketplace_id": 1}
+        """
+        marketplace_id = request.data.get('marketplace_id')
+        if not marketplace_id:
+            return Response({'error': 'marketplace_id required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Product (sample)
-        if 'product' in templates:
-            sample_product = self._get_sample_product(product_id)
-            if sample_product:
-                xml_parts.append(self._render_template(templates['product'], {'product': sample_product}))
-
-        # Footer
-        if 'footer' in templates:
-            xml_parts.append(self._render_template(templates['footer'], {}))
-
-        return Response({
-            'xml': '\n'.join(xml_parts) if xml_parts else '<!-- Нет настроенных шаблонов -->'
-        })
-
-    def _render_template(self, template_content: str, context: dict) -> str:
-        """Рендер шаблона с контекстом"""
         try:
-            # Заменяем Jinja2 синтаксис на Django
-            content = template_content.replace('{{', '{{ ').replace('}}', ' }}')
-            content = content.replace('{%', '{% ').replace('%}', ' %}')
+            marketplace = Marketplace.objects.get(id=marketplace_id)
+        except Marketplace.DoesNotExist:
+            return Response({'error': 'Marketplace not found'}, status=status.HTTP_404_NOT_FOUND)
 
-            template = Template(content)
-            return template.render(Context(context))
-        except Exception as e:
-            return f'<!-- Ошибка рендеринга: {str(e)} -->'
+        from apps.marketplaces.services.feed_generator import FeedGenerator
+        generator = FeedGenerator(marketplace)
+        result = generator.generate()
 
-    def _get_sample_product(self, product_id=None):
-        """Получить пример товара для превью"""
-        from apps.product.models import Product
+        # Save to file
+        import os
+        feed_dir = os.path.join(settings.MEDIA_ROOT, 'feed')
+        os.makedirs(feed_dir, exist_ok=True)
+        filename = marketplace.feed_filename or f'{marketplace.slug}.xml'
+        filepath = os.path.join(feed_dir, filename)
 
-        if product_id:
-            product = Product.objects.filter(id=product_id).first()
-        else:
-            product = Product.objects.first()
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(result['xml'])
 
-        if not product:
-            return {
-                'id': 1,
-                'name': 'Пример товара',
-                'price': 1999,
-                'url': 'https://moami.com.ua/product/example/',
-                'image': 'https://moami.com.ua/media/example.jpg',
-                'category_code': '6390',
-                'description': 'Описание товара',
-                'available': 'true',
-                'attributes': [
-                    {'name': 'Цвет', 'value': 'Красный'},
-                    {'name': 'Размер', 'value': 'M'},
-                ],
-            }
+        from django.utils import timezone
+        from django.conf import settings
+        marketplace.last_feed_generated = timezone.now()
+        marketplace.save(update_fields=['last_feed_generated'])
 
-        return {
-            'id': product.id,
-            'name': product.name,
-            'price': product.get_price() if hasattr(product, 'get_price') else 0,
-            'url': f'https://moami.com.ua/product/{product.slug}/',
-            'image': product.get_main_image() if hasattr(product, 'get_main_image') else '',
-            'category_code': '6390',
-            'description': product.description if hasattr(product, 'description') else '',
-            'available': 'true',
-            'attributes': [],
-        }
+        result['file_path'] = f'/media/feed/{filename}'
+        return Response(result)
+
+    @action(detail=False, methods=['get'])
+    def download(self, request):
+        """
+        Скачать сгенерированный фид.
+        GET /feed-templates/download/?marketplace_id=X
+        """
+        marketplace_id = request.query_params.get('marketplace_id')
+        if not marketplace_id:
+            return Response({'error': 'marketplace_id required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            marketplace = Marketplace.objects.get(id=marketplace_id)
+        except Marketplace.DoesNotExist:
+            return Response({'error': 'Marketplace not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        from apps.marketplaces.services.feed_generator import FeedGenerator
+        generator = FeedGenerator(marketplace)
+        result = generator.generate()
+
+        filename = marketplace.feed_filename or f'{marketplace.slug}.xml'
+        response = HttpResponse(result['xml'], content_type='application/xml; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+    @action(detail=False, methods=['get'])
+    def variables(self, request):
+        """Справочник доступных переменных шаблона"""
+        from apps.marketplaces.services.feed_generator import TEMPLATE_VARIABLES
+        return Response(TEMPLATE_VARIABLES)

@@ -379,10 +379,22 @@ export const feedTemplatesAPI = {
     fetchAPI<void>(`/marketplaces/feed-templates/${id}/`, { method: 'DELETE' }),
 
   preview: (marketplaceId: number, productId?: number) =>
-    fetchAPI<{ xml: string }>('/marketplaces/feed-templates/preview/', {
+    fetchAPI<{ xml: string; products_count: number; generation_time: number }>('/marketplaces/feed-templates/preview/', {
       method: 'POST',
       body: JSON.stringify({ marketplace_id: marketplaceId, product_id: productId }),
     }),
+
+  generate: (marketplaceId: number) =>
+    fetchAPI<{ xml: string; products_count: number; generation_time: number; file_path: string }>('/marketplaces/feed-templates/generate/', {
+      method: 'POST',
+      body: JSON.stringify({ marketplace_id: marketplaceId }),
+    }),
+
+  downloadUrl: (marketplaceId: number) =>
+    `${API_BASE}/marketplaces/feed-templates/download/?marketplace_id=${marketplaceId}`,
+
+  variables: () =>
+    fetchAPI<Record<string, Record<string, string>>>('/marketplaces/feed-templates/variables/'),
 };
 
 // =============================================================================

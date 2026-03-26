@@ -4,7 +4,7 @@ import { useParams, usePathname } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { marketplacesAPI, categoriesAPI, attributesAPI } from '@/lib/api';
 import Link from 'next/link';
-import { ChevronRight, RefreshCw, FolderTree, ArrowLeftRight, Layers, Settings2, Link as LinkIcon, Bot, Workflow, GitCompare, Tags } from 'lucide-react';
+import { ChevronRight, RefreshCw, FolderTree, ArrowLeftRight, Layers, Settings2, Link as LinkIcon, Bot, Workflow, GitCompare, Tags, FileCode } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const navItems = [
@@ -14,6 +14,7 @@ const navItems = [
   { href: '/entity-mapping', label: 'Сущности', icon: Tags },
   { href: '/attributes', label: 'Атрибуты', icon: Layers },
   { href: '/research', label: 'Исследование', icon: Bot },
+  { href: '/feed-templates', label: 'Шаблоны фида', icon: FileCode },
   { href: '/pipeline', label: 'Пайплайны', icon: Workflow },
   { href: '/settings', label: 'Настройки', icon: Settings2 },
 ];
