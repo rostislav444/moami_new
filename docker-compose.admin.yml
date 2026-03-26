@@ -1,0 +1,12 @@
+services:
+  frontend_admin:
+    container_name: frontend_admin
+    build: ./frontend_admin
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend_admin/src:/app/src
+      - ./frontend_admin/public:/app/public
+    environment:
+      - WATCHPACK_POLLING=true
+      - BACKEND_INTERNAL_URL=http://web:8000

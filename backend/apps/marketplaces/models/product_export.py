@@ -65,6 +65,24 @@ class ProductMarketplaceAttribute(models.Model):
         verbose_name='Атрибут маркетплейса'
     )
 
+    # Уровень: variant или size (null = product level)
+    variant = models.ForeignKey(
+        'product.Variant',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='marketplace_attributes',
+        verbose_name='Вариант'
+    )
+    variant_size = models.ForeignKey(
+        'product.VariantSize',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='marketplace_attributes',
+        verbose_name='Размер варианта'
+    )
+
     # Значения разных типов
     value_option = models.ForeignKey(
         'marketplaces.MarketplaceAttributeOption',
@@ -97,10 +115,16 @@ class ProductMarketplaceAttribute(models.Model):
     class Meta:
         verbose_name = 'Атрибут товара для маркетплейса'
         verbose_name_plural = 'Атрибуты товаров для маркетплейсов'
-        unique_together = ['product', 'marketplace_attribute']
+        unique_together = ['product', 'marketplace_attribute', 'variant', 'variant_size']
 
     def __str__(self):
-        return f'{self.product.name}: {self.marketplace_attribute.name}'
+        parts = [self.product.name]
+        if self.variant:
+            parts.append(f'[{self.variant.code}]')
+        if self.variant_size:
+            parts.append(f'({self.variant_size.size})')
+        parts.append(f': {self.marketplace_attribute.name}')
+        return ''.join(parts)
 
     @property
     def marketplace(self):

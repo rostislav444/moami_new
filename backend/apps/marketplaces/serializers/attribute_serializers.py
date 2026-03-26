@@ -6,6 +6,20 @@ from apps.marketplaces.models import (
 )
 
 
+def get_shared_options_count(attr):
+    """Get options count: own or shared via external_code"""
+    if not attr.has_options:
+        return 0
+    own = attr.options.count()
+    if own > 0:
+        return own
+    # Fallback: sibling with same external_code
+    return MarketplaceAttributeOption.objects.filter(
+        attribute__external_code=attr.external_code,
+        attribute__attribute_set__marketplace=attr.attribute_set.marketplace,
+    ).values('external_code').distinct().count()
+
+
 class MarketplaceAttributeOptionSerializer(serializers.ModelSerializer):
     """Сериализатор опции атрибута"""
 
@@ -16,7 +30,7 @@ class MarketplaceAttributeOptionSerializer(serializers.ModelSerializer):
 
 class MarketplaceAttributeSerializer(serializers.ModelSerializer):
     """Сериализатор атрибута"""
-    options = MarketplaceAttributeOptionSerializer(many=True, read_only=True)
+    options = serializers.SerializerMethodField()
     options_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -27,10 +41,20 @@ class MarketplaceAttributeSerializer(serializers.ModelSerializer):
             'suffix', 'extra_data', 'options', 'options_count'
         ]
 
+    def get_options(self, obj):
+        if not obj.has_options:
+            return []
+        qs = obj.options.all()
+        if not qs.exists():
+            # Shared options from sibling
+            qs = MarketplaceAttributeOption.objects.filter(
+                attribute__external_code=obj.external_code,
+                attribute__attribute_set__marketplace=obj.attribute_set.marketplace,
+            ).order_by('name')
+        return MarketplaceAttributeOptionSerializer(qs, many=True).data
+
     def get_options_count(self, obj):
-        if obj.has_options:
-            return obj.options.count()
-        return 0
+        return get_shared_options_count(obj)
 
 
 class MarketplaceAttributeListSerializer(serializers.ModelSerializer):
@@ -45,9 +69,7 @@ class MarketplaceAttributeListSerializer(serializers.ModelSerializer):
         ]
 
     def get_options_count(self, obj):
-        if obj.has_options:
-            return obj.options.count()
-        return 0
+        return get_shared_options_count(obj)
 
 
 class MarketplaceAttributeSetSerializer(serializers.ModelSerializer):

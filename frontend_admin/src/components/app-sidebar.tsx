@@ -22,6 +22,8 @@ import {
   ChevronRight,
   Loader2,
   Settings,
+  Package,
+  FolderTree,
 } from 'lucide-react';
 import { marketplacesAPI } from '@/lib/api';
 import { useState } from 'react';
@@ -100,6 +102,32 @@ export function AppSidebar() {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
+
+              {/* Categories */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === '/categories'}
+                >
+                  <Link href="/categories">
+                    <FolderTree className="h-4 w-4" />
+                    <span>Категории</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Products */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname.startsWith('/products')}
+                >
+                  <Link href="/products">
+                    <Package className="h-4 w-4" />
+                    <span>Товары</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
 
               {/* Settings - direct link */}
               <SidebarMenuItem>

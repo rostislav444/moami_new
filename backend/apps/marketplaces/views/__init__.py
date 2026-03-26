@@ -8,6 +8,16 @@ from .ai_views import AIAssistantViewSet
 from .research_views import ResearchViewSet
 from .pipeline_views import PipelineViewSet, PipelineStepViewSet, PipelineRunViewSet
 from .task_views import BackgroundTaskViewSet
+from .attribute_level_views import MarketplaceAttributeLevelViewSet
+from .product_admin_views import ProductAdminViewSet
+from .entity_mapping_views import (
+    MarketplaceEntityViewSet,
+    BrandMappingViewSet,
+    ColorMappingViewSet,
+    CountryMappingViewSet,
+    SizeMappingViewSet,
+)
+from .export_views import ExportConfigViewSet
 
 __all__ = [
     'MarketplaceViewSet',
@@ -26,4 +36,13 @@ __all__ = [
     'PipelineStepViewSet',
     'PipelineRunViewSet',
     'BackgroundTaskViewSet',
+    # Attribute Levels, Products & Entity Mapping
+    'MarketplaceAttributeLevelViewSet',
+    'ProductAdminViewSet',
+    'MarketplaceEntityViewSet',
+    'BrandMappingViewSet',
+    'ColorMappingViewSet',
+    'CountryMappingViewSet',
+    'SizeMappingViewSet',
+    'ExportConfigViewSet',
 ]

@@ -597,3 +597,526 @@ export const aiAPI = {
       body: JSON.stringify({ marketplace_id: marketplaceId }),
     }),
 };
+
+// =============================================================================
+// Attribute Levels API (Categories Config)
+// =============================================================================
+
+export interface AttributeConfigItem {
+  mp_attribute_id: number;
+  external_code: string;
+  name: string;
+  name_uk: string;
+  attr_type: string;
+  is_required: boolean;
+  is_system: boolean;
+  group_name: string;
+  suffix: string;
+  options_count: number;
+  level: string | null;
+  level_id: number | null;
+}
+
+export interface CategoryAttributeConfig {
+  category_mapping_id: number;
+  our_category_id: number;
+  our_category_name: string;
+  mp_category_id: number;
+  mp_category_name: string;
+  mp_category_code: string;
+  attribute_set_id: number | null;
+  attribute_set_name: string;
+  total_attributes: number;
+  configured_attributes: number;
+  attributes: AttributeConfigItem[];
+}
+
+export interface CategoryMappingSummary {
+  category_mapping_id: number;
+  our_category_id: number;
+  our_category_name: string;
+  mp_category_id: number;
+  mp_category_name: string;
+  mp_category_code: string;
+  total_attributes: number;
+  configured_attributes: number;
+}
+
+export const attributeLevelsAPI = {
+  mappingsList: (marketplaceId: number) =>
+    fetchAPI<CategoryMappingSummary[]>(`/marketplaces/attribute-levels/mappings-list/${marketplaceId}/`),
+
+  config: (categoryMappingId: number) =>
+    fetchAPI<CategoryAttributeConfig>(`/marketplaces/attribute-levels/config/${categoryMappingId}/`),
+
+  bulkUpdate: (categoryMappingId: number, levels: { marketplace_attribute_id: number; level: string }[]) =>
+    fetchAPI<{ success: boolean; updated: number }>('/marketplaces/attribute-levels/bulk_update/', {
+      method: 'POST',
+      body: JSON.stringify({ category_mapping_id: categoryMappingId, levels }),
+    }),
+
+  aiAssign: (marketplaceId: number) =>
+    fetchAPI<{ success: boolean; saved: number; categories_processed: number; errors: string[] }>(
+      `/marketplaces/attribute-levels/ai-assign/${marketplaceId}/`,
+      { method: 'POST' },
+    ),
+};
+
+// =============================================================================
+// Product Admin API
+// =============================================================================
+
+export interface ProductListItem {
+  id: number;
+  name: string;
+  category: number;
+  category_name: string;
+  brand_name: string | null;
+  price: number;
+  promo_price: number | null;
+  variants_count: number;
+  first_image: string | null;
+  marketplace_status: Record<string, {
+    name: string;
+    status: string;
+    filled?: number;
+    required?: number;
+  }>;
+}
+
+export interface VariantImage {
+  id: number;
+  index: number;
+  exclude_at_marketplace: boolean;
+  url: string | null;
+  thumbnail: string | null;
+}
+
+export interface VariantSizeDetail {
+  id: number;
+  size: number;
+  size_name: string;
+  max_size: number | null;
+  max_size_name: string;
+  stock: number;
+  sku: string;
+}
+
+export interface VariantDetail {
+  id: number;
+  code: string;
+  color: number;
+  color_name: string;
+  color_code: string;
+  first_image: string | null;
+  images: VariantImage[];
+  sizes: VariantSizeDetail[];
+}
+
+export interface ProductComposition {
+  id: number;
+  composition: number;
+  composition_name: string;
+  value: number;
+}
+
+export interface ProductAttribute {
+  id: number;
+  attribute_group: number;
+  attribute_group_name: string;
+  data_type: string;
+  value_single_attribute: number | null;
+  value_single_attribute_name: string | null;
+  value_multi_attributes: number[];
+  value_multi_attributes_list: { id: number; name: string }[];
+  value_int: number | null;
+  value_str: string | null;
+}
+
+export interface ProductDetail {
+  id: number;
+  name: string;
+  category: number;
+  category_name: string;
+  category_size_group: number | null;
+  brand: number | null;
+  brand_name: string | null;
+  country: number | null;
+  country_name: string | null;
+  code: string;
+  price: number;
+  promo_price: number | null;
+  old_price: number | null;
+  description: string;
+  extra_description: string | null;
+  variants: VariantDetail[];
+  compositions: ProductComposition[];
+  attributes: ProductAttribute[];
+}
+
+// Lookup types
+export interface LookupItem {
+  id: number;
+  name: string;
+}
+
+export interface LookupColor {
+  id: number;
+  name: string;
+  code: string;
+}
+
+export interface LookupCategory {
+  id: number;
+  name: string;
+  level: number;
+  parent_id: number | null;
+  size_group_id: number | null;
+}
+
+export interface LookupSize {
+  id: number;
+  name: string;
+  interpretations: Record<string, string>;
+}
+
+export interface LookupAttributeGroup {
+  id: number;
+  name: string;
+  data_type: string;
+  required: boolean;
+  attributes: { id: number; name: string }[];
+}
+
+export interface MarketplaceFormAttribute {
+  mp_attribute_id: number;
+  external_code: string;
+  name: string;
+  name_uk: string;
+  attr_type: string;
+  is_required: boolean;
+  is_system?: boolean;
+  group_name?: string;
+  suffix: string;
+  current_value: Record<string, unknown> | null;
+  options?: { id: number; code: string; name: string; name_uk: string }[];
+}
+
+export interface MarketplaceFormData {
+  marketplace: { id: number; name: string };
+  category_mapping_id?: number;
+  mp_category_name?: string;
+  error?: string;
+  product_attributes: MarketplaceFormAttribute[];
+  brand_attributes: {
+    mp_attribute_id: number;
+    name: string;
+    attr_type: string;
+    is_required: boolean;
+    auto_value: { entity_id: number; entity_name: string; entity_external_id: string } | null;
+    our_brand: string | null;
+  }[];
+  variants: {
+    variant_id: number;
+    code: string;
+    color_name: string;
+    image_url: string | null;
+    attributes: MarketplaceFormAttribute[];
+    sizes: {
+      variant_size_id: number;
+      size_name: string;
+      sku: string;
+      stock: number;
+      attributes: MarketplaceFormAttribute[];
+    }[];
+  }[];
+}
+
+export const productAdminAPI = {
+  list: (params?: { category?: number; search?: string; brand?: number; page?: number; page_size?: number }) =>
+    fetchAPI<PaginatedResponse<ProductListItem>>('/marketplaces/admin-products/', { params }),
+
+  get: (id: number) =>
+    fetchAPI<ProductDetail>(`/marketplaces/admin-products/${id}/`),
+
+  marketplaceForm: (productId: number, marketplaceId: number) =>
+    fetchAPI<MarketplaceFormData>(`/marketplaces/admin-products/${productId}/marketplace-form/${marketplaceId}/`),
+
+  bulkAiFill: (marketplaceId: number, withImages = false) =>
+    fetchAPI<{ task_id: number; status: string }>('/marketplaces/admin-products/bulk-ai-fill/', {
+      method: 'POST',
+      body: JSON.stringify({ marketplace_id: marketplaceId, with_images: withImages }),
+    }),
+
+  bulkAiFillStatus: (taskId: number) =>
+    fetchAPI<{
+      task_id: number;
+      status: string;
+      progress: number;
+      progress_message: string;
+      result: { total: number; filled: number; skipped: number; errors: number; error_details: string[] } | null;
+      error: string;
+    }>(`/marketplaces/admin-products/bulk-ai-fill-status/${taskId}/`),
+
+  aiFillBase: (productId: number) =>
+    fetchAPI<{
+      success: boolean;
+      data?: {
+        description?: string | null;
+        compositions?: { composition_id: number; value: number }[] | null;
+        our_attributes?: {
+          attribute_group_id: number;
+          value_single_attribute?: number | null;
+          value_multi_attributes?: number[] | null;
+          value_int?: number | null;
+          value_str?: string | null;
+        }[] | null;
+        reasoning?: string;
+      };
+      error?: string;
+    }>(`/marketplaces/admin-products/${productId}/ai-fill-base/`, {
+      method: 'POST',
+    }),
+
+  aiFill: (productId: number, marketplaceId: number, withImages = false) =>
+    fetchAPI<{
+      success: boolean;
+      filled?: Record<string, unknown>;
+      reasoning?: string;
+      error?: string;
+    }>(`/marketplaces/admin-products/${productId}/ai-fill/${marketplaceId}/`, {
+      method: 'POST',
+      body: JSON.stringify({ with_images: withImages }),
+    }),
+
+  saveAttributes: (productId: number, data: {
+    marketplace_id: number;
+    product_attributes?: Record<string, unknown>[];
+    variant_attributes?: Record<string, unknown>[];
+    size_attributes?: Record<string, unknown>[];
+  }) =>
+    fetchAPI<{ success: boolean; saved: number }>(`/marketplaces/admin-products/${productId}/save-attributes/`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  saveAll: (productId: number, data: {
+    name?: string;
+    code?: string;
+    category?: number;
+    brand?: number;
+    country?: number;
+    price?: number;
+    promo_price?: number;
+    old_price?: number;
+    description?: string;
+    extra_description?: string;
+    compositions?: { composition_id: number; value: number }[];
+    our_attributes?: {
+      attribute_group_id: number;
+      value_single_attribute?: number | null;
+      value_multi_attributes?: number[];
+      value_int?: number | null;
+      value_str?: string | null;
+    }[];
+    variants?: {
+      id?: number;
+      code?: string;
+      color_id?: number;
+      sizes?: {
+        id?: number;
+        size_id?: number;
+        max_size_id?: number | null;
+        stock?: number;
+      }[];
+    }[];
+    deleted_variant_ids?: number[];
+    deleted_size_ids?: number[];
+    deleted_image_ids?: number[];
+    image_reorders?: { variant_id: number; image_ids: number[] }[];
+  }) =>
+    fetchAPI<ProductDetail>(`/marketplaces/admin-products/${productId}/save-all/`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  uploadImage: async (productId: number, variantId: number, file: File): Promise<VariantImage> => {
+    const formData = new FormData();
+    formData.append('variant_id', String(variantId));
+    formData.append('image', file);
+
+    const response = await fetch(`${API_BASE}/marketplaces/admin-products/${productId}/upload-image/`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+  },
+};
+
+// =============================================================================
+// Lookups API
+// =============================================================================
+
+export const lookupsAPI = {
+  brands: () => fetchAPI<LookupItem[]>('/marketplaces/admin-lookups/brands/'),
+  countries: () => fetchAPI<LookupItem[]>('/marketplaces/admin-lookups/countries/'),
+  colors: () => fetchAPI<LookupColor[]>('/marketplaces/admin-lookups/colors/'),
+  categories: () => fetchAPI<LookupCategory[]>('/marketplaces/admin-lookups/categories/'),
+  sizes: (sizeGroupId: number) => fetchAPI<LookupSize[]>('/marketplaces/admin-lookups/sizes/', {
+    params: { size_group: sizeGroupId },
+  }),
+  compositions: () => fetchAPI<LookupItem[]>('/marketplaces/admin-lookups/compositions/'),
+  attributeGroups: (categoryId: number) =>
+    fetchAPI<LookupAttributeGroup[]>('/marketplaces/admin-lookups/attribute-groups/', {
+      params: { category: categoryId },
+    }),
+  aiUsage: () =>
+    fetchAPI<{
+      total_cost_usd: number;
+      total_calls: number;
+      total_input_tokens: number;
+      total_output_tokens: number;
+      by_action: { action: string; cost: number; calls: number }[];
+    }>('/marketplaces/admin-lookups/ai-usage/'),
+};
+
+// =============================================================================
+// Entity Mapping API
+// =============================================================================
+
+export interface MarketplaceEntity {
+  id: number;
+  marketplace: number;
+  entity_type: string;
+  external_id: string;
+  external_code: string;
+  name: string;
+  name_uk: string | null;
+}
+
+export interface EntityMappingItem {
+  id: number;
+  created_at: string;
+  // brand/color/country/size specific fields are dynamic
+  [key: string]: unknown;
+}
+
+export const entityMappingsAPI = {
+  listEntities: (marketplaceId: number, entityType: string, search?: string) =>
+    fetchAPI<MarketplaceEntity[]>('/marketplaces/marketplace-entities/', {
+      params: { marketplace: marketplaceId, entity_type: entityType, search },
+    }),
+
+  brands: {
+    list: (marketplaceId: number) =>
+      fetchAPI<EntityMappingItem[]>('/marketplaces/brand-mappings/', {
+        params: { marketplace: marketplaceId },
+      }),
+    create: (data: { brand: number; marketplace_entity: number }) =>
+      fetchAPI<EntityMappingItem>('/marketplaces/brand-mappings/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    delete: (id: number) =>
+      fetchAPI<void>(`/marketplaces/brand-mappings/${id}/`, { method: 'DELETE' }),
+    autoMap: (marketplaceId: number) =>
+      fetchAPI<{ success: boolean; matched: number }>('/marketplaces/brand-mappings/auto_map/', {
+        method: 'POST',
+        body: JSON.stringify({ marketplace_id: marketplaceId }),
+      }),
+    ourBrands: () =>
+      fetchAPI<{ id: number; name: string }[]>('/marketplaces/brand-mappings/our_brands/'),
+  },
+
+  colors: {
+    list: (marketplaceId: number) =>
+      fetchAPI<EntityMappingItem[]>('/marketplaces/color-mappings/', {
+        params: { marketplace: marketplaceId },
+      }),
+    create: (data: { color: number; marketplace_entity: number }) =>
+      fetchAPI<EntityMappingItem>('/marketplaces/color-mappings/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    delete: (id: number) =>
+      fetchAPI<void>(`/marketplaces/color-mappings/${id}/`, { method: 'DELETE' }),
+    autoMap: (marketplaceId: number) =>
+      fetchAPI<{ success: boolean; matched: number }>('/marketplaces/color-mappings/auto_map/', {
+        method: 'POST',
+        body: JSON.stringify({ marketplace_id: marketplaceId }),
+      }),
+    ourColors: () =>
+      fetchAPI<{ id: number; name: string; code: string }[]>('/marketplaces/color-mappings/our_colors/'),
+  },
+
+  countries: {
+    list: (marketplaceId: number) =>
+      fetchAPI<EntityMappingItem[]>('/marketplaces/country-mappings/', {
+        params: { marketplace: marketplaceId },
+      }),
+    create: (data: { country: number; marketplace_entity: number }) =>
+      fetchAPI<EntityMappingItem>('/marketplaces/country-mappings/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    delete: (id: number) =>
+      fetchAPI<void>(`/marketplaces/country-mappings/${id}/`, { method: 'DELETE' }),
+    autoMap: (marketplaceId: number) =>
+      fetchAPI<{ success: boolean; matched: number }>('/marketplaces/country-mappings/auto_map/', {
+        method: 'POST',
+        body: JSON.stringify({ marketplace_id: marketplaceId }),
+      }),
+    ourCountries: () =>
+      fetchAPI<{ id: number; name: string }[]>('/marketplaces/country-mappings/our_countries/'),
+  },
+
+  sizes: {
+    list: (marketplaceId: number) =>
+      fetchAPI<EntityMappingItem[]>('/marketplaces/size-mappings/', {
+        params: { marketplace: marketplaceId },
+      }),
+    create: (data: { size: number; marketplace_entity: number }) =>
+      fetchAPI<EntityMappingItem>('/marketplaces/size-mappings/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    delete: (id: number) =>
+      fetchAPI<void>(`/marketplaces/size-mappings/${id}/`, { method: 'DELETE' }),
+    autoMap: (marketplaceId: number) =>
+      fetchAPI<{ success: boolean; matched: number }>('/marketplaces/size-mappings/auto_map/', {
+        method: 'POST',
+        body: JSON.stringify({ marketplace_id: marketplaceId }),
+      }),
+    ourSizes: () =>
+      fetchAPI<{ id: number; name: string }[]>('/marketplaces/size-mappings/our_sizes/'),
+  },
+};
+
+// =============================================================================
+// Export Config API
+// =============================================================================
+
+export const exportAPI = {
+  full: (marketplaceId: number) =>
+    fetchAPI<Record<string, unknown>>(`/marketplaces/export-config/${marketplaceId}/full/`),
+
+  categories: (marketplaceId: number) =>
+    fetchAPI<Record<string, unknown>>(`/marketplaces/export-config/${marketplaceId}/categories/`),
+
+  attributeMappings: (marketplaceId: number) =>
+    fetchAPI<Record<string, unknown>>(`/marketplaces/export-config/${marketplaceId}/attribute-mappings/`),
+
+  entityMappings: (marketplaceId: number) =>
+    fetchAPI<Record<string, unknown>>(`/marketplaces/export-config/${marketplaceId}/entity-mappings/`),
+
+  attributeSets: (marketplaceId: number) =>
+    fetchAPI<Record<string, unknown>>(`/marketplaces/export-config/${marketplaceId}/attribute-sets/`),
+
+  products: (marketplaceId: number) =>
+    fetchAPI<Record<string, unknown>>(`/marketplaces/export-config/${marketplaceId}/products/`),
+};

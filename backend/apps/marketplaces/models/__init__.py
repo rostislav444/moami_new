@@ -18,9 +18,11 @@ from .product_export import (
     ProductMarketplaceAttribute,
 )
 from .feed_template import FeedTemplate
+from .attribute_level import MarketplaceAttributeLevel
 from .research import AgentConversation, AgentMessage
 from .pipeline import MarketplacePipeline, PipelineStep, PipelineRun
 from .tasks import BackgroundTask
+from .ai_usage import AIUsageLog
 
 __all__ = [
     'Marketplace',
@@ -38,6 +40,7 @@ __all__ = [
     'ProductMarketplaceConfig',
     'ProductMarketplaceAttribute',
     'FeedTemplate',
+    'MarketplaceAttributeLevel',
     # Research & Pipeline
     'AgentConversation',
     'AgentMessage',
@@ -45,4 +48,5 @@ __all__ = [
     'PipelineStep',
     'PipelineRun',
     'BackgroundTask',
+    'AIUsageLog',
 ]

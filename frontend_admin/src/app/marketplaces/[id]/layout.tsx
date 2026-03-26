@@ -4,12 +4,14 @@ import { useParams, usePathname } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { marketplacesAPI, categoriesAPI, attributesAPI } from '@/lib/api';
 import Link from 'next/link';
-import { ChevronRight, RefreshCw, FolderTree, ArrowLeftRight, Layers, Settings2, Link as LinkIcon, Bot, Workflow } from 'lucide-react';
+import { ChevronRight, RefreshCw, FolderTree, ArrowLeftRight, Layers, Settings2, Link as LinkIcon, Bot, Workflow, GitCompare, Tags } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const navItems = [
   { href: '', label: 'Категории', icon: FolderTree },
-  { href: '/mappings', label: 'Маппинг', icon: ArrowLeftRight },
+  { href: '/mappings', label: 'Маппинг категорий', icon: ArrowLeftRight },
+  { href: '/attr-mapping', label: 'Конфиг атрибутов', icon: GitCompare },
+  { href: '/entity-mapping', label: 'Сущности', icon: Tags },
   { href: '/attributes', label: 'Атрибуты', icon: Layers },
   { href: '/research', label: 'Исследование', icon: Bot },
   { href: '/pipeline', label: 'Пайплайны', icon: Workflow },
