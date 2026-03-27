@@ -47,42 +47,14 @@ interface CatalogueResponse {
   results: ProductVariant[]
 }
 
-const getApiUrl = () => {
-  // Use server-side API URL for SSR (internal Docker network)
-  return process.env.API_URL ||
-         (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000')
-}
+import { serverFetch } from '@/lib/server-fetch'
 
 async function getCatalogue(categorySlug: string, page: number = 1, pageSize: number = 24): Promise<CatalogueResponse | null> {
-  try {
-    const res = await fetch(`${getApiUrl()}/api/catalogue/?category=${categorySlug}&page=${page}&page_size=${pageSize}`, {
-      next: { revalidate: 3600 }
-    })
-
-    if (!res.ok) {
-      return null
-    }
-
-    return res.json()
-  } catch {
-    return null
-  }
+  return serverFetch(`/api/catalogue/?category=${categorySlug}&page=${page}&page_size=${pageSize}`, null);
 }
 
 async function getCategories(): Promise<CategoryState[]> {
-  try {
-    const res = await fetch(`${getApiUrl()}/api/category/categories/`, {
-      next: { revalidate: 3600 }
-    })
-
-    if (!res.ok) {
-      return []
-    }
-
-    return res.json()
-  } catch {
-    return []
-  }
+  return serverFetch('/api/category/categories/', []);
 }
 
 function createBreadcrumbs(slugs: string[], categories: CategoryState[]) {

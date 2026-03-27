@@ -5,3 +5,6 @@ frontend/src/local.ts
 nginx/cert.pem
 nginx/key.pem
 .trunk/
+nginx/.htpasswd
+nginx/logs/
+nginx/dashboard/

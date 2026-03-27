@@ -6,6 +6,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
 import { CategoryState } from '@/types/categories'
 import { ProductViewTracker } from '@/components/product/ProductViewTracker'
 
+import { serverFetch } from '@/lib/server-fetch'
+
 interface PageProps {
   params: Promise<{
     slug: string
@@ -75,43 +77,16 @@ interface ProductVariant {
     }
     stock: number
   }>
-}
-
-const getApiUrl = () => {
-  return process.env.API_URL ||
-         (process.env.NODE_ENV === 'production' ? 'http://web:8000' : 'http://localhost:8000')
+  video?: string | null
+  product_video?: string | null
 }
 
 async function getProduct(slug: string): Promise<ProductVariant | null> {
-  try {
-    const res = await fetch(`${getApiUrl()}/api/product/variants/${slug}/`, {
-      next: { revalidate: 3600 }
-    })
-
-    if (!res.ok) {
-      return null
-    }
-
-    return res.json()
-  } catch {
-    return null
-  }
+  return serverFetch(`/api/product/variants/${slug}/`, null);
 }
 
 async function getCategories(): Promise<CategoryState[]> {
-  try {
-    const res = await fetch(`${getApiUrl()}/api/category/categories/`, {
-      next: { revalidate: 3600 }
-    })
-
-    if (!res.ok) {
-      return []
-    }
-
-    return res.json()
-  } catch {
-    return []
-  }
+  return serverFetch('/api/category/categories/', []);
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

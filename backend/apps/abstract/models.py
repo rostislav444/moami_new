@@ -139,20 +139,17 @@ class ImageWithThumbnails(ImageModel):
 @receiver(pre_delete)
 def delete_image_file(sender, instance, **kwargs):
     if issubclass(sender, ImageWithThumbnails):
-        # Skip if no image
-        if not instance.image or not instance.image.name:
-            return
-
         paths = [instance.image.name, *instance.thumbnails.values()]
 
         for path in paths:
-            if path and default_storage.exists(path):
-                default_storage.delete(path)
-
-        # Try to remove empty directory
-        dir_path = os.path.dirname(settings.MEDIA_ROOT + paths[0])
-        if os.path.exists(dir_path) and not os.listdir(dir_path):
             try:
-                os.rmdir(dir_path)
-            except OSError:
-                pass  # Directory not empty or other error
+                default_storage.delete(path)
+            except FileNotFoundError:
+                pass
+
+        dir_path = os.path.dirname(settings.MEDIA_ROOT + paths[0])
+        try:
+            if not os.listdir(dir_path):
+                default_storage.delete(dir_path)
+        except FileNotFoundError:
+            pass
