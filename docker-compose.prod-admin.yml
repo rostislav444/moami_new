@@ -1,0 +1,17 @@
+services:
+  frontend_admin:
+    container_name: frontend_admin
+    build:
+      context: ./frontend_admin
+      dockerfile: Dockerfile.prod
+    environment:
+      - BACKEND_INTERNAL_URL=http://web:8000
+      - NEXT_PUBLIC_API_URL=http://web:8000/api
+    networks:
+      - nginx_net
+    restart: unless-stopped
+
+networks:
+  nginx_net:
+    name: nginx_net
+    external: true
