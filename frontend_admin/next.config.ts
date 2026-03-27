@@ -4,6 +4,7 @@ const backendInternal = process.env.BACKEND_INTERNAL_URL || 'http://localhost:80
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
   async rewrites() {
     return [
       {

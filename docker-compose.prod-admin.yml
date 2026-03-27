@@ -4,9 +4,13 @@ services:
     build:
       context: ./frontend_admin
       dockerfile: Dockerfile.prod
+      args:
+        - NEXT_PUBLIC_BASE_PATH=/mp-admin
+        - NEXT_PUBLIC_API_URL=https://moami.com.ua/api
     environment:
       - BACKEND_INTERNAL_URL=http://web:8000
-      - NEXT_PUBLIC_API_URL=http://web:8000/api
+      - NEXT_PUBLIC_API_URL=https://moami.com.ua/api
+      - NEXT_PUBLIC_BASE_PATH=/mp-admin
     networks:
       - nginx_net
     restart: unless-stopped
