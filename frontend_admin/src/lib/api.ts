@@ -682,6 +682,12 @@ export const attributeLevelsAPI = {
       body: JSON.stringify({ category_mapping_id: categoryMappingId, levels }),
     }),
 
+  aiLoadAttributes: (categoryMappingId: number) =>
+    fetchAPI<{ success: boolean; created_attributes: number; created_options: number; total_in_set: number; error?: string }>(
+      '/marketplaces/attribute-levels/ai-load-attributes/',
+      { method: 'POST', body: JSON.stringify({ category_mapping_id: categoryMappingId }) },
+    ),
+
   aiAssignCategory: (categoryMappingId: number) =>
     fetchAPI<{ success: boolean; saved: number; error?: string }>(
       '/marketplaces/attribute-levels/ai-assign-category/',

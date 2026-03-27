@@ -144,6 +144,8 @@ function CategoryMappingCard({
   const isConfigured = mapping.configured_attributes > 0
   const isFullyConfigured = mapping.configured_attributes >= mapping.total_attributes
   const [aiLoading, setAiLoading] = useState(false)
+  const [loadingAttrs, setLoadingAttrs] = useState(false)
+  const [loadResult, setLoadResult] = useState<string | null>(null)
 
   const handleAiAssign = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -154,6 +156,24 @@ function CategoryMappingCard({
       queryClient.invalidateQueries({ queryKey: ['attribute-level-config', mapping.category_mapping_id] })
     } finally {
       setAiLoading(false)
+    }
+  }
+
+  const handleLoadAttributes = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setLoadingAttrs(true)
+    setLoadResult(null)
+    try {
+      const res = await attributeLevelsAPI.aiLoadAttributes(mapping.category_mapping_id)
+      if (res.success) {
+        setLoadResult(`+${res.created_attributes} атр., +${res.created_options} опций (всего: ${res.total_in_set})`)
+        queryClient.invalidateQueries({ queryKey: ['attribute-levels-mappings'] })
+        queryClient.invalidateQueries({ queryKey: ['attribute-level-config', mapping.category_mapping_id] })
+      }
+    } catch (err) {
+      setLoadResult('Ошибка')
+    } finally {
+      setLoadingAttrs(false)
     }
   }
 
@@ -203,6 +223,15 @@ function CategoryMappingCard({
           {aiLoading ? <Loader2 className="h-3 w-3 animate-spin inline mr-1" /> : null}
           AI назначить
         </button>
+        <button
+          onClick={handleLoadAttributes}
+          disabled={loadingAttrs}
+          className="px-2.5 py-1 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded border border-emerald-200 disabled:opacity-50"
+        >
+          {loadingAttrs ? <Loader2 className="h-3 w-3 animate-spin inline mr-1" /> : null}
+          AI атрибуты
+        </button>
+        {loadResult && <span className="text-xs text-emerald-600">{loadResult}</span>}
       </div>
 
       {isExpanded && (

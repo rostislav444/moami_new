@@ -438,3 +438,148 @@ class MarketplaceAttributeLevelViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logging.getLogger(__name__).error(f'AI assign category error: {e}')
             return Response({'error': str(e)}, status=500)
+
+    @action(detail=False, methods=['post'], url_path='ai-load-attributes')
+    def ai_load_attributes(self, request):
+        """
+        AI загрузка атрибутов для категории маркетплейса.
+        AI находит атрибуты по своим знаниям о маркетплейсе и создаёт их в БД.
+
+        POST /attribute-levels/ai-load-attributes/
+        Body: {"category_mapping_id": 123}
+        """
+        import json
+        import logging
+        from django.conf import settings
+
+        try:
+            import anthropic
+        except ImportError:
+            return Response({'error': 'anthropic not installed'}, status=400)
+
+        cm_id = request.data.get('category_mapping_id')
+        if not cm_id:
+            return Response({'error': 'category_mapping_id required'}, status=400)
+
+        try:
+            cm = CategoryMapping.objects.select_related(
+                'category', 'marketplace_category', 'marketplace_category__marketplace'
+            ).get(id=cm_id)
+        except CategoryMapping.DoesNotExist:
+            return Response({'error': 'CategoryMapping not found'}, status=404)
+
+        marketplace = cm.marketplace_category.marketplace
+        mp_cat = cm.marketplace_category
+
+        # Check if attributes already exist
+        existing_set = MarketplaceAttributeSet.objects.filter(
+            marketplace=marketplace,
+            marketplace_category=mp_cat,
+        ).first() or MarketplaceAttributeSet.objects.filter(
+            marketplace=marketplace,
+            external_code=mp_cat.external_code,
+        ).first()
+
+        existing_count = existing_set.attributes.count() if existing_set else 0
+
+        prompt = f"""Ты эксперт по маркетплейсам. Найди атрибуты (характеристики) для категории товаров.
+
+Маркетплейс: {marketplace.name}
+Категория маркетплейса: {mp_cat.name} (код: {mp_cat.external_code}, id: {mp_cat.external_id})
+Наша категория: {cm.category.name}
+
+{"У этой категории уже есть " + str(existing_count) + " атрибутов. Добавь ТОЛЬКО недостающие." if existing_count > 0 else "Атрибутов нет — создай полный набор."}
+
+Для каждого атрибута укажи:
+- name: название (на украинском для укр. маркетплейсов)
+- code: код атрибута в маркетплейсе (числовой или строковый)
+- type: select | multiselect | string | text | int | float | boolean
+- is_required: true/false
+- suffix: единица измерения (г, мм, см) или null
+- options: массив возможных значений (для select/multiselect) или null
+
+Типичные атрибуты для одежды: бренд, страна, цвет, размер (UA/EU/INT), пол, сезон, стиль, фасон,
+состав ткани, длина рукава, вес, габариты упаковки (высота/ширина/глубина в мм), мера измерения и т.д.
+
+Ответь ТОЛЬКО JSON:
+{{
+  "attributes": [
+    {{"name": "Бренд", "code": "brand", "type": "select", "is_required": true, "suffix": null, "options": null}},
+    {{"name": "Вага", "code": "weight", "type": "float", "is_required": true, "suffix": "г", "options": null}},
+    {{"name": "Колір", "code": "78", "type": "multiselect", "is_required": true, "suffix": null, "options": ["Білий", "Чорний", "Червоний"]}},
+  ]
+}}"""
+
+        try:
+            client = anthropic.Anthropic(api_key=getattr(settings, 'ANTHROPIC_API_KEY', None))
+            response = client.messages.create(
+                model='claude-sonnet-4-20250514',
+                max_tokens=4096,
+                messages=[{'role': 'user', 'content': prompt}],
+            )
+
+            from apps.marketplaces.models import AIUsageLog
+            AIUsageLog.log(response, 'claude-sonnet-4-20250514', 'load_attributes', marketplace=marketplace)
+
+            text = response.content[0].text.strip()
+            if '```json' in text:
+                text = text.split('```json')[1].split('```')[0].strip()
+            elif '```' in text:
+                text = text.split('```')[1].split('```')[0].strip()
+
+            result = json.loads(text)
+            ai_attributes = result.get('attributes', [])
+
+            # Create/get attribute set
+            attr_set, _ = MarketplaceAttributeSet.objects.get_or_create(
+                marketplace=marketplace,
+                external_code=mp_cat.external_code or str(mp_cat.external_id),
+                defaults={
+                    'name': mp_cat.name,
+                    'marketplace_category': mp_cat,
+                },
+            )
+
+            created_attrs = 0
+            created_options = 0
+            for attr_data in ai_attributes:
+                code = str(attr_data.get('code', ''))
+                if not code:
+                    continue
+
+                ma, created = MarketplaceAttribute.objects.get_or_create(
+                    attribute_set=attr_set,
+                    external_code=code,
+                    defaults={
+                        'name': attr_data.get('name', ''),
+                        'attr_type': attr_data.get('type', 'string'),
+                        'is_required': attr_data.get('is_required', False),
+                        'suffix': attr_data.get('suffix', '') or '',
+                    },
+                )
+                if created:
+                    created_attrs += 1
+
+                # Create options
+                options = attr_data.get('options') or []
+                if options and attr_data.get('type') in ('select', 'multiselect'):
+                    from apps.marketplaces.models import MarketplaceAttributeOption
+                    for opt_name in options:
+                        _, opt_created = MarketplaceAttributeOption.objects.get_or_create(
+                            attribute=ma,
+                            external_code=opt_name[:100],
+                            defaults={'name': opt_name[:500]},
+                        )
+                        if opt_created:
+                            created_options += 1
+
+            return Response({
+                'success': True,
+                'created_attributes': created_attrs,
+                'created_options': created_options,
+                'total_in_set': attr_set.attributes.count(),
+            })
+
+        except Exception as e:
+            logging.getLogger(__name__).error(f'AI load attributes error: {e}')
+            return Response({'error': str(e)}, status=500)
