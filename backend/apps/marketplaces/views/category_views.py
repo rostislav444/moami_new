@@ -383,3 +383,187 @@ class CategoryMappingViewSet(viewsets.ModelViewSet):
             'success': True,
             'matched': matched
         })
+
+    @action(detail=False, methods=['post'], url_path='ai-assistant')
+    def ai_assistant(self, request):
+        """
+        AI помощник для работы с категориями и маппингом.
+        Принимает произвольный промпт + контекст.
+
+        POST /category-mappings/ai-assistant/
+        Body: {
+            "marketplace_id": 1,
+            "prompt": "Вот JSON категорий розетки: [...]. Создай категории и замапь с нашими.",
+            "data": "любые данные (JSON, текст, список категорий)"
+        }
+        """
+        import json as json_module
+        from django.conf import settings as django_settings
+
+        marketplace_id = request.data.get('marketplace_id')
+        user_prompt = request.data.get('prompt', '')
+        user_data = request.data.get('data', '')
+
+        if not marketplace_id or not user_prompt:
+            return Response(
+                {'error': 'marketplace_id and prompt are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        from apps.marketplaces.models import Marketplace
+        try:
+            marketplace = Marketplace.objects.get(id=marketplace_id)
+        except Marketplace.DoesNotExist:
+            return Response({'error': 'Marketplace not found'}, status=404)
+
+        # Our categories
+        from apps.categories.models import Category
+        our_cats = list(Category.objects.all().order_by('tree_id', 'lft').values(
+            'id', 'name', 'level', 'parent_id'
+        ))
+        our_cats_str = json_module.dumps(our_cats, ensure_ascii=False, indent=2)
+
+        # Existing marketplace categories
+        mp_cats = list(MarketplaceCategory.objects.filter(
+            marketplace=marketplace
+        ).values('id', 'name', 'external_id', 'external_code', 'parent_id'))
+        mp_cats_str = json_module.dumps(mp_cats, ensure_ascii=False, indent=2)
+
+        # Existing mappings
+        existing_mappings = list(CategoryMapping.objects.filter(
+            marketplace_category__marketplace=marketplace
+        ).values('category_id', 'marketplace_category_id'))
+
+        try:
+            import anthropic
+            client = anthropic.Anthropic(
+                api_key=getattr(django_settings, 'ANTHROPIC_API_KEY', None)
+            )
+
+            system_prompt = f"""Ты AI-помощник для маркетплейс-интеграции магазина одежды/аксессуаров MOAMI.
+
+МАРКЕТПЛЕЙС: {marketplace.name}
+
+НАШИ КАТЕГОРИИ (id, name, level, parent_id):
+{our_cats_str}
+
+СУЩЕСТВУЮЩИЕ КАТЕГОРИИ МАРКЕТПЛЕЙСА:
+{mp_cats_str if mp_cats else "Пусто — нужно создать"}
+
+СУЩЕСТВУЮЩИЕ МАППИНГИ: {len(existing_mappings)} шт.
+
+ЗАДАЧА: Для каждой нашей категории найди соответствующую категорию на маркетплейсе "{marketplace.name}".
+Используй свои знания о структуре категорий этого маркетплейса (API, сайт, документация).
+
+Для Rozetka: категории имеют числовые ID (напр. 2219 = Жіночий одяг, 4626 = Сукні, 4627 = Блузи, 4636 = Штани жіночі).
+Для Epicentr: категории имеют числовые коды (напр. 6390 = Жіночий одяг).
+Для Prom/Satu: используй стандартные коды.
+
+Возвращай ТОЛЬКО JSON:
+{{
+  "actions": [
+    {{"action": "create_mp_category", "name": "Назва категорії (укр)", "external_id": "12345", "external_code": "12345"}},
+    {{"action": "create_mapping", "our_category_id": 1, "mp_category_name": "назва"}},
+  ],
+  "message": "Что сделал: перечисли созданные маппинги"
+}}
+
+ПРАВИЛА:
+- create_mp_category: создаёт категорию маркетплейса. name — на украинском. external_id и external_code — реальные коды маркетплейса
+- create_mapping: маппит нашу категорию (our_category_id) → категорию МП (по имени, mp_category_name должен точно совпадать с name в create_mp_category)
+- Сначала все create_mp_category, потом все create_mapping
+- Пропускай наши категории у которых level=0 (это корневые группы, не конечные)
+- Ищи конечные (leaf) категории маркетплейса — самые специфичные
+- Возвращай ТОЛЬКО JSON"""
+
+            response = client.messages.create(
+                model='claude-sonnet-4-20250514',
+                max_tokens=8192,
+                messages=[
+                    {'role': 'user', 'content': f"{user_prompt}\n\nДАННЫЕ:\n{user_data}" if user_data else user_prompt},
+                ],
+                system=system_prompt,
+            )
+
+            # Log usage
+            from apps.marketplaces.models import AIUsageLog
+            AIUsageLog.log(response, 'claude-sonnet-4-20250514', 'category_assistant', marketplace=marketplace)
+
+            text = response.content[0].text.strip()
+            if '```json' in text:
+                text = text.split('```json')[1].split('```')[0].strip()
+            elif '```' in text:
+                text = text.split('```')[1].split('```')[0].strip()
+
+            result = json_module.loads(text)
+            actions = result.get('actions', [])
+            message = result.get('message', '')
+
+            # Execute actions
+            created_categories = 0
+            created_mappings = 0
+            errors = []
+
+            # First pass: create categories
+            name_to_mp_cat = {}
+            for a in actions:
+                if a['action'] == 'create_mp_category':
+                    try:
+                        mc, created = MarketplaceCategory.objects.get_or_create(
+                            marketplace=marketplace,
+                            external_code=str(a.get('external_code', a.get('external_id', ''))),
+                            defaults={
+                                'name': a['name'],
+                                'external_id': str(a.get('external_id', '')),
+                                'parent_id': a.get('parent_id'),
+                            }
+                        )
+                        name_to_mp_cat[a['name'].lower()] = mc
+                        if created:
+                            created_categories += 1
+                    except Exception as e:
+                        errors.append(f"create_mp_category {a.get('name')}: {str(e)[:100]}")
+
+            # Second pass: create mappings
+            for a in actions:
+                if a['action'] == 'create_mapping':
+                    try:
+                        our_cat_id = a['our_category_id']
+                        mp_cat_name = a.get('mp_category_name', '').lower()
+                        mp_cat = name_to_mp_cat.get(mp_cat_name) or MarketplaceCategory.objects.filter(
+                            marketplace=marketplace, name__iexact=a.get('mp_category_name', '')
+                        ).first()
+                        if mp_cat:
+                            _, created = CategoryMapping.objects.get_or_create(
+                                category_id=our_cat_id,
+                                marketplace_category=mp_cat,
+                            )
+                            if created:
+                                created_mappings += 1
+                    except Exception as e:
+                        errors.append(f"create_mapping: {str(e)[:100]}")
+
+                elif a['action'] == 'create_mapping_by_ids':
+                    try:
+                        _, created = CategoryMapping.objects.get_or_create(
+                            category_id=a['our_category_id'],
+                            marketplace_category_id=a['mp_category_id'],
+                        )
+                        if created:
+                            created_mappings += 1
+                    except Exception as e:
+                        errors.append(f"create_mapping_by_ids: {str(e)[:100]}")
+
+            return Response({
+                'success': True,
+                'message': message,
+                'created_categories': created_categories,
+                'created_mappings': created_mappings,
+                'errors': errors,
+                'total_actions': len(actions),
+            })
+
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f'AI assistant error: {e}')
+            return Response({'error': str(e)}, status=500)

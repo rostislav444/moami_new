@@ -67,9 +67,9 @@ class MarketplaceAttributeSetViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class MarketplaceAttributeViewSet(viewsets.ReadOnlyModelViewSet):
+class MarketplaceAttributeViewSet(viewsets.ModelViewSet):
     """
-    ViewSet для атрибутов (только чтение)
+    ViewSet для атрибутов
 
     Endpoints:
     - GET /api/attributes/ - список атрибутов

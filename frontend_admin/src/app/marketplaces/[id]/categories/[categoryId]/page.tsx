@@ -8,8 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   RefreshCw, ChevronRight, ChevronLeft, Folder, Loader2, Upload,
-  FileSpreadsheet, Save, Trash2, Layers, Search, X,
+  FileSpreadsheet, Save, Trash2, Layers, Search, X, Pencil, Check,
 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useState, useRef, useMemo } from 'react';
 
@@ -40,6 +42,9 @@ export default function CategoryDetailPage() {
   const [attrSearch, setAttrSearch] = useState('');
   const [filterType, setFilterType] = useState<string>('');
   const [filterRequired, setFilterRequired] = useState<boolean | null>(null);
+  const [selectedAttrs, setSelectedAttrs] = useState<Set<number>>(new Set());
+  const [deleting, setDeleting] = useState(false);
+  const [editingAttr, setEditingAttr] = useState<{ id: number; name: string; external_code: string; attr_type: string; is_required: boolean; suffix: string } | null>(null);
 
   // Load category + attribute set + attributes in one query
   const { data: category, isLoading: categoryLoading } = useQuery({
@@ -120,9 +125,17 @@ export default function CategoryDetailPage() {
     setError(null);
     setParsedAttributes(null);
     try {
-      const result = await aiAPI.parseAttributesFile(file);
-      if (result.success && result.attributes) {
-        setParsedAttributes(result.attributes);
+      const result = await aiAPI.parseAttributesFile(file, marketplaceId, category?.external_code);
+      if (result.success) {
+        if (result.saved_count && result.saved_count > 0) {
+          // Already saved to DB — just refresh
+          queryClient.invalidateQueries({ queryKey: ['attribute-sets', marketplaceId] });
+          queryClient.invalidateQueries({ queryKey: ['set-attributes'] });
+          setTimeout(() => refetchAttributes(), 500);
+          setParsedAttributes(null);
+        } else if (result.attributes) {
+          setParsedAttributes(result.attributes);
+        }
       } else {
         setError(result.error || 'Ошибка парсинга файла');
       }
@@ -333,9 +346,59 @@ export default function CategoryDetailPage() {
           </div>
         </div>
 
+        {/* Bulk actions */}
+        {selectedAttrs.size > 0 && (
+          <div className="flex items-center gap-3 px-4 py-2 bg-indigo-50 border-b border-indigo-200">
+            <span className="text-sm font-medium text-indigo-700">Выбрано: {selectedAttrs.size}</span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setSelectedAttrs(new Set())}
+              className="h-7 text-xs"
+            >
+              Снять
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs text-red-600 border-red-200 hover:bg-red-50"
+              disabled={deleting}
+              onClick={async () => {
+                if (!confirm(`Удалить ${selectedAttrs.size} атрибутов?`)) return
+                setDeleting(true)
+                try {
+                  for (const attrId of selectedAttrs) {
+                    try {
+                      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/marketplaces/marketplace-attributes/${attrId}/`, { method: 'DELETE' })
+                    } catch {}
+                  }
+                  setSelectedAttrs(new Set())
+                  refetchAttributes()
+                } finally {
+                  setDeleting(false)
+                }
+              }}
+            >
+              {deleting ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Trash2 className="h-3 w-3 mr-1" />}
+              Удалить выбранные
+            </Button>
+          </div>
+        )}
+
         {/* Table header */}
         <div className="flex items-center gap-3 px-4 py-1.5 bg-muted/50 border-b text-xs font-medium text-muted-foreground">
-          <div className="w-5 shrink-0" />
+          <input
+            type="checkbox"
+            className="w-4 h-4 rounded border-slate-300 shrink-0"
+            checked={selectedAttrs.size > 0 && selectedAttrs.size === filteredAttributes.length}
+            onChange={e => {
+              if (e.target.checked) {
+                setSelectedAttrs(new Set(filteredAttributes.map(a => a.id)))
+              } else {
+                setSelectedAttrs(new Set())
+              }
+            }}
+          />
           <span className="flex-1">Название</span>
           <span className="shrink-0 w-32 text-center">Код</span>
           <span className="shrink-0 w-20 text-center">Значений</span>
@@ -357,6 +420,18 @@ export default function CategoryDetailPage() {
                     className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-muted/30 transition-colors"
                     onClick={() => attr.options && attr.options.length > 0 && toggleAttrExpand(attr.id)}
                   >
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 rounded border-slate-300 shrink-0"
+                      checked={selectedAttrs.has(attr.id)}
+                      onClick={e => e.stopPropagation()}
+                      onChange={e => {
+                        const next = new Set(selectedAttrs)
+                        if (e.target.checked) next.add(attr.id)
+                        else next.delete(attr.id)
+                        setSelectedAttrs(next)
+                      }}
+                    />
                     {attr.options && attr.options.length > 0 ? (
                       <ChevronRight
                         className={`h-4 w-4 shrink-0 transition-transform text-muted-foreground ${
@@ -383,6 +458,22 @@ export default function CategoryDetailPage() {
                         <Badge variant="destructive" className="text-xs">Да</Badge>
                       )}
                     </span>
+                    <button
+                      onClick={e => {
+                        e.stopPropagation()
+                        setEditingAttr({
+                          id: attr.id,
+                          name: attr.name,
+                          external_code: attr.external_code,
+                          attr_type: attr.attr_type,
+                          is_required: attr.is_required,
+                          suffix: attr.suffix || '',
+                        })
+                      }}
+                      className="shrink-0 px-2 py-1 text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded border border-indigo-200"
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </button>
                   </div>
                   {/* Expanded options */}
                   {expandedAttrs.has(attr.id) && attr.options && attr.options.length > 0 && (
@@ -424,6 +515,109 @@ export default function CategoryDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Edit attribute modal */}
+      {editingAttr && (
+        <EditAttributeModal
+          attr={editingAttr}
+          onClose={() => setEditingAttr(null)}
+          onSaved={() => {
+            setEditingAttr(null)
+            refetchAttributes()
+          }}
+        />
+      )}
     </div>
   );
+}
+
+function EditAttributeModal({
+  attr,
+  onClose,
+  onSaved,
+}: {
+  attr: { id: number; name: string; external_code: string; attr_type: string; is_required: boolean; suffix: string }
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const [name, setName] = useState(attr.name)
+  const [code, setCode] = useState(attr.external_code)
+  const [attrType, setAttrType] = useState(attr.attr_type)
+  const [isRequired, setIsRequired] = useState(attr.is_required)
+  const [suffix, setSuffix] = useState(attr.suffix)
+  const [saving, setSaving] = useState(false)
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await fetch(`${API_BASE}/marketplaces/marketplace-attributes/${attr.id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, external_code: code, attr_type: attrType, is_required: isRequired, suffix }),
+      })
+      onSaved()
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const types = ['select', 'multiselect', 'string', 'text', 'int', 'float', 'boolean', 'array']
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Редактировать атрибут</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label className="text-xs">Название</Label>
+            <Input value={name} onChange={e => setName(e.target.value)} className="mt-1" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs">Код</Label>
+              <Input value={code} onChange={e => setCode(e.target.value)} className="mt-1 font-mono" />
+            </div>
+            <div>
+              <Label className="text-xs">Суффикс (ед. изм.)</Label>
+              <Input value={suffix} onChange={e => setSuffix(e.target.value)} className="mt-1" placeholder="мм, г, см" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs">Тип</Label>
+              <select
+                value={attrType}
+                onChange={e => setAttrType(e.target.value)}
+                className="mt-1 w-full border border-slate-200 rounded-md px-3 py-2 text-sm"
+              >
+                {types.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <div className="flex items-end pb-1">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={isRequired}
+                  onChange={e => setIsRequired(e.target.checked)}
+                  className="h-4 w-4 rounded border-slate-300"
+                />
+                Обязательный
+              </label>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="outline" size="sm" onClick={onClose}>Отмена</Button>
+          <Button size="sm" onClick={handleSave} disabled={saving}>
+            {saving ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Check className="mr-2 h-3 w-3" />}
+            Сохранить
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
 }

@@ -270,12 +270,13 @@ class AIAssistantViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'])
     def parse_attributes_file(self, request):
         """
-        Универсальный парсинг XLSX/CSV файла с атрибутами (AI + Python)
+        Универсальный парсинг XLSX/CSV файла с атрибутами.
 
-        Трёхэтапный процесс:
-        1. AI анализирует первые 30 строк → определяет структуру и маппинг колонок
-        2. Python парсит ВСЕ данные по этому конфигу
-        3. AI маппит типы данных (ComboBox → select и т.д.)
+        Процесс:
+        1. Читаем файл, собираем список вкладок с превью
+        2. AI определяет какие вкладки содержат данные (характеристики, размеры и т.д.)
+        3. Цикл: для каждой полезной вкладки — AI определяет структуру, Python парсит
+        4. Конкатенируем результаты и отдаём
 
         POST /api/ai/parse_attributes_file/
         Content-Type: multipart/form-data
@@ -284,430 +285,385 @@ class AIAssistantViewSet(viewsets.ViewSet):
         import anthropic
         import openpyxl
         import csv
+        import re as _re
 
         if 'file' not in request.FILES:
-            return Response(
-                {'error': 'Файл не загружен'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({'error': 'Файл не загружен'}, status=400)
 
         uploaded_file = request.FILES['file']
         filename = uploaded_file.name.lower()
+        file_bytes = uploaded_file.read()
+        marketplace_id = request.data.get('marketplace_id') or request.query_params.get('marketplace_id')
 
-        # ===== ШАГ 1: Читаем файл =====
-        all_sheets_info = {}  # {sheet_name: first_10_rows}
-        target_sheet_name = None
-
+        # ===== ШАГ 1: Читаем все вкладки =====
+        all_sheets = {}  # {name: [[row], ...]}
         try:
-            if filename.endswith('.xlsx') or filename.endswith('.xls'):
-                workbook = openpyxl.load_workbook(io.BytesIO(uploaded_file.read()))
-
-                # Собираем информацию о ВСЕХ вкладках
-                for sheet_name in workbook.sheetnames:
-                    sheet = workbook[sheet_name]
+            if filename.endswith(('.xlsx', '.xls')):
+                wb = openpyxl.load_workbook(io.BytesIO(file_bytes), data_only=True)
+                for sn in wb.sheetnames:
+                    ws = wb[sn]
                     sheet_rows = []
-                    for i, row in enumerate(sheet.iter_rows(values_only=True)):
-                        if i >= 10:  # только первые 10 строк каждой вкладки
-                            break
-                        if any(cell is not None for cell in row):
-                            sheet_rows.append([str(cell).strip() if cell is not None else '' for cell in row])
-                    all_sheets_info[sheet_name] = sheet_rows
-
-                # Пока используем первую вкладку, AI определит нужную
-                sheet = workbook.active
-                rows = []
-                for row in sheet.iter_rows(values_only=True):
-                    if any(cell is not None for cell in row):
-                        rows.append([str(cell).strip() if cell is not None else '' for cell in row])
-                target_sheet_name = sheet.title
-
+                    for row in ws.iter_rows(values_only=True):
+                        if any(c is not None for c in row):
+                            sheet_rows.append([str(c).strip() if c else '' for c in row])
+                    all_sheets[sn] = sheet_rows
+                wb.close()
             elif filename.endswith('.csv'):
-                content = uploaded_file.read().decode('utf-8-sig')
-                # Пробуем разные разделители
-                if '\t' in content:
-                    reader = csv.reader(io.StringIO(content), delimiter='\t')
-                else:
-                    reader = csv.reader(io.StringIO(content))
-                rows = [row for row in reader if any(cell.strip() for cell in row)]
-
+                content = file_bytes.decode('utf-8-sig')
+                sep = '\t' if '\t' in content else ','
+                reader = csv.reader(io.StringIO(content), delimiter=sep)
+                all_sheets['CSV'] = [r for r in reader if any(c.strip() for c in r)]
             else:
-                return Response(
-                    {'error': 'Неподдерживаемый формат файла. Используйте XLSX или CSV.'},
-                    status=status.HTTP_400_BAD_REQUEST
+                return Response({'error': 'Формат не поддерживается'}, status=400)
+        except Exception as e:
+            return Response({'error': f'Ошибка чтения: {e}'}, status=400)
+
+        if not all_sheets:
+            return Response({'error': 'Файл пустой'}, status=400)
+
+        sheet_names = list(all_sheets.keys())
+        print(f"[PARSE] XLSX sheets: {sheet_names}")
+
+        # ===== ШАГ 2: AI определяет какие вкладки парсить =====
+        # Если одна вкладка — не спрашиваем AI
+        if len(sheet_names) == 1:
+            sheets_to_parse = [{'sheet': sheet_names[0], 'type': 'attributes'}]
+        else:
+            # Превью каждой вкладки для AI
+            preview = ""
+            for sn, rows in all_sheets.items():
+                preview += f'\n=== "{sn}" ({len(rows)} строк) ===\n'
+                for r in rows[:5]:
+                    preview += '\t'.join(r[:12]) + '\n'
+
+            try:
+                client = anthropic.Anthropic(api_key=getattr(settings, 'ANTHROPIC_API_KEY', None))
+                resp = client.messages.create(
+                    model='claude-haiku-4-5-20251001',
+                    max_tokens=500,
+                    messages=[{'role': 'user', 'content': f"""Вот вкладки Excel файла маркетплейса:
+{preview}
+
+Определи какие вкладки содержат ПОЛЕЗНЫЕ данные. Типы:
+- "attributes" — характеристики/атрибуты товаров (названия, типы, возможные значения). Выбери ОДНУ вкладку (укр предпочтительнее)
+- "size_grid" — размерные сетки (таблицы размеров с обхватами)
+- "skip" — шаблоны товаров, примеры, инструкции, правила, дубли на других языках
+
+НЕ включай дубли характеристик на разных языках — только одну вкладку!
+
+Ответь ТОЛЬКО JSON массивом:
+[{{"sheet": "Характеристики (укр)", "type": "attributes"}}, {{"sheet": "Розмірні сітки", "type": "size_grid"}}]"""}],
                 )
+                txt = resp.content[0].text.strip()
+                if '```' in txt:
+                    txt = txt.split('```json')[-1].split('```')[0] if '```json' in txt else txt.split('```')[1].split('```')[0]
+                sheets_to_parse = json.loads(txt.strip())
+                sheets_to_parse = [s for s in sheets_to_parse if s.get('type') != 'skip']
+                print(f"[PARSE] AI sheets to parse: {sheets_to_parse}")
+            except Exception as e:
+                logger.warning(f"AI sheet detection failed: {e}, using all sheets")
+                sheets_to_parse = [{'sheet': sn, 'type': 'attributes'} for sn in sheet_names]
 
-        except Exception as e:
-            logger.error(f"Error reading file: {e}")
-            return Response(
-                {'error': f'Ошибка чтения файла: {str(e)}'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # ===== ШАГ 3: Парсим каждую вкладку =====
+        all_attributes = []
+        all_size_grids = []
 
-        if len(rows) < 2:
-            return Response(
-                {'error': 'Файл пустой или содержит меньше 2 строк'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        for sheet_info in sheets_to_parse:
+            sn = sheet_info.get('sheet', '')
+            stype = sheet_info.get('type', 'attributes')
+            if sn not in all_sheets:
+                continue
+            rows = all_sheets[sn]
+            if len(rows) < 2:
+                continue
 
-        # ===== ШАГ 2: AI анализирует структуру =====
-        # Формируем информацию о всех вкладках для AI
-        sheets_preview = ""
-        if all_sheets_info:
-            sheets_preview = "ВКЛАДКИ В ФАЙЛЕ:\n"
-            for sheet_name, sheet_rows in all_sheets_info.items():
-                sheets_preview += f"\n=== Вкладка: \"{sheet_name}\" ===\n"
-                for row in sheet_rows[:5]:
-                    sheets_preview += '\t'.join(row[:10]) + '\n'  # первые 10 колонок
-                sheets_preview += "...\n"
+            print(f"[PARSE] Parsing sheet '{sn}' as {stype}")
 
-        sample_rows = rows[:30]
-        sample_text = '\n'.join(['\t'.join(row) for row in sample_rows])
+            if stype == 'size_grid':
+                # Parse size grid blocks into attributes
+                # Each block = one attribute (e.g. "ТР жіночого одягу (3XS-15XL):226")
+                # Options = sizes with their IDs
+                current_grid_name = sn
+                current_grid_id = None
+                current_headers = None
+                current_sizes = []
 
-        try:
-            client = anthropic.Anthropic(
-                api_key=getattr(settings, 'ANTHROPIC_API_KEY', None)
-            )
+                def flush_grid():
+                    if current_sizes and current_grid_name:
+                        # Create attribute from size grid
+                        values = []
+                        for sz in current_sizes:
+                            # First column = size name, second = ID
+                            label = sz.get('label', '')
+                            sid = sz.get('id', '')
+                            if label:
+                                values.append(f"{sid}:{label}" if sid else label)
 
-            structure_prompt = f"""Проанализируй Excel файл с атрибутами товаров маркетплейса.
+                        all_attributes.append({
+                            'name': current_grid_name.split(':')[0].strip() if ':' in current_grid_name else current_grid_name,
+                            'code': current_grid_id or f'size_grid_{len(all_attributes)}',
+                            'type': 'select',
+                            'is_required': False,
+                            'possible_values': [sz.get('label', '') for sz in current_sizes if sz.get('label')],
+                            'unit': None,
+                            '_sheet': sn,
+                            '_size_grid_data': current_sizes,
+                        })
 
-⚠️ ВАЖНО: Файл может содержать НЕСКОЛЬКО вкладок!
-- Первая вкладка часто содержит ШАБЛОН ТОВАРОВ (примеры заполнения) - это НЕ атрибуты!
-- Атрибуты обычно находятся на вкладках с названиями категорий (Одяг, Взуття) или "Характеристики"
+                for r in rows:
+                    non_empty = sum(1 for c in r if c)
 
-{sheets_preview}
-
-ТЕКУЩАЯ ВКЛАДКА "{target_sheet_name}" (первые 30 строк):
-{sample_text}
-
-ЗАДАЧА:
-1. Посмотри на ВСЕ вкладки выше
-2. Определи - на какой вкладке находятся АТРИБУТЫ (список характеристик), а не данные о товарах
-3. Если текущая вкладка содержит данные о товарах (артикулы, цены, названия товаров) - укажи правильную вкладку в "correct_sheet"
-
-Атрибуты обычно выглядят так:
-- Колонка с ID/кодом атрибута
-- Колонка с названием атрибута (Бренд, Размер, Цвет...)
-- Возможные значения атрибутов
-
-Шаблон товаров выглядит так:
-- ID поставщика, Артикул, Штрих-код, Название товара, Цена...
-
-Ответь ТОЛЬКО валидным JSON:
-{{
-    "correct_sheet": null,
-    "header_row": 1,
-    "data_start_row": 2,
-    "category_name": "Женские джинсы",
-    "columns": {{
-        "attr_id": 0,
-        "attr_name": 1,
-        "attr_type": 2,
-        "is_required": 3,
-        "value_name": 6,
-        "unit": 4
-    }},
-    "required_true_values": ["Да", "Yes", "True", "+", "1", "Так"],
-    "ignored_columns": [5, 7],
-    "notes": "Краткое описание"
-}}
-
-ВАЖНО:
-- "correct_sheet": null если текущая вкладка правильная, или "Название вкладки" если нужно читать другую
-- Если видишь данные о товарах вместо атрибутов - ОБЯЗАТЕЛЬНО укажи в correct_sheet правильную вкладку!
-- Если какой-то колонки нет - укажи null в columns"""
-
-            response = client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=1000,
-                messages=[{"role": "user", "content": structure_prompt}]
-            )
-
-            result_text = response.content[0].text.strip()
-
-            # Извлекаем JSON
-            if "```json" in result_text:
-                result_text = result_text.split("```json")[1].split("```")[0].strip()
-            elif "```" in result_text:
-                result_text = result_text.split("```")[1].split("```")[0].strip()
-
-            structure = json.loads(result_text)
-            logger.info(f"AI detected structure: {structure}")
-
-            # Если AI указал другую вкладку - перечитываем данные
-            correct_sheet = structure.get('correct_sheet')
-            if correct_sheet and correct_sheet != target_sheet_name:
-                logger.info(f"AI указал другую вкладку: {correct_sheet}")
-                if correct_sheet in all_sheets_info:
-                    # Перечитываем данные из правильной вкладки
-                    uploaded_file.seek(0)
-                    workbook = openpyxl.load_workbook(io.BytesIO(uploaded_file.read()))
-                    sheet = workbook[correct_sheet]
-                    rows = []
-                    for row in sheet.iter_rows(values_only=True):
-                        if any(cell is not None for cell in row):
-                            rows.append([str(cell).strip() if cell is not None else '' for cell in row])
-                    target_sheet_name = correct_sheet
-
-                    # Нужно заново проанализировать структуру этой вкладки
-                    sample_rows = rows[:30]
-                    sample_text = '\n'.join(['\t'.join(row) for row in sample_rows])
-
-                    reanalyze_prompt = f"""Проанализируй вкладку "{correct_sheet}" с атрибутами:
-
-{sample_text}
-
-Найди колонки:
-- attr_id: ID/код атрибута
-- attr_name: название атрибута
-- attr_type: тип данных
-- is_required: обязательность
-- value_name: возможное значение
-- unit: единица измерения
-
-Ответь ТОЛЬКО валидным JSON:
-{{
-    "header_row": 0,
-    "data_start_row": 1,
-    "category_name": null,
-    "columns": {{
-        "attr_id": null,
-        "attr_name": 0,
-        "attr_type": null,
-        "is_required": null,
-        "value_name": null,
-        "unit": null
-    }},
-    "required_true_values": [],
-    "notes": "описание"
-}}
-
-Если это формат "атрибуты в колонках" (каждая колонка = атрибут, строки = значения):
-{{
-    "format": "columns_as_attributes",
-    "header_row": 0,
-    "data_start_row": 1,
-    "notes": "Каждая колонка это атрибут, строки содержат возможные значения"
-}}"""
-
-                    response = client.messages.create(
-                        model="claude-sonnet-4-20250514",
-                        max_tokens=1000,
-                        messages=[{"role": "user", "content": reanalyze_prompt}]
-                    )
-
-                    result_text = response.content[0].text.strip()
-                    if "```json" in result_text:
-                        result_text = result_text.split("```json")[1].split("```")[0].strip()
-                    elif "```" in result_text:
-                        result_text = result_text.split("```")[1].split("```")[0].strip()
-
-                    structure = json.loads(result_text)
-                    structure['correct_sheet'] = None  # уже на правильной вкладке
-                    structure['parsed_sheet'] = correct_sheet
-                    logger.info(f"Re-analyzed structure for sheet {correct_sheet}: {structure}")
-                else:
-                    logger.warning(f"Sheet {correct_sheet} not found in file")
-
-        except Exception as e:
-            logger.error(f"AI structure analysis error: {e}")
-            return Response(
-                {'error': f'Ошибка анализа структуры: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-        # ===== ШАГ 3: Проверяем формат "атрибуты в колонках" =====
-        if structure.get('format') == 'columns_as_attributes':
-            # Специальная обработка: каждая колонка = атрибут
-            header_row = structure.get('header_row', 0)
-            data_start_row = structure.get('data_start_row', 1)
-
-            if header_row < len(rows):
-                headers = rows[header_row]
-                attributes = []
-
-                for col_idx, attr_name in enumerate(headers):
-                    if not attr_name or not attr_name.strip():
+                    # Detect new block header: "ТР жіночого одягу (3XS-15XL):226"
+                    if non_empty <= 2 and r[0] and ':' in r[0]:
+                        flush_grid()
+                        current_sizes = []
+                        raw_name = r[0]
+                        if raw_name.rsplit(':', 1)[1].strip().isdigit():
+                            current_grid_id = raw_name.rsplit(':', 1)[1].strip()
+                            current_grid_name = raw_name.rsplit(':', 1)[0].strip()
+                        else:
+                            current_grid_name = raw_name
+                            current_grid_id = None
+                        current_headers = None
+                        continue
+                    elif non_empty <= 2 and r[0]:
+                        flush_grid()
+                        current_sizes = []
+                        current_grid_name = r[0]
+                        current_grid_id = None
+                        current_headers = None
                         continue
 
-                    # Собираем уникальные значения из этой колонки
-                    possible_values = set()
-                    for row in rows[data_start_row:]:
-                        if col_idx < len(row) and row[col_idx] and row[col_idx].strip():
-                            possible_values.add(row[col_idx].strip())
+                    # Detect column headers
+                    r_lower = ' '.join(c.lower() for c in r if c)
+                    if any(kw in r_lower for kw in ['id', 'міжнародна', 'українська', 'обхват', 'международная']):
+                        current_headers = r
+                        continue
 
-                    attributes.append({
-                        'name': attr_name.strip(),
-                        'code': f"col_{col_idx}",
-                        'original_type': 'columns_format',
-                        'is_required': False,
-                        'possible_values': list(possible_values)[:100],
-                        'unit': None,
-                        'type': 'select' if possible_values else 'string'
+                    # Data row
+                    if current_headers and any(r):
+                        size_entry = {'label': r[0] if r[0] else ''}
+                        for i, h in enumerate(current_headers):
+                            if h and i < len(r) and r[i]:
+                                if h.strip().upper() == 'ID':
+                                    size_entry['id'] = r[i]
+                                else:
+                                    size_entry[h] = r[i]
+                        if size_entry.get('label'):
+                            current_sizes.append(size_entry)
+
+                flush_grid()
+                continue
+
+            # Parse attributes sheet
+            # Detect format: columns (Kasta) or rows
+            header = rows[0]
+            is_columns_format = any(':' in h and h.rsplit(':', 1)[1].strip().isdigit() for h in header if h)
+
+            if is_columns_format:
+                # Columns format: each column = attribute
+                for col_idx, raw_h in enumerate(header):
+                    if not raw_h or not raw_h.strip():
+                        continue
+                    raw = raw_h.strip()
+                    attr_id = None
+                    name = raw
+                    attr_type = 'select'
+                    is_required = False
+                    unit = None
+
+                    if ':' in raw and raw.rsplit(':', 1)[1].strip().isdigit():
+                        parts = raw.rsplit(':', 1)
+                        name_part = parts[0].strip()
+                        attr_id = parts[1].strip()
+
+                        if '*' in name_part:
+                            is_required = True
+                            name_part = name_part.replace('*', '')
+
+                        tm = _re.search(r'\(([^)]+)\)', name_part)
+                        if tm:
+                            hint = tm.group(1).lower()
+                            if 'множ' in hint: attr_type = 'multiselect'
+                            elif 'числ' in hint: attr_type = 'float'
+                            elif 'строк' in hint or 'стрічк' in hint: attr_type = 'string'
+                            name_part = name_part[:tm.start()].strip()
+
+                        if ',' in name_part:
+                            nm, mu = name_part.split(',', 1)
+                            if len(mu.strip()) <= 5:
+                                unit = mu.strip()
+                                name_part = nm.strip()
+
+                        name = name_part.strip()
+
+                    values = sorted(set(
+                        r[col_idx] for r in rows[1:] if col_idx < len(r) and r[col_idx]
+                    ))[:200]
+
+                    ftype = attr_type if attr_type in ('float', 'string') else (attr_type if values else 'string')
+
+                    all_attributes.append({
+                        'name': name, 'code': attr_id or f'col_{col_idx}',
+                        'type': ftype, 'is_required': is_required,
+                        'possible_values': values, 'unit': unit,
+                        '_sheet': sn,
                     })
-
-                return Response({
-                    'success': True,
-                    'category_name': structure.get('category_name'),
-                    'attributes': attributes,
-                    'structure': structure,
-                    'type_mapping': {},
-                    'stats': {
-                        'total_rows': len(rows),
-                        'attributes_count': len(attributes),
-                        'format': 'columns_as_attributes',
-                        'parsed_sheet': target_sheet_name
-                    }
-                })
-
-        # ===== ШАГ 4: Python парсит ВСЕ данные по конфигу от AI =====
-        columns = structure.get('columns', {})
-        data_start = structure.get('data_start_row', 1)
-        category_name = structure.get('category_name')
-        required_true_values = structure.get('required_true_values', ['Да', 'Yes', 'True', '+', '1', 'Так'])
-
-        col_attr_id = columns.get('attr_id')
-        col_attr_name = columns.get('attr_name')
-        col_attr_type = columns.get('attr_type')
-        col_is_required = columns.get('is_required')
-        col_value_name = columns.get('value_name')
-        col_unit = columns.get('unit')
-
-        if col_attr_id is None or col_attr_name is None:
-            return Response({
-                'error': 'AI не смог определить колонки с ID и названием атрибута',
-                'structure': structure
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        data_rows = rows[data_start:]
-        attributes_dict = {}
-        unique_types = set()
-
-        # Normalize required_true_values for comparison
-        required_true_values_lower = [str(v).lower().strip() for v in required_true_values]
-
-        for row in data_rows:
-            if len(row) <= max(filter(lambda x: x is not None, [col_attr_id, col_attr_name, col_attr_type, col_is_required, col_value_name, col_unit] + [0])):
-                continue
-
-            attr_id = row[col_attr_id] if col_attr_id is not None and col_attr_id < len(row) else None
-            attr_name = row[col_attr_name] if col_attr_name is not None and col_attr_name < len(row) else None
-            attr_type = row[col_attr_type] if col_attr_type is not None and col_attr_type < len(row) else None
-            is_required_raw = row[col_is_required] if col_is_required is not None and col_is_required < len(row) else None
-            value_name = row[col_value_name] if col_value_name is not None and col_value_name < len(row) else None
-            unit = row[col_unit] if col_unit is not None and col_unit < len(row) else None
-
-            if not attr_id or not attr_name:
-                continue
-
-            # Determine if required
-            is_required = False
-            if is_required_raw:
-                is_required = str(is_required_raw).lower().strip() in required_true_values_lower
-
-            # Собираем уникальные типы
-            if attr_type:
-                unique_types.add(attr_type)
-
-            if attr_id not in attributes_dict:
-                unit_value = None
-                if unit and unit.strip() and unit.strip().upper() not in ['N/D', 'N/A', '-', '']:
-                    unit_value = unit.strip()
-
-                attributes_dict[attr_id] = {
-                    'name': attr_name,
-                    'code': attr_id,
-                    'original_type': attr_type or '',
-                    'is_required': is_required,
-                    'possible_values': [],
-                    'unit': unit_value,
-                }
             else:
-                # Update is_required if any row says it's required
-                if is_required:
-                    attributes_dict[attr_id]['is_required'] = True
+                # Rows format: AI determines columns
+                try:
+                    client = anthropic.Anthropic(api_key=getattr(settings, 'ANTHROPIC_API_KEY', None))
+                    sample = '\n'.join('\t'.join(r) for r in rows[:20])
+                    resp = client.messages.create(
+                        model='claude-haiku-4-5-20251001',
+                        max_tokens=500,
+                        messages=[{'role': 'user', 'content': f"""Вкладка "{sn}" с атрибутами (строки):
+{sample}
 
-            # Добавляем значение
-            if value_name and value_name.strip():
-                if value_name not in attributes_dict[attr_id]['possible_values']:
-                    attributes_dict[attr_id]['possible_values'].append(value_name)
+Определи номера колонок (0-based). Каждая строка = один вариант значения атрибута.
+Одинаковый attr_id означает тот же атрибут, но другое значение (опция).
 
-        # ===== ШАГ 4: AI маппит типы данных =====
-        type_mapping = {}
-        if unique_types:
+{{"header_row": 0, "data_start_row": 1, "columns": {{"attr_id": 0, "attr_name": 1, "attr_type": 2, "is_required": null, "value_id": 5, "value_name": 6, "unit": null}}}}
+
+value_id = колонка с ID/кодом варианта значения (опции)
+value_name = колонка с текстом значения (опции)
+Если нет заголовка — header_row: null, data_start_row: 0
+Ответь ТОЛЬКО JSON."""}],
+                    )
+                    txt = resp.content[0].text.strip()
+                    if '```' in txt:
+                        txt = txt.split('```json')[-1].split('```')[0] if '```json' in txt else txt.split('```')[1].split('```')[0]
+                    cfg = json.loads(txt.strip())
+                except Exception as e:
+                    logger.warning(f"AI row config failed for {sn}: {e}")
+                    continue
+
+                cols = cfg.get('columns', {})
+                ci = cols.get('attr_id')
+                cn = cols.get('attr_name')
+                ct = cols.get('attr_type')
+                cr = cols.get('is_required')
+                cvi = cols.get('value_id')
+                cvn = cols.get('value_name')
+                cu = cols.get('unit')
+                if ci is None or cn is None:
+                    continue
+
+                start = cfg.get('data_start_row', 1) or 0
+                # Map types from marketplace format to our format
+                type_map_simple = {
+                    'listvalues': 'multiselect', 'combobox': 'select',
+                    'string': 'string', 'text': 'text',
+                    'integer': 'int', 'float': 'float', 'number': 'float',
+                    'boolean': 'boolean', 'checkbox': 'boolean',
+                }
+
+                attrs_dict = {}
+                for r in rows[start:]:
+                    aid = r[ci] if ci is not None and ci < len(r) else None
+                    aname = r[cn] if cn is not None and cn < len(r) else None
+                    if not aid or not aname:
+                        continue
+                    atype_raw = r[ct] if ct is not None and ct < len(r) else ''
+                    areq = r[cr] if cr is not None and cr < len(r) else ''
+                    aval_id = r[cvi] if cvi is not None and cvi < len(r) else ''
+                    aval_name = r[cvn] if cvn is not None and cvn < len(r) else ''
+                    aunit = r[cu] if cu is not None and cu < len(r) else ''
+
+                    # Map type
+                    atype = type_map_simple.get(str(atype_raw).lower().strip(), atype_raw or 'string')
+
+                    if aid not in attrs_dict:
+                        is_req = str(areq).lower().strip() in ('да', 'yes', 'true', '+', '1', 'так', 'нет')
+                        # "Нет" means not required for Rozetka
+                        if str(areq).lower().strip() in ('нет', 'no', 'false', '0'):
+                            is_req = False
+                        attrs_dict[aid] = {
+                            'name': aname, 'code': str(aid), 'type': atype,
+                            'is_required': is_req,
+                            'possible_values': [], 'unit': aunit.strip() if aunit else None,
+                            '_sheet': sn,
+                            '_option_ids': [],
+                        }
+                    if aval_name and aval_name.strip():
+                        attrs_dict[aid]['possible_values'].append(aval_name.strip())
+                        if aval_id:
+                            attrs_dict[aid]['_option_ids'].append(str(aval_id).strip())
+
+                all_attributes.extend(attrs_dict.values())
+                print(f"[PARSE] Rows format: {len(attrs_dict)} attrs from {sn}")
+
+        print(f"[PARSE] Total: {len(all_attributes)} attrs, {len(all_size_grids)} size grids")
+
+        # ===== ШАГ 4: Сохраняем в БД если marketplace_id указан =====
+        saved_count = 0
+        if marketplace_id:
             try:
-                types_prompt = f"""Вот список типов данных атрибутов из файла маркетплейса:
-{list(unique_types)}
+                from apps.marketplaces.models import (
+                    MarketplaceAttributeSet, MarketplaceAttribute, MarketplaceAttributeOption,
+                    Marketplace,
+                )
+                mp = Marketplace.objects.get(id=marketplace_id)
 
-Сопоставь каждый тип с одним из наших внутренних типов:
-- select: выбор одного значения из списка (dropdown, combobox)
-- multiselect: выбор нескольких значений (checkbox list, multiple select)
-- string: короткая строка (до 255 символов)
-- text: длинный текст (textarea)
-- int: целое число
-- float: дробное число
-- boolean: да/нет
+                # Determine category code from request or first parsed
+                category_code = request.data.get('category_code', '')
 
-Ответь ТОЛЬКО валидным JSON:
-{{
-    "ComboBox": "select",
-    "ListValues": "multiselect",
-    "String": "string"
-}}"""
-
-                response = client.messages.create(
-                    model="claude-sonnet-4-20250514",
-                    max_tokens=500,
-                    messages=[{"role": "user", "content": types_prompt}]
+                # Find or create attribute set
+                attr_set, _ = MarketplaceAttributeSet.objects.get_or_create(
+                    marketplace=mp,
+                    external_code=category_code or 'imported',
+                    defaults={'name': category_code or 'Imported from XLSX'},
                 )
 
-                type_result = response.content[0].text.strip()
-                if "```json" in type_result:
-                    type_result = type_result.split("```json")[1].split("```")[0].strip()
-                elif "```" in type_result:
-                    type_result = type_result.split("```")[1].split("```")[0].strip()
+                for attr_data in all_attributes:
+                    code = str(attr_data.get('code', ''))
+                    if not code:
+                        continue
 
-                type_mapping = json.loads(type_result)
-                logger.info(f"AI type mapping: {type_mapping}")
+                    # Map types
+                    atype = attr_data.get('type', 'string').lower()
+                    type_map = {'float': 'float', 'int': 'int', 'string': 'string',
+                                'text': 'text', 'select': 'select', 'multiselect': 'multiselect',
+                                'boolean': 'boolean'}
+                    mapped_type = type_map.get(atype, 'string')
+
+                    ma, created = MarketplaceAttribute.objects.update_or_create(
+                        attribute_set=attr_set,
+                        external_code=code,
+                        defaults={
+                            'name': attr_data.get('name', ''),
+                            'attr_type': mapped_type,
+                            'is_required': attr_data.get('is_required', False),
+                            'suffix': attr_data.get('unit', '') or '',
+                        }
+                    )
+
+                    # Create options
+                    if mapped_type in ('select', 'multiselect'):
+                        option_ids = attr_data.get('_option_ids', [])
+                        for idx, val in enumerate(attr_data.get('possible_values', [])):
+                            opt_code = option_ids[idx] if idx < len(option_ids) else val[:100]
+                            MarketplaceAttributeOption.objects.get_or_create(
+                                attribute=ma,
+                                external_code=str(opt_code)[:100],
+                                defaults={'name': val[:500]},
+                            )
+                    saved_count += 1
+
+                logger.info(f"Saved {saved_count} attributes to set {attr_set.id}")
 
             except Exception as e:
-                logger.warning(f"AI type mapping error: {e}, using defaults")
-
-        # Применяем маппинг типов
-        for attr in attributes_dict.values():
-            original_type = attr.get('original_type', '')
-            if original_type in type_mapping:
-                attr['type'] = type_mapping[original_type]
-            else:
-                # Fallback на простую эвристику
-                type_lower = original_type.lower()
-                if 'combo' in type_lower or 'select' in type_lower or 'list' in type_lower:
-                    attr['type'] = 'select'
-                elif 'multi' in type_lower or 'check' in type_lower:
-                    attr['type'] = 'multiselect'
-                elif 'int' in type_lower or 'number' in type_lower:
-                    attr['type'] = 'int'
-                elif 'float' in type_lower or 'decimal' in type_lower:
-                    attr['type'] = 'float'
-                elif 'bool' in type_lower:
-                    attr['type'] = 'boolean'
-                elif 'text' in type_lower:
-                    attr['type'] = 'text'
-                else:
-                    attr['type'] = 'string'
-
-        attributes = list(attributes_dict.values())
+                logger.error(f"Save attributes error: {e}")
 
         return Response({
             'success': True,
-            'category_name': category_name,
-            'attributes': attributes,
-            'structure': structure,
-            'type_mapping': type_mapping,
+            'attributes': all_attributes,
+            'size_grid': all_size_grids if all_size_grids else None,
+            'saved_count': saved_count,
             'stats': {
-                'total_rows': len(rows),
-                'data_rows': len(data_rows),
-                'attributes_count': len(attributes),
-                'unique_types': list(unique_types)
+                'attributes_count': len(all_attributes),
+                'size_grid_count': len(all_size_grids),
+                'sheets_parsed': [s['sheet'] for s in sheets_to_parse if s.get('type') != 'skip'],
             }
         })
 

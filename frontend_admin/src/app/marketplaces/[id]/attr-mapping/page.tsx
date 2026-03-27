@@ -143,6 +143,19 @@ function CategoryMappingCard({
   const queryClient = useQueryClient()
   const isConfigured = mapping.configured_attributes > 0
   const isFullyConfigured = mapping.configured_attributes >= mapping.total_attributes
+  const [aiLoading, setAiLoading] = useState(false)
+
+  const handleAiAssign = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setAiLoading(true)
+    try {
+      await attributeLevelsAPI.aiAssignCategory(mapping.category_mapping_id)
+      queryClient.invalidateQueries({ queryKey: ['attribute-levels-mappings'] })
+      queryClient.invalidateQueries({ queryKey: ['attribute-level-config', mapping.category_mapping_id] })
+    } finally {
+      setAiLoading(false)
+    }
+  }
 
   return (
     <Card>
@@ -181,6 +194,16 @@ function CategoryMappingCard({
           )}
         </div>
       </button>
+      <div className="px-6 pb-2 flex justify-end -mt-2">
+        <button
+          onClick={handleAiAssign}
+          disabled={aiLoading || mapping.total_attributes === 0}
+          className="px-2.5 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded border border-indigo-200 disabled:opacity-50"
+        >
+          {aiLoading ? <Loader2 className="h-3 w-3 animate-spin inline mr-1" /> : null}
+          AI назначить
+        </button>
+      </div>
 
       {isExpanded && (
         <CardContent className="border-t pt-4">

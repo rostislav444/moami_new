@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { RefreshCw, ChevronRight, ChevronDown, FolderOpen, FileText, Loader2, Plus, Trash2, Search, CheckCircle2, Circle, X, Download, XCircle, Check } from 'lucide-react';
+import { RefreshCw, ChevronRight, ChevronDown, FolderOpen, FileText, Loader2, Plus, Trash2, Search, CheckCircle2, Circle, X, Download, XCircle, Check, Settings, Pencil } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState, useEffect, useCallback } from 'react';
@@ -25,6 +25,7 @@ export default function CategoriesPage() {
   // Multi-select for bulk attribute loading
   const [checkedCategories, setCheckedCategories] = useState<Map<number, string>>(new Map());
   const [syncResult, setSyncResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [showEditIdsModal, setShowEditIdsModal] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -130,6 +131,19 @@ export default function CategoriesPage() {
   const showTree = !debouncedSearch;
   const showSearchResults = !!debouncedSearch;
 
+  // Flatten all categories for "select all"
+  const flattenTree = (cats: MarketplaceCategory[]): { id: number; external_code: string }[] => {
+    const result: { id: number; external_code: string }[] = []
+    for (const c of cats) {
+      result.push({ id: c.id, external_code: c.external_code })
+      if (c.children) result.push(...flattenTree(c.children))
+    }
+    return result
+  }
+  const allFlatCategories = showSearchResults
+    ? flatSearchResults.map(c => ({ id: c.id, external_code: c.external_code }))
+    : flattenTree(rootCategories || [])
+
   if (isLoading && !debouncedSearch) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -170,7 +184,20 @@ export default function CategoriesPage() {
 
         {/* Table header */}
         <div className="flex items-center gap-3 px-4 py-1.5 bg-muted/50 border-y border-border text-xs font-medium text-muted-foreground">
-          <div className="shrink-0 w-6" />
+          <input
+            type="checkbox"
+            className="shrink-0 w-4 h-4 rounded border-slate-300"
+            checked={checkedCategories.size > 0 && allFlatCategories.length > 0 && checkedCategories.size === allFlatCategories.length}
+            onChange={(e) => {
+              if (e.target.checked) {
+                const all = new Map<number, string>()
+                allFlatCategories.forEach(c => all.set(c.id, c.external_code))
+                setCheckedCategories(all)
+              } else {
+                setCheckedCategories(new Map())
+              }
+            }}
+          />
           <div className="shrink-0 w-5" />
           <span className="flex-1">Название</span>
           <span className="shrink-0 w-24 text-center">Код</span>
@@ -290,7 +317,50 @@ export default function CategoriesPage() {
             )}
             Загрузить атрибуты
           </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-red-600 border-red-200 hover:bg-red-50"
+            onClick={async () => {
+              if (!confirm(`Удалить ${checkedCategories.size} категорий?`)) return
+              const ids = Array.from(checkedCategories.keys())
+              for (const catId of ids) {
+                try {
+                  await categoriesAPI.deleteMarketplaceCategory(catId)
+                } catch {}
+              }
+              setCheckedCategories(new Map())
+              queryClient.invalidateQueries({ queryKey: ['marketplace-category-tree', id] })
+              queryClient.invalidateQueries({ queryKey: ['marketplace-categories-search', id] })
+              queryClient.invalidateQueries({ queryKey: ['marketplace', id] })
+            }}
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Удалить выбранные
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowEditIdsModal(true)}
+          >
+            <Settings className="h-4 w-4 mr-1" />
+            Редактировать ID
+          </Button>
         </div>
+      )}
+
+      {/* Edit IDs Modal */}
+      {showEditIdsModal && (
+        <EditCategoryIdsModal
+          marketplaceId={id}
+          categoryIds={Array.from(checkedCategories.keys())}
+          onClose={() => setShowEditIdsModal(false)}
+          onSaved={() => {
+            setShowEditIdsModal(false)
+            queryClient.invalidateQueries({ queryKey: ['marketplace-category-tree', id] })
+            queryClient.invalidateQueries({ queryKey: ['marketplace-categories-search', id] })
+          }}
+        />
       )}
 
       {/* Sync result toast */}
@@ -456,6 +526,8 @@ function CategoryRow({
   isChecked?: boolean;
   onToggleCheck?: (id: number, code: string) => void;
 }) {
+  const [showEditModal, setShowEditModal] = useState(false)
+
   const hasChildren = category.has_children;
   const categoriesWithAttributes = new Set(
     attributeSets.filter((s) => s.attributes_count > 0).map((s) => s.external_code)
@@ -464,16 +536,25 @@ function CategoryRow({
   const attrSet = attributeSets.find((s) => s.external_code === category.external_code);
 
   return (
+    <>
+    {showEditModal && (
+      <EditSingleCategoryModal
+        category={category}
+        onClose={() => setShowEditModal(false)}
+        onSaved={() => {
+          setShowEditModal(false)
+        }}
+      />
+    )}
     <div
       className={`
-        flex items-center gap-3 px-4 py-2.5 border-b border-border cursor-pointer transition-colors group
+        flex items-center gap-3 px-4 py-2.5 border-b border-border transition-colors group
         hover:bg-muted/50
         ${isSelected ? 'bg-primary/10' : ''}
         ${isChecked ? 'bg-blue-50' : ''}
         ${hasChildren ? 'bg-muted/20' : ''}
       `}
       style={{ paddingLeft: `${16 + level * 24}px` }}
-      onClick={() => onSelect(category)}
     >
       {/* Checkbox */}
       <div className="shrink-0 w-6 flex items-center justify-center">
@@ -532,21 +613,30 @@ function CategoryRow({
         )}
       </div>
 
-      <div className="shrink-0 w-8 flex justify-end">
+      <div className="shrink-0 flex items-center gap-1">
+        <button
+          onClick={(e) => { e.stopPropagation(); setShowEditModal(true) }}
+          className="px-2 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded border border-indigo-200 transition-colors"
+        >
+          <Pencil className="h-3 w-3 inline mr-1" />Ред.
+        </button>
         {onDelete && (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(category);
-            }}
-            className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-100 rounded text-muted-foreground hover:text-red-600 transition-opacity"
-            title="Удалить"
+            onClick={(e) => { e.stopPropagation(); onDelete(category) }}
+            className="px-2 py-1 text-xs font-medium text-red-500 bg-red-50 hover:bg-red-100 rounded border border-red-200 transition-colors"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3 w-3 inline mr-1" />Уд.
           </button>
         )}
+        <button
+          onClick={(e) => { e.stopPropagation(); onSelect(category) }}
+          className="px-2 py-1 text-xs font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 rounded border border-slate-200 transition-colors"
+        >
+          Открыть <ChevronRight className="h-3 w-3 inline" />
+        </button>
       </div>
     </div>
+    </>
   );
 }
 
@@ -659,4 +749,186 @@ function CreateCategoryModal({
       </DialogContent>
     </Dialog>
   );
+}
+
+function EditCategoryIdsModal({
+  marketplaceId,
+  categoryIds,
+  onClose,
+  onSaved,
+}: {
+  marketplaceId: number
+  categoryIds: number[]
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const [categories, setCategories] = useState<{ id: number; name: string; external_id: string; external_code: string }[]>([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const load = async () => {
+      const results: typeof categories = []
+      for (const catId of categoryIds) {
+        try {
+          const cat = await categoriesAPI.getCategory(catId)
+          results.push({
+            id: cat.id,
+            name: cat.name,
+            external_id: cat.external_id || '',
+            external_code: cat.external_code || '',
+          })
+        } catch {}
+      }
+      setCategories(results)
+      setLoading(false)
+    }
+    load()
+  }, [categoryIds])
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      for (const cat of categories) {
+        await categoriesAPI.updateMarketplaceCategory(cat.id, {
+          external_id: cat.external_id,
+          external_code: cat.external_code,
+        })
+      }
+      onSaved()
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+        <DialogHeader>
+          <DialogTitle>Редактировать ID категорий ({categoryIds.length})</DialogTitle>
+        </DialogHeader>
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+          </div>
+        ) : (
+          <div className="flex-1 overflow-auto space-y-2">
+            <div className="grid grid-cols-[1fr_120px_120px] gap-2 text-xs font-medium text-slate-500 px-1 sticky top-0 bg-white pb-1">
+              <span>Название</span>
+              <span>External ID</span>
+              <span>External Code</span>
+            </div>
+            {categories.map((cat, idx) => (
+              <div key={cat.id} className="grid grid-cols-[1fr_120px_120px] gap-2 items-center">
+                <span className="text-sm text-slate-700 truncate">{cat.name}</span>
+                <Input
+                  value={cat.external_id}
+                  onChange={e => {
+                    const next = [...categories]
+                    next[idx] = { ...next[idx], external_id: e.target.value, external_code: e.target.value }
+                    setCategories(next)
+                  }}
+                  className="h-8 text-xs font-mono"
+                  placeholder="ID"
+                />
+                <Input
+                  value={cat.external_code}
+                  onChange={e => {
+                    const next = [...categories]
+                    next[idx] = { ...next[idx], external_code: e.target.value }
+                    setCategories(next)
+                  }}
+                  className="h-8 text-xs font-mono"
+                  placeholder="Code"
+                />
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="flex justify-end gap-2 pt-3 border-t">
+          <Button variant="outline" size="sm" onClick={onClose}>Отмена</Button>
+          <Button size="sm" onClick={handleSave} disabled={saving}>
+            {saving ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Check className="mr-2 h-3 w-3" />}
+            Сохранить
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function EditSingleCategoryModal({
+  category,
+  onClose,
+  onSaved,
+}: {
+  category: MarketplaceCategory
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const [name, setName] = useState(category.name || '')
+  const [nameUk, setNameUk] = useState(category.name_uk || '')
+  const [externalId, setExternalId] = useState(category.external_id || '')
+  const [externalCode, setExternalCode] = useState(category.external_code || '')
+  const [saving, setSaving] = useState(false)
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await categoriesAPI.updateMarketplaceCategory(category.id, {
+        name,
+        name_uk: nameUk,
+        external_id: externalId,
+        external_code: externalCode,
+      })
+      onSaved()
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-md" onClick={e => e.stopPropagation()}>
+        <DialogHeader>
+          <DialogTitle>Редактировать категорию</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label className="text-xs">Название</Label>
+            <Input value={name} onChange={e => setName(e.target.value)} className="mt-1" />
+          </div>
+          <div>
+            <Label className="text-xs">Название (укр)</Label>
+            <Input value={nameUk} onChange={e => setNameUk(e.target.value)} className="mt-1" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs">External ID</Label>
+              <Input
+                value={externalId}
+                onChange={e => { setExternalId(e.target.value); setExternalCode(e.target.value) }}
+                className="mt-1 font-mono"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">External Code</Label>
+              <Input
+                value={externalCode}
+                onChange={e => setExternalCode(e.target.value)}
+                className="mt-1 font-mono"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="outline" size="sm" onClick={onClose}>Отмена</Button>
+          <Button size="sm" onClick={handleSave} disabled={saving}>
+            {saving ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Check className="mr-2 h-3 w-3" />}
+            Сохранить
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
 }

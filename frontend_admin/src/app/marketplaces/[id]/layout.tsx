@@ -130,8 +130,8 @@ export default function MarketplaceLayout({
       </div>
 
       {/* Navigation tabs */}
-      <nav className="border-b">
-        <div className="flex gap-1">
+      <nav className="border-b overflow-x-auto">
+        <div className="flex gap-0.5 min-w-max">
           {navItems.map((item) => {
             const isActive = activeTab === item.href;
             const Icon = item.icon;
@@ -139,13 +139,13 @@ export default function MarketplaceLayout({
               <Link
                 key={item.href}
                 href={`${basePath}${item.href}`}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${
                   isActive
                     ? 'border-primary text-primary'
                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300'
                 }`}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-3.5 w-3.5" />
                 {item.label}
               </Link>
             );

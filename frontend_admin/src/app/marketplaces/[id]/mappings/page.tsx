@@ -87,6 +87,31 @@ export default function MappingsPage() {
     },
   });
 
+  // AI Assistant
+  const [showAi, setShowAi] = useState(false)
+  const [aiPrompt, setAiPrompt] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiResult, setAiResult] = useState<{ message: string; created_categories: number; created_mappings: number; errors: string[] } | null>(null)
+
+  const handleAiAssistant = async () => {
+    const prompt = aiPrompt.trim() || `Найди в интернете категории маркетплейса ${marketplace?.name || ''} которые соответствуют нашим категориям одежды и аксессуаров. Создай категории маркетплейса с правильными external_id/external_code и замапь с нашими.`
+    setAiLoading(true)
+    setAiResult(null)
+    try {
+      const res = await categoriesAPI.aiAssistant(id, prompt)
+      setAiResult(res)
+      if (res.created_categories > 0 || res.created_mappings > 0) {
+        queryClient.invalidateQueries({ queryKey: ['category-mappings'] })
+        queryClient.invalidateQueries({ queryKey: ['marketplace-category-tree'] })
+        queryClient.invalidateQueries({ queryKey: ['marketplace-categories-search-mappings'] })
+      }
+    } catch (e: unknown) {
+      setAiResult({ message: e instanceof Error ? e.message : 'Ошибка', created_categories: 0, created_mappings: 0, errors: [] })
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -104,6 +129,79 @@ export default function MappingsPage() {
   }
 
   return (
+    <div className="space-y-4">
+      {/* AI Assistant */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+        <button
+          onClick={() => setShowAi(!showAi)}
+          className="w-full flex items-center justify-between p-4"
+        >
+          <span className="font-semibold text-slate-900 flex items-center gap-2">
+            <Bot className="h-4 w-4 text-indigo-500" />
+            AI помощник по категориям
+          </span>
+          {showAi ? <ChevronDown className="h-4 w-4 text-slate-400" /> : <ChevronRight className="h-4 w-4 text-slate-400" />}
+        </button>
+        {showAi && (
+          <div className="px-4 pb-4 space-y-3">
+            <p className="text-xs text-slate-500">
+              AI найдёт категории маркетплейса в интернете, создаст их и замапит с нашими. Можно уточнить задачу в поле ниже.
+            </p>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const tree = (ourCategories || []).map(c =>
+                      '\u00A0\u00A0'.repeat(c.level) + `[id=${c.id}] ${c.name}`
+                    ).join('\n')
+                    setAiPrompt(prev => {
+                      const base = prev || `Найди категории ${marketplace?.name || 'маркетплейса'} и замапь с нашими. ОБЯЗАТЕЛЬНО укажи реальные ID категорий маркетплейса в external_id и external_code (числовые коды с сайта/API маркетплейса):`
+                      return `${base}\n\nНаши категории:\n${tree}`
+                    })
+                  }}
+                  className="text-xs"
+                >
+                  Вставить наши категории
+                </Button>
+              </div>
+              <div className="flex items-start gap-3">
+                <textarea
+                  value={aiPrompt}
+                  onChange={e => setAiPrompt(e.target.value)}
+                  placeholder={`Найди категории ${marketplace?.name || 'маркетплейса'} для женской одежды и аксессуаров и замапь с нашими...`}
+                  className="flex-1 h-32 bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm resize-y focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono"
+                />
+                <Button
+                  size="sm"
+                  onClick={handleAiAssistant}
+                  disabled={aiLoading}
+                  className="bg-indigo-600 hover:bg-indigo-700 shrink-0"
+                >
+                  {aiLoading ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Bot className="mr-2 h-3 w-3" />}
+                  Найти и замапить
+                </Button>
+              </div>
+            </div>
+            {aiResult && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 text-sm">
+                  {aiResult.created_categories > 0 && <span className="text-emerald-600 font-medium">+{aiResult.created_categories} категорий</span>}
+                  {aiResult.created_mappings > 0 && <span className="text-indigo-600 font-medium">+{aiResult.created_mappings} маппингов</span>}
+                  {aiResult.errors.length > 0 && <span className="text-red-500">{aiResult.errors.length} ошибок</span>}
+                </div>
+                {aiResult.message && (
+                  <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-sm text-indigo-800 whitespace-pre-wrap">
+                    {aiResult.message}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
     <CategoryMappingTab
       marketplace={marketplace}
       mappings={mappings || []}
@@ -132,6 +230,7 @@ export default function MappingsPage() {
       isDeleting={deleteMappingMutation.isPending}
       isCleaning={cleanupMutation.isPending}
     />
+    </div>
   );
 }
 

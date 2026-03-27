@@ -329,6 +329,19 @@ export const categoriesAPI = {
       method: 'POST',
       body: JSON.stringify({ marketplace_id: marketplaceId }),
     }),
+
+  aiAssistant: (marketplaceId: number, prompt: string, data?: string) =>
+    fetchAPI<{
+      success: boolean;
+      message: string;
+      created_categories: number;
+      created_mappings: number;
+      errors: string[];
+      total_actions: number;
+    }>('/marketplaces/category-mappings/ai-assistant/', {
+      method: 'POST',
+      body: JSON.stringify({ marketplace_id: marketplaceId, prompt, data }),
+    }),
 };
 
 // =============================================================================
@@ -550,9 +563,11 @@ export const aiAPI = {
     }),
 
   // Парсинг файла с атрибутами через Claude
-  parseAttributesFile: async (file: File): Promise<AIDiscoveryResult> => {
+  parseAttributesFile: async (file: File, marketplaceId?: number, categoryCode?: string): Promise<AIDiscoveryResult & { saved_count?: number; size_grid?: Record<string, string>[] }> => {
     const formData = new FormData();
     formData.append('file', file);
+    if (marketplaceId) formData.append('marketplace_id', String(marketplaceId));
+    if (categoryCode) formData.append('category_code', categoryCode);
 
     const response = await fetch(`${API_BASE}/marketplaces/ai/parse_attributes_file/`, {
       method: 'POST',
@@ -666,6 +681,12 @@ export const attributeLevelsAPI = {
       method: 'POST',
       body: JSON.stringify({ category_mapping_id: categoryMappingId, levels }),
     }),
+
+  aiAssignCategory: (categoryMappingId: number) =>
+    fetchAPI<{ success: boolean; saved: number; error?: string }>(
+      '/marketplaces/attribute-levels/ai-assign-category/',
+      { method: 'POST', body: JSON.stringify({ category_mapping_id: categoryMappingId }) },
+    ),
 
   aiAssign: (marketplaceId: number) =>
     fetchAPI<{ success: boolean; saved: number; categories_processed: number; errors: string[] }>(

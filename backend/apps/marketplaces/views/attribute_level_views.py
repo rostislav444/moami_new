@@ -318,3 +318,123 @@ class MarketplaceAttributeLevelViewSet(viewsets.ModelViewSet):
             'categories_processed': categories_processed,
             'errors': errors,
         })
+
+    @action(detail=False, methods=['post'], url_path='ai-assign-category')
+    def ai_assign_category(self, request):
+        """
+        AI назначение уровней для ОДНОЙ категории.
+        POST /attribute-levels/ai-assign-category/
+        Body: {"category_mapping_id": 123}
+        """
+        import json
+        import logging
+        from django.conf import settings
+
+        try:
+            import anthropic
+        except ImportError:
+            return Response({'error': 'anthropic not installed'}, status=400)
+
+        cm_id = request.data.get('category_mapping_id')
+        if not cm_id:
+            return Response({'error': 'category_mapping_id required'}, status=400)
+
+        try:
+            cm = CategoryMapping.objects.select_related(
+                'category', 'marketplace_category'
+            ).get(id=cm_id)
+        except CategoryMapping.DoesNotExist:
+            return Response({'error': 'CategoryMapping not found'}, status=404)
+
+        marketplace = cm.marketplace_category.marketplace
+
+        attr_set = MarketplaceAttributeSet.objects.filter(
+            marketplace=marketplace,
+            marketplace_category=cm.marketplace_category,
+        ).first() or MarketplaceAttributeSet.objects.filter(
+            marketplace=marketplace,
+            external_code=cm.marketplace_category.external_code,
+        ).first()
+
+        if not attr_set:
+            return Response({'error': 'No attribute set found'}, status=404)
+
+        attrs = list(attr_set.attributes.all())
+        if not attrs:
+            return Response({'error': 'No attributes'}, status=404)
+
+        attrs_desc = '\n'.join(
+            f'id={a.id} code="{a.external_code}" name="{a.name}" '
+            f'type={a.attr_type} required={a.is_required}'
+            for a in attrs
+        )
+
+        prompt = f"""Магазин одежды/аксессуаров → маркетплейс. Назначь уровень каждому атрибуту.
+
+Категория: {cm.category.name} → {cm.marketplace_category.name}
+
+Атрибуты:
+{attrs_desc}
+
+Уровни (выбери один для каждого атрибута):
+
+- product — общие характеристики товара, одинаковые для всех размеров и вариантов:
+  пол, сезон, стиль, фасон, описание, вес упаковки, габариты УПАКОВКИ (высота/ширина/глубина упаковки),
+  мера измерения, минимальная кратность, тип застёжки, длина рукава, силуэт, посадка, назначение
+
+- size — всё что РАЗЛИЧАЕТСЯ между размерами одного товара:
+  размер (EU/UA/INT/US), габариты ИЗДЕЛИЯ (длина изделия, ширина изделия, обхват груди/талии/бёдер),
+  вес изделия если зависит от размера
+
+- variant — специфичное для цветового варианта (очень редко, почти не используется)
+
+- brand — бренд (code="brand" или название "бренд"/"brand"/"торговая марка")
+- color — цвет (code: 78, 12097, 12361, или название содержит "цвет"/"colour"/"color")
+- country — страна производства (code="country_of_origin" или "страна"/"country"/"производств")
+- composition — состав/материал ткани ("материал"/"состав"/"ткань"/"material"/"fabric"/"composition")
+
+- skip — бесполезные: штрих-код/barcode, EAN/GTIN, популярные запросы, обмен и возврат,
+  коллекция, ratio/кратность заказа, идентификаторы
+
+ВАЖНО:
+- Отличай "габариты упаковки" (product) от "габариты изделия" (size)
+- Размерные сетки (EU, UA, INT, US) → size
+- Если сомневаешься между product и size — выбирай product
+
+Ответь ТОЛЬКО JSON: {{"<attr_id>": "<level>", ...}}"""
+
+        try:
+            client = anthropic.Anthropic(api_key=getattr(settings, 'ANTHROPIC_API_KEY', None))
+            response = client.messages.create(
+                model='claude-haiku-4-5-20251001',
+                max_tokens=2048,
+                messages=[{'role': 'user', 'content': prompt}],
+            )
+
+            # Log usage
+            from apps.marketplaces.models import AIUsageLog
+            AIUsageLog.log(response, 'claude-haiku-4-5-20251001', 'assign_levels', marketplace=marketplace)
+
+            text = response.content[0].text.strip()
+            if '```json' in text:
+                text = text.split('```json')[1].split('```')[0].strip()
+            elif '```' in text:
+                text = text.split('```')[1].split('```')[0].strip()
+
+            attr_levels = json.loads(text)
+            saved = 0
+            for attr_id_str, level in attr_levels.items():
+                attr_id = int(attr_id_str)
+                if level in ('product', 'variant', 'size', 'brand', 'color', 'country', 'composition', 'skip'):
+                    MarketplaceAttributeLevel.objects.update_or_create(
+                        category_mapping_id=cm.id,
+                        marketplace_attribute_id=attr_id,
+                        defaults={'level': level}
+                    )
+                    saved += 1
+
+            return Response({'success': True, 'saved': saved})
+
+        except Exception as e:
+            logging.getLogger(__name__).error(f'AI assign category error: {e}')
+            return Response({'error': str(e)}, status=500)
