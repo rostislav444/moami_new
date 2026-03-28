@@ -1,5 +1,6 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from apps.marketplaces.models import (
@@ -14,6 +15,12 @@ from apps.marketplaces.serializers import (
 )
 
 
+class AttributeSetPagination(PageNumberPagination):
+    page_size = 50
+    page_size_query_param = 'page_size'
+    max_page_size = 200
+
+
 class MarketplaceAttributeSetViewSet(viewsets.ModelViewSet):
     """
     ViewSet для наборов атрибутов
@@ -21,10 +28,12 @@ class MarketplaceAttributeSetViewSet(viewsets.ModelViewSet):
     Endpoints:
     - GET /api/attribute-sets/ - список наборов
     - GET /api/attribute-sets/{id}/ - детали набора
+    - DELETE /api/attribute-sets/delete-all/?marketplace={id} - удалить все наборы
     """
 
     queryset = MarketplaceAttributeSet.objects.all()
     serializer_class = MarketplaceAttributeSetSerializer
+    pagination_class = AttributeSetPagination
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related(
@@ -47,6 +56,20 @@ class MarketplaceAttributeSetViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(name__icontains=search)
 
         return queryset
+
+    @action(detail=False, methods=['delete'], url_path='delete-all')
+    def delete_all(self, request):
+        """Delete all attribute sets for a marketplace"""
+        marketplace_id = request.query_params.get('marketplace')
+        if not marketplace_id:
+            return Response(
+                {'error': 'marketplace parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        qs = MarketplaceAttributeSet.objects.filter(marketplace_id=marketplace_id)
+        count = qs.count()
+        qs.delete()
+        return Response({'deleted': count})
 
     @action(detail=True, methods=['get'])
     def attributes(self, request, pk=None):

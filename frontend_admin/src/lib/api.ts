@@ -349,8 +349,15 @@ export const categoriesAPI = {
 // =============================================================================
 
 export const attributesAPI = {
-  listSets: (marketplaceId: number) =>
-    fetchAPI<MarketplaceAttributeSet[]>('/marketplaces/attribute-sets/', {
+  listSets: (marketplaceId: number, params?: { page?: number; search?: string }) =>
+    fetchAPI<{ count: number; next: string | null; previous: string | null; results: MarketplaceAttributeSet[] }>(
+      '/marketplaces/attribute-sets/',
+      { params: { marketplace: marketplaceId, ...params } },
+    ),
+
+  deleteAllSets: (marketplaceId: number) =>
+    fetchAPI<{ deleted: number }>('/marketplaces/attribute-sets/delete-all/', {
+      method: 'DELETE',
       params: { marketplace: marketplaceId },
     }),
 
