@@ -355,6 +355,11 @@ export const attributesAPI = {
       { params: { marketplace: marketplaceId, ...params } },
     ),
 
+  listAllSets: (marketplaceId: number) =>
+    fetchAPI<MarketplaceAttributeSet[]>('/marketplaces/attribute-sets/', {
+      params: { marketplace: marketplaceId, page_size: 'all' },
+    }),
+
   deleteAllSets: (marketplaceId: number) =>
     fetchAPI<{ deleted: number }>('/marketplaces/attribute-sets/delete-all/', {
       method: 'DELETE',

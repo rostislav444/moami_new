@@ -42,7 +42,7 @@ export default function MarketplaceLayout({
 
   const { data: attributeSets } = useQuery({
     queryKey: ['attribute-sets', id],
-    queryFn: () => attributesAPI.listSets(id),
+    queryFn: () => attributesAPI.listAllSets(id),
     enabled: !!id,
   });
 

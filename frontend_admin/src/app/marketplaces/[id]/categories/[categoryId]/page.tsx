@@ -56,7 +56,7 @@ export default function CategoryDetailPage() {
   // Load attribute sets (cached across category pages)
   const { data: attributeSets, isLoading: setsLoading } = useQuery({
     queryKey: ['attribute-sets', marketplaceId],
-    queryFn: () => attributesAPI.listSets(marketplaceId),
+    queryFn: () => attributesAPI.listAllSets(marketplaceId),
     enabled: !!marketplaceId,
     staleTime: 5 * 60 * 1000,
   });
