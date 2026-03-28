@@ -1,4 +1,3 @@
-from django.db.models import Count
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -35,8 +34,6 @@ class MarketplaceAttributeSetViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset().select_related(
             'marketplace',
-        ).annotate(
-            attributes_count=Count('attributes'),
         )
 
         marketplace_id = self.request.query_params.get('marketplace')

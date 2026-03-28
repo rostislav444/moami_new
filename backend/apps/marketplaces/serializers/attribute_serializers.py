@@ -74,7 +74,6 @@ class MarketplaceAttributeListSerializer(serializers.ModelSerializer):
 
 class MarketplaceAttributeSetListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for attribute set listings (no nested attributes)"""
-    attributes_count = serializers.IntegerField(read_only=True)
     marketplace_name = serializers.CharField(source='marketplace.name', read_only=True)
 
     class Meta:
