@@ -116,7 +116,11 @@ class PipelineExecutor:
                 config = dict(step.config)
                 if config.get('use_previous') and self._previous_result:
                     config['filepath'] = self._previous_result.get('filepath')
-                    config['data'] = self._previous_result.get('items')
+                    config['data'] = (
+                        self._previous_result.get('extracted')
+                        or self._previous_result.get('items')
+                        or self._previous_result.get('data')
+                    )
 
                 # Execute
                 result = handler.execute(config)
