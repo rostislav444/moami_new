@@ -28,7 +28,7 @@ export interface Pipeline {
   marketplace_name: string;
   name: string;
   description: string;
-  purpose: 'categories' | 'attributes' | 'attribute_options' | 'other';
+  purpose: 'categories' | 'attributes' | 'attribute_options' | 'feed' | 'other';
   is_active: boolean;
   config: Record<string, unknown>;
   steps: PipelineStep[];
@@ -49,7 +49,7 @@ export interface PipelineListItem {
   marketplace_name: string;
   name: string;
   description: string;
-  purpose: 'categories' | 'attributes' | 'attribute_options' | 'other';
+  purpose: 'categories' | 'attributes' | 'attribute_options' | 'feed' | 'other';
   is_active: boolean;
   steps_count: number;
   runs_count: number;
