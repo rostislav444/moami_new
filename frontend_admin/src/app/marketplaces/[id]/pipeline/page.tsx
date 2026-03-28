@@ -153,6 +153,7 @@ export default function PipelinePage() {
         icon={<Settings2 className="h-5 w-5 text-green-500" />}
         pipelines={feedPipelines}
         marketplaceId={marketplaceId}
+        researchPreset="feed"
         onDelete={(id) => {
           if (confirm('Удалити пайплайн?')) deleteMutation.mutate(id);
         }}

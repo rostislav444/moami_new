@@ -107,6 +107,60 @@ const RESEARCH_PRESETS: ResearchPreset[] = [
     inputPlaceholder: 'Добавьте ссылки на документацию API атрибутов/опций...',
     inputHint: 'Дайте ссылки на документацию API опций атрибутов, или опишите как получить данные. Потом нажмите "Начать исследование".',
   },
+  {
+    id: 'feed',
+    label: 'Генерація XML фіду',
+    description: 'Створити шаблони для генерації XML фіду маркетплейсу',
+    icon: <Sparkles className="h-5 w-5" />,
+    color: 'border-green-200 bg-green-50 hover:border-green-400',
+    systemContext: `Допоможи створити шаблони XML фіду для цього маркетплейсу.
+
+Система шаблонів використовує Django Template синтаксис ({{ variable }}, {% for %}, {% if %}).
+Є 4 типи шаблонів які рендеряться окремо:
+
+1. **header** — шапка XML файлу. Доступні змінні:
+   - {{ shop_name }}, {{ shop_url }}, {{ company_name }}
+   - {{ time }} — дата/час генерації
+   - {{ products_count }} — кількість товарів
+   - {{ products_xml }} — XML всіх товарів (якщо header містить offers)
+
+2. **product** — шаблон товару. Доступні змінні:
+   - {{ product.id }}, {{ product.name }}, {{ product.name_uk }}
+   - {{ product.code }}, {{ product.slug }}, {{ product.url }}
+   - {{ product.price }}, {{ product.promo_price }}, {{ product.old_price }}
+   - {{ product.description }}, {{ product.description_uk }}
+   - {{ product.brand }}, {{ product.brand_mapped.name }}, {{ product.brand_mapped.external_id }}
+   - {{ product.country }}, {{ product.country_uk }}, {{ product.country_mapped.name }}
+   - {{ product.composition }}, {{ product.composition_uk }}
+   - {{ product.category.name }}, {{ product.category.mp_category.name }}, {{ product.category.mp_category.code }}
+   - {{ product.attrs.<code>.value }}, {{ product.attrs.<code>.value_uk }} — атрибути МП по коду
+   - {{ product.variants }} — список варіантів (for variant in product.variants)
+   - {{ product.variants_xml }} — XML варіантів (якщо є variant шаблон)
+   - {{ product.attributes }} — наші атрибути [{name, value, value_uk}]
+
+3. **variant** — шаблон варіанту товару (рендериться для кожного variant+size). Доступні змінні:
+   - product.* — всі поля товару
+   - {{ variant.code }}, {{ variant.slug }}
+   - {{ variant.color }}, {{ variant.color_uk }}, {{ variant.color_mapped.name }}
+   - {{ variant.images }} — список зображень [{url, image}]
+   - {{ variant.attrs.<code>.value }} — атрибути варіанту
+   - {{ size.size }}, {{ size.size_name }}, {{ size.max_size }}
+   - {{ size.stock }}, {{ size.sku }}, {{ size.mk_sku }}, {{ size.mk_full_id }}
+   - {{ size.interpretations }} — розмірні сітки {ua: "42", eu: "36", int: "S"}
+   - {{ size.size_mapped.name }} — розмір маркетплейсу
+   - {{ size.attrs.<code>.value }} — атрибути розміру
+
+4. **footer** — закриваючі теги (пустий контекст)
+
+Мені потрібно:
+1. Вивчити формат XML фіду який потребує маркетплейс
+2. Створити 4 шаблони (header, product, variant, footer) з правильними тегами
+3. Правильно замапити наші змінні на поля фіду маркетплейсу
+
+ВАЖНО: Створи finding з типом "pipeline" що містить готові кроки для створення шаблонів.`,
+    inputPlaceholder: 'Додайте посилання на документацію формату фіду маркетплейсу, приклади XML...',
+    inputHint: 'Дайте посилання на документацію формату XML фіду маркетплейсу, приклади, або опишіть вимоги. Натисніть "Почати дослідження".',
+  },
 ];
 
 // =============================================================================
