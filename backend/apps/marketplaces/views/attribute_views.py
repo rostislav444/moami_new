@@ -1,3 +1,4 @@
+from django.db.models import Count
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -10,6 +11,7 @@ from apps.marketplaces.models import (
 )
 from apps.marketplaces.serializers import (
     MarketplaceAttributeSetSerializer,
+    MarketplaceAttributeSetListSerializer,
     MarketplaceAttributeSerializer,
     MarketplaceAttributeOptionSerializer,
 )
@@ -20,48 +22,41 @@ class AttributeSetPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 200
 
-    def paginate_queryset(self, queryset, request, view=None):
-        # Skip pagination when page_size=all
-        if request.query_params.get('page_size') == 'all':
-            return None
-        return super().paginate_queryset(queryset, request, view)
-
 
 class MarketplaceAttributeSetViewSet(viewsets.ModelViewSet):
     """
     ViewSet для наборов атрибутов
-
-    Endpoints:
-    - GET /api/attribute-sets/ - список наборов
-    - GET /api/attribute-sets/{id}/ - детали набора
-    - DELETE /api/attribute-sets/delete-all/?marketplace={id} - удалить все наборы
     """
 
     queryset = MarketplaceAttributeSet.objects.all()
-    serializer_class = MarketplaceAttributeSetSerializer
+    serializer_class = MarketplaceAttributeSetListSerializer
     pagination_class = AttributeSetPagination
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related(
-            'marketplace', 'marketplace_category'
-        ).prefetch_related('attributes')
+            'marketplace',
+        ).annotate(
+            attributes_count=Count('attributes'),
+        )
 
-        # Фильтр по маркетплейсу
         marketplace_id = self.request.query_params.get('marketplace')
         if marketplace_id:
             queryset = queryset.filter(marketplace_id=marketplace_id)
 
-        # Фильтр по коду категории
         category_code = self.request.query_params.get('category_code')
         if category_code:
             queryset = queryset.filter(external_code=category_code)
 
-        # Поиск
         search = self.request.query_params.get('search')
         if search:
             queryset = queryset.filter(name__icontains=search)
 
         return queryset
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return MarketplaceAttributeSetSerializer
+        return MarketplaceAttributeSetListSerializer
 
     @action(detail=False, methods=['delete'], url_path='delete-all')
     def delete_all(self, request):
@@ -87,7 +82,6 @@ class MarketplaceAttributeSetViewSet(viewsets.ModelViewSet):
         attribute_set = self.get_object()
         attributes = attribute_set.attributes.prefetch_related('options')
 
-        # Фильтр только обязательные
         required_only = request.query_params.get('required_only')
         if required_only and required_only.lower() == 'true':
             attributes = attributes.filter(is_required=True)
@@ -99,10 +93,6 @@ class MarketplaceAttributeSetViewSet(viewsets.ModelViewSet):
 class MarketplaceAttributeViewSet(viewsets.ModelViewSet):
     """
     ViewSet для атрибутов
-
-    Endpoints:
-    - GET /api/attributes/ - список атрибутов
-    - GET /api/attributes/{id}/ - детали атрибута с опциями
     """
 
     queryset = MarketplaceAttribute.objects.all()
@@ -113,29 +103,24 @@ class MarketplaceAttributeViewSet(viewsets.ModelViewSet):
             'attribute_set', 'attribute_set__marketplace'
         ).prefetch_related('options')
 
-        # Фильтр по маркетплейсу
         marketplace_id = self.request.query_params.get('marketplace')
         if marketplace_id:
             queryset = queryset.filter(
                 attribute_set__marketplace_id=marketplace_id
             )
 
-        # Фильтр по набору атрибутов
         attribute_set_id = self.request.query_params.get('attribute_set')
         if attribute_set_id:
             queryset = queryset.filter(attribute_set_id=attribute_set_id)
 
-        # Фильтр по типу
         attr_type = self.request.query_params.get('type')
         if attr_type:
             queryset = queryset.filter(attr_type=attr_type)
 
-        # Только обязательные
         required_only = self.request.query_params.get('required_only')
         if required_only and required_only.lower() == 'true':
             queryset = queryset.filter(is_required=True)
 
-        # Поиск
         search = self.request.query_params.get('search')
         if search:
             queryset = queryset.filter(name__icontains=search)
@@ -144,11 +129,7 @@ class MarketplaceAttributeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def options(self, request, pk=None):
-        """
-        Опции атрибута
-
-        GET /api/attributes/{id}/options/
-        """
+        """Опции атрибута"""
         attribute = self.get_object()
 
         if not attribute.has_options:
@@ -156,7 +137,6 @@ class MarketplaceAttributeViewSet(viewsets.ModelViewSet):
 
         options = attribute.options.all()
 
-        # Поиск
         search = request.query_params.get('search')
         if search:
             options = options.filter(name__icontains=search)

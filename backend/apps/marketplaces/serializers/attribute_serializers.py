@@ -72,8 +72,22 @@ class MarketplaceAttributeListSerializer(serializers.ModelSerializer):
         return get_shared_options_count(obj)
 
 
+class MarketplaceAttributeSetListSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for attribute set listings (no nested attributes)"""
+    attributes_count = serializers.IntegerField(read_only=True)
+    marketplace_name = serializers.CharField(source='marketplace.name', read_only=True)
+
+    class Meta:
+        model = MarketplaceAttributeSet
+        fields = [
+            'id', 'external_code', 'name', 'name_uk',
+            'marketplace', 'marketplace_name', 'marketplace_category',
+            'attributes_count',
+        ]
+
+
 class MarketplaceAttributeSetSerializer(serializers.ModelSerializer):
-    """Сериализатор набора атрибутов"""
+    """Full serializer with nested attributes (for detail view)"""
     attributes = MarketplaceAttributeListSerializer(many=True, read_only=True)
     attributes_count = serializers.IntegerField(read_only=True)
     required_attributes_count = serializers.IntegerField(read_only=True)

@@ -9,6 +9,7 @@ from .category_serializers import (
 )
 from .attribute_serializers import (
     MarketplaceAttributeSetSerializer,
+    MarketplaceAttributeSetListSerializer,
     MarketplaceAttributeSerializer,
     MarketplaceAttributeOptionSerializer,
 )

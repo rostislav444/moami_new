@@ -355,10 +355,20 @@ export const attributesAPI = {
       { params: { marketplace: marketplaceId, ...params } },
     ),
 
-  listAllSets: (marketplaceId: number) =>
-    fetchAPI<MarketplaceAttributeSet[]>('/marketplaces/attribute-sets/', {
-      params: { marketplace: marketplaceId, page_size: 'all' },
-    }),
+  listAllSets: async (marketplaceId: number): Promise<MarketplaceAttributeSet[]> => {
+    const all: MarketplaceAttributeSet[] = [];
+    let page = 1;
+    while (true) {
+      const res = await fetchAPI<{ count: number; next: string | null; results: MarketplaceAttributeSet[] }>(
+        '/marketplaces/attribute-sets/',
+        { params: { marketplace: marketplaceId, page, page_size: 200 } },
+      );
+      all.push(...res.results);
+      if (!res.next) break;
+      page++;
+    }
+    return all;
+  },
 
   deleteAllSets: (marketplaceId: number) =>
     fetchAPI<{ deleted: number }>('/marketplaces/attribute-sets/delete-all/', {
