@@ -247,12 +247,14 @@ class MarketplaceClient:
         fields = self.fields_config.get('categories', {})
         count = 0
 
-        for set_data in self._paginate(endpoint):
+        # Use API-level filtering when codes are provided
+        params = {}
+        if category_codes:
+            params['filter[codes][]'] = category_codes
+
+        for set_data in self._paginate(endpoint, params=params):
             code = str(set_data.get(fields.get('code', 'code'), ''))
             if not code:
-                continue
-
-            if category_codes and code not in category_codes:
                 continue
 
             name_ru = self._get_translation(set_data, 'ru')
