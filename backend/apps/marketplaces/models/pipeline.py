@@ -8,6 +8,7 @@ class MarketplacePipeline(models.Model):
         ('categories', 'Categories'),
         ('attributes', 'Attributes'),
         ('attribute_options', 'Attribute Options'),
+        ('feed', 'Feed Generation'),
         ('other', 'Other'),
     ]
 

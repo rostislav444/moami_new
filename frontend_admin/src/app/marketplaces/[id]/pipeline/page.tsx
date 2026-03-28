@@ -74,6 +74,7 @@ export default function PipelinePage() {
   const categoryPipelines = pipelines?.filter((p) => p.purpose === 'categories') || [];
   const attributePipelines = pipelines?.filter((p) => p.purpose === 'attributes') || [];
   const optionsPipelines = pipelines?.filter((p) => p.purpose === 'attribute_options') || [];
+  const feedPipelines = pipelines?.filter((p) => p.purpose === 'feed') || [];
   const otherPipelines = pipelines?.filter((p) => p.purpose === 'other') || [];
 
   return (
@@ -140,6 +141,18 @@ export default function PipelinePage() {
         pipelines={optionsPipelines}
         marketplaceId={marketplaceId}
         researchPreset="attribute_options"
+        onDelete={(id) => {
+          if (confirm('Удалити пайплайн?')) deleteMutation.mutate(id);
+        }}
+      />
+
+      {/* Section 4: Feed Generation */}
+      <WorkflowSection
+        title="Генерація фіду"
+        description="Згенерувати XML фід для маркетплейсу"
+        icon={<Settings2 className="h-5 w-5 text-green-500" />}
+        pipelines={feedPipelines}
+        marketplaceId={marketplaceId}
         onDelete={(id) => {
           if (confirm('Удалити пайплайн?')) deleteMutation.mutate(id);
         }}
