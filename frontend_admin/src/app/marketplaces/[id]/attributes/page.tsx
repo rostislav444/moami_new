@@ -1,13 +1,16 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { attributesAPI } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { RefreshCw, ChevronRight, ChevronDown, Layers, Settings2, Loader2, Search, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, ChevronRight, ChevronDown, Layers, Settings2, Loader2, Search, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 // Color mapping for attribute types
 const attrTypeColors: Record<string, { bg: string; text: string; border: string }> = {
@@ -47,8 +50,16 @@ export default function AttributesPage() {
 }
 
 function AttributesTab({ attributeSets }: { attributeSets: Array<{ id: number; external_code: string; name: string; attributes_count: number }> }) {
+  const queryClient = useQueryClient()
+  const params = useParams()
+  const marketplaceId = Number(params.id)
   const [search, setSearch] = useState('');
   const [expandedSets, setExpandedSets] = useState<Set<number>>(new Set());
+
+  const handleDeleteSet = async (setId: number) => {
+    await fetch(`${API_BASE}/marketplaces/attribute-sets/${setId}/`, { method: 'DELETE' })
+    queryClient.invalidateQueries({ queryKey: ['attribute-sets', marketplaceId] })
+  }
 
   const toggleSet = (id: number) => {
     setExpandedSets(prev => {
@@ -124,6 +135,7 @@ function AttributesTab({ attributeSets }: { attributeSets: Array<{ id: number; e
             set={set}
             isExpanded={expandedSets.has(set.id)}
             onToggle={() => toggleSet(set.id)}
+            onDelete={handleDeleteSet}
           />
         ))}
       </div>
@@ -141,10 +153,12 @@ function AttributeSetCard({
   set,
   isExpanded,
   onToggle,
+  onDelete,
 }: {
   set: { id: number; name: string; external_code: string; attributes_count: number };
   isExpanded: boolean;
   onToggle: () => void;
+  onDelete: (id: number) => void;
 }) {
   const { data: attributes, isLoading } = useQuery({
     queryKey: ['set-attributes', set.id],
@@ -195,6 +209,15 @@ function AttributeSetCard({
           <Badge className="bg-gray-100 text-gray-700 border-gray-200">
             {set.attributes_count} атр.
           </Badge>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              if (confirm(`Удалить набор "${set.name}" и все его атрибуты?`)) onDelete(set.id)
+            }}
+            className="px-2 py-1 text-xs text-red-500 bg-red-50 hover:bg-red-100 rounded border border-red-200"
+          >
+            <Trash2 className="h-3 w-3 inline mr-1" />Уд.
+          </button>
         </div>
       </div>
 
@@ -225,13 +248,14 @@ function AttributeSetCard({
                 <div className="col-span-4">Название</div>
                 <div className="col-span-2">Код</div>
                 <div className="col-span-2 text-center">Тип</div>
-                <div className="col-span-2 text-center">Значений</div>
-                <div className="col-span-2 text-center">Статус</div>
+                <div className="col-span-1 text-center">Значений</div>
+                <div className="col-span-1 text-center">Статус</div>
+                <div className="col-span-2 text-center">Действия</div>
               </div>
 
               {/* Attributes */}
               <ScrollArea className="h-[400px]">
-                <AttributeRowsList attributes={attributes} />
+                <AttributeRowsList attributes={attributes} setId={set.id} />
               </ScrollArea>
             </>
           ) : (
@@ -246,15 +270,31 @@ function AttributeSetCard({
 }
 
 // Attribute rows with expandable options
-function AttributeRowsList({ attributes }: { attributes: Array<{
+function AttributeRowsList({ attributes, setId }: { attributes: Array<{
   id: number;
   name: string;
   external_code: string;
   attr_type: string;
   is_required: boolean;
   options?: Array<{ id: number; name: string; external_code: string }>;
-}> }) {
+}>; setId: number }) {
+  const queryClient = useQueryClient()
   const [expandedAttrs, setExpandedAttrs] = useState<Set<number>>(new Set());
+  const [selectedAttrs, setSelectedAttrs] = useState<Set<number>>(new Set());
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteSelected = async () => {
+    if (!confirm(`Удалить ${selectedAttrs.size} атрибутов?`)) return
+    setDeleting(true)
+    try {
+      for (const attrId of selectedAttrs) {
+        try { await fetch(`${API_BASE}/marketplaces/marketplace-attributes/${attrId}/`, { method: 'DELETE' }) } catch {}
+      }
+      setSelectedAttrs(new Set())
+      queryClient.invalidateQueries({ queryKey: ['set-attributes', setId] })
+      queryClient.invalidateQueries({ queryKey: ['attribute-sets'] })
+    } finally { setDeleting(false) }
+  }
 
   const toggleAttr = (id: number) => {
     setExpandedAttrs(prev => {
@@ -267,6 +307,28 @@ function AttributeRowsList({ attributes }: { attributes: Array<{
 
   return (
     <>
+      {/* Bulk actions */}
+      {selectedAttrs.size > 0 && (
+        <div className="flex items-center gap-3 px-4 py-2 bg-indigo-50 border-b border-indigo-200">
+          <input
+            type="checkbox"
+            className="w-4 h-4 rounded"
+            checked={selectedAttrs.size === attributes.length}
+            onChange={e => setSelectedAttrs(e.target.checked ? new Set(attributes.map(a => a.id)) : new Set())}
+          />
+          <span className="text-sm font-medium text-indigo-700">Выбрано: {selectedAttrs.size}</span>
+          <Button size="sm" variant="outline" onClick={() => setSelectedAttrs(new Set())} className="h-6 text-xs">Снять</Button>
+          <Button
+            size="sm" variant="outline"
+            className="h-6 text-xs text-red-600 border-red-200 hover:bg-red-50"
+            disabled={deleting}
+            onClick={handleDeleteSelected}
+          >
+            {deleting ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Trash2 className="h-3 w-3 mr-1" />}
+            Удалить выбранные
+          </Button>
+        </div>
+      )}
       {attributes.map((attr, idx) => {
         const typeStyle = getAttrTypeStyle(attr.attr_type);
         const optionsCount = attr.options?.length || 0;
@@ -284,8 +346,19 @@ function AttributeRowsList({ attributes }: { attributes: Array<{
               } ${isExpanded ? 'bg-blue-50' : ''}`}
               onClick={() => hasOptions && toggleAttr(attr.id)}
             >
-              {/* Name */}
+              {/* Checkbox + Name */}
               <div className="col-span-4 flex items-center gap-2 min-w-0">
+                <input
+                  type="checkbox"
+                  className="w-3.5 h-3.5 rounded shrink-0"
+                  checked={selectedAttrs.has(attr.id)}
+                  onClick={e => e.stopPropagation()}
+                  onChange={e => {
+                    const next = new Set(selectedAttrs)
+                    if (e.target.checked) next.add(attr.id); else next.delete(attr.id)
+                    setSelectedAttrs(next)
+                  }}
+                />
                 {hasOptions ? (
                   <button className="p-0.5 shrink-0">
                     {isExpanded ? (
@@ -315,10 +388,10 @@ function AttributeRowsList({ attributes }: { attributes: Array<{
               </div>
 
               {/* Options count */}
-              <div className="col-span-2 flex items-center justify-center">
+              <div className="col-span-1 flex items-center justify-center">
                 {optionsCount > 0 ? (
                   <span className={`text-xs px-2 py-0.5 rounded ${isExpanded ? 'bg-blue-200 text-blue-700' : 'bg-blue-50 text-blue-600'}`}>
-                    {optionsCount} знач.
+                    {optionsCount}
                   </span>
                 ) : (
                   <span className="text-xs text-muted-foreground">—</span>
@@ -326,15 +399,31 @@ function AttributeRowsList({ attributes }: { attributes: Array<{
               </div>
 
               {/* Required status */}
-              <div className="col-span-2 flex items-center justify-center">
+              <div className="col-span-1 flex items-center justify-center">
                 {attr.is_required ? (
-                  <Badge className="bg-red-100 text-red-700 border-red-200 text-xs">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    Обяз.
-                  </Badge>
+                  <span className="text-xs text-red-600 font-medium">Обяз.</span>
                 ) : (
                   <span className="text-xs text-muted-foreground">Опц.</span>
                 )}
+              </div>
+
+              {/* Actions */}
+              <div className="col-span-2 flex items-center justify-center">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (confirm(`Удалить атрибут "${attr.name}"?`)) {
+                      fetch(`${API_BASE}/marketplaces/marketplace-attributes/${attr.id}/`, { method: 'DELETE' })
+                        .then(() => {
+                          queryClient.invalidateQueries({ queryKey: ['set-attributes', setId] })
+                          queryClient.invalidateQueries({ queryKey: ['attribute-sets'] })
+                        })
+                    }
+                  }}
+                  className="px-2 py-0.5 text-xs text-red-500 hover:bg-red-50 rounded border border-red-200"
+                >
+                  <Trash2 className="h-3 w-3 inline" />
+                </button>
               </div>
             </div>
 

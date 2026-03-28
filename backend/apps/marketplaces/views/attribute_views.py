@@ -14,9 +14,9 @@ from apps.marketplaces.serializers import (
 )
 
 
-class MarketplaceAttributeSetViewSet(viewsets.ReadOnlyModelViewSet):
+class MarketplaceAttributeSetViewSet(viewsets.ModelViewSet):
     """
-    ViewSet для наборов атрибутов (только чтение)
+    ViewSet для наборов атрибутов
 
     Endpoints:
     - GET /api/attribute-sets/ - список наборов
