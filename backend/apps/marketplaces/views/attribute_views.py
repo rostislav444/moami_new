@@ -163,41 +163,72 @@ class MarketplaceAttributeViewSet(viewsets.ModelViewSet):
         category_name = request.data.get('category_name', '')
         attr_set_name = attribute.attribute_set.name if attribute.attribute_set else ''
 
-        options_text = '\n'.join(f'- {name} (code: {code})' for _, name, code in options)
+        # Build compact option list: code|name
+        valid_codes = {code for _, _, code in options}
+        options_text = '\n'.join(f'{code}|{name}' for _, name, code in options)
 
-        prompt = f"""У атрибута "{attribute.name}" ({attribute.attr_type}) в категории "{attr_set_name}" ({category_name}) есть {len(options)} значений.
+        attr_name_lower = attribute.name.lower()
+        is_size = any(kw in attr_name_lower for kw in ('розмір', 'размер', 'size'))
+        is_color = any(kw in attr_name_lower for kw in ('колір', 'цвет', 'color'))
 
-Это слишком много. Выбери только ОСНОВНЫЕ, наиболее распространённые и полезные значения. Удали редкие, дублирующиеся, слишком специфичные.
+        if is_size:
+            filter_instruction = f"""Это атрибут РАЗМЕР для категории "{attr_set_name}".
+Оставь ТОЛЬКО стандартные размеры для этой категории одежды:
+- Для одежды: числовые UA размеры (34-56), буквенные (XS, S, M, L, XL, XXL, 3XL), EU размеры
+- Для джинсов: W/L комбинации (W28-W42, L28-L36)
+- Для обуви: числовые (35-47)
+Удали все составные, редкие, с суффиксами (-Long, -Short, -Petite, -Regular, -Tall), двойные через дефис (25-26, 27-28), и прочий мусор.
+Оставь 30-60 размеров."""
+        elif is_color:
+            filter_instruction = f"""Это атрибут ЦВЕТ для категории "{attr_set_name}".
+Оставь 30-50 основных цветов: белый, чёрный, серый, красный, синий, зелёный, жёлтый, оранжевый, розовый, фиолетовый, коричневый, бежевый, бордовый, голубой, бирюзовый, хаки, мятный, лавандовый, пудровый, молочный, айвори, тауп, кофейный, серебряный, золотой, коралловый, персиковый, оливковый, горчичный, марсала и т.п.
+Удали экзотические, составные и дублирующие оттенки."""
+        else:
+            filter_instruction = f"""Это атрибут "{attribute.name}" для категории "{attr_set_name}".
+Оставь 20-50 самых распространённых и полезных значений. Удали редкие, специфичные, дублирующие."""
 
-Для цветов: оставь 30-50 основных цветов (белый, чёрный, красный, синий, зелёный, бежевый, серый, коричневый, розовый, фиолетовый, оранжевый, жёлтый, бордовый, голубой, бирюзовый, хаки, мятный, лавандовый, пудровый, молочный, айвори, тауп, кофейный, серебряный, золотой и т.п.)
-Для размеров: оставь стандартные размеры для данной категории одежды/обуви.
-Для других атрибутов: оставь 20-50 самых релевантных значений.
+        prompt = f"""{filter_instruction}
 
-Вот все значения:
+Всего значений: {len(options)}
+Формат: code|название
+
 {options_text}
 
-Ответь ТОЛЬКО списком кодов (external_code) которые НУЖНО ОСТАВИТЬ, по одному на строку. Никакого другого текста."""
+ОТВЕТЬ ТОЛЬКО кодами (первая колонка до |) которые ОСТАВИТЬ.
+По одному коду на строку. БЕЗ пояснений, БЕЗ символов -, *, •."""
 
         try:
             client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
             response = client.messages.create(
-                model='claude-haiku-4-5-20251001',
-                max_tokens=4096,
+                model='claude-sonnet-4-20250514',
+                max_tokens=8192,
                 messages=[{'role': 'user', 'content': prompt}],
             )
             ai_text = response.content[0].text.strip()
         except Exception as e:
             return Response({'error': f'AI call failed: {str(e)}'}, status=500)
 
-        # Parse codes to keep
+        # Parse codes — only accept codes that actually exist in options
         keep_codes = set()
         for line in ai_text.split('\n'):
-            code = line.strip().strip('-').strip()
-            if code:
+            code = line.strip().strip('-').strip('*').strip('•').strip()
+            # Ignore lines with explanatory text
+            if not code or ' ' in code or len(code) > 50:
+                continue
+            if code in valid_codes:
                 keep_codes.add(code)
 
-        if not keep_codes:
-            return Response({'error': 'AI returned empty result'}, status=500)
+        if not keep_codes or len(keep_codes) >= len(options):
+            return Response({
+                'error': f'AI result invalid: {len(keep_codes)} codes parsed from {len(options)} options',
+                'ai_response_preview': ai_text[:500],
+            }, status=500)
+
+        # Safety: don't delete if AI wants to keep almost everything
+        if len(keep_codes) > len(options) * 0.8:
+            return Response({
+                'error': f'AI kept too many ({len(keep_codes)}/{len(options)}), optimization skipped',
+            }, status=400)
 
         # Delete options not in keep list
         to_delete = attribute.options.exclude(external_code__in=keep_codes)
