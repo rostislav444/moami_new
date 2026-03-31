@@ -66,6 +66,7 @@ export default function ProductsPage() {
   })
 
   const activeMarketplaces = marketplaces.filter(m => m.is_active)
+  const [withImages, setWithImages] = useState(true)
 
   // Bulk AI fill — client-driven, one product at a time
   const [bulkRunning, setBulkRunning] = useState(false)
@@ -75,9 +76,9 @@ export default function ProductsPage() {
   const [bulkDone, setBulkDone] = useState(false)
   const queryClient = useQueryClient()
 
-  const startBulkFill = async (mpId: number) => {
+  const startBulkFill = async (mpIds: number[]) => {
     setBulkRunning(true)
-    setBulkMpId(mpId)
+    setBulkMpId(mpIds[0])
     setBulkDone(false)
     bulkAbortRef.current = false
     setBulkProgress({ current: 0, total: 0, filled: 0, skipped: 0, errors: 0, currentName: '' })
@@ -93,42 +94,46 @@ export default function ProductsPage() {
         pg++
       }
 
-      setBulkProgress(prev => ({ ...prev, total: allProducts.length }))
+      const totalOps = allProducts.length * mpIds.length
+      setBulkProgress(prev => ({ ...prev, total: totalOps }))
 
-      for (let i = 0; i < allProducts.length; i++) {
-        if (bulkAbortRef.current) break
+      let opIdx = 0
+      for (const mpId of mpIds) {
+        for (let i = 0; i < allProducts.length; i++) {
+          if (bulkAbortRef.current) break
+          opIdx++
 
-        const p = allProducts[i]
-        setBulkProgress(prev => ({ ...prev, current: i + 1, currentName: p.name }))
+          const p = allProducts[i]
+          const mpName = activeMarketplaces.find(m => m.id === mpId)?.name || ''
+          setBulkProgress(prev => ({ ...prev, current: opIdx, currentName: `${p.name} → ${mpName}` }))
 
-        try {
-          const result = await productAdminAPI.aiFill(p.id, mpId, false)
-          if (result.success) {
-            // Auto-save
-            const d = result as Record<string, unknown>
-            if (d.filled_product || d.filled_variants || d.filled_sizes) {
-              // Save via save-attributes — build payload from AI result
-              await productAdminAPI.saveAttributes(p.id, {
-                marketplace_id: mpId,
-                product_attributes: _buildPayloadFromFilled(d.filled_product as Record<string, unknown>),
-                variant_attributes: _buildVariantPayload(d.filled_variants as Record<string, Record<string, unknown>>),
-                size_attributes: _buildSizePayload(d.filled_sizes as Record<string, Record<string, unknown>>),
-              })
-              setBulkProgress(prev => ({ ...prev, filled: prev.filled + 1 }))
+          try {
+            const result = await productAdminAPI.aiFill(p.id, mpId, withImages)
+            if (result.success) {
+              const d = result as Record<string, unknown>
+              if (d.filled_product || d.filled_variants || d.filled_sizes) {
+                await productAdminAPI.saveAttributes(p.id, {
+                  marketplace_id: mpId,
+                  product_attributes: _buildPayloadFromFilled(d.filled_product as Record<string, unknown>),
+                  variant_attributes: _buildVariantPayload(d.filled_variants as Record<string, Record<string, unknown>>),
+                  size_attributes: _buildSizePayload(d.filled_sizes as Record<string, Record<string, unknown>>),
+                })
+                setBulkProgress(prev => ({ ...prev, filled: prev.filled + 1 }))
+              } else {
+                setBulkProgress(prev => ({ ...prev, skipped: prev.skipped + 1 }))
+              }
             } else {
-              setBulkProgress(prev => ({ ...prev, skipped: prev.skipped + 1 }))
+              setBulkProgress(prev => ({ ...prev, errors: prev.errors + 1 }))
             }
-          } else {
+          } catch {
             setBulkProgress(prev => ({ ...prev, errors: prev.errors + 1 }))
           }
-        } catch {
-          setBulkProgress(prev => ({ ...prev, errors: prev.errors + 1 }))
-        }
 
-        // Refresh AI usage every 5 products
-        if ((i + 1) % 5 === 0) {
-          queryClient.invalidateQueries({ queryKey: ['ai-usage'] })
+          if (opIdx % 5 === 0) {
+            queryClient.invalidateQueries({ queryKey: ['ai-usage'] })
+          }
         }
+        if (bulkAbortRef.current) break
       }
     } finally {
       setBulkRunning(false)
@@ -163,30 +168,53 @@ export default function ProductsPage() {
               <span className="ml-2">{aiUsage.total_calls} вызовов</span>
             </div>
           )}
-          {activeMarketplaces.map(mp => (
-            bulkRunning && bulkMpId === mp.id ? (
-              <Button
-                key={mp.id}
-                variant="outline"
-                size="sm"
-                onClick={stopBulkFill}
-                className="border-red-200 text-red-600 hover:bg-red-50"
-              >
-                Остановить
-              </Button>
-            ) : (
-              <Button
-                key={mp.id}
-                variant="outline"
-                size="sm"
-                onClick={() => startBulkFill(mp.id)}
-                disabled={bulkRunning}
-                className="border-indigo-200 text-indigo-600 hover:bg-indigo-50"
-              >
-                AI заполнить все ({mp.name})
-              </Button>
-            )
-          ))}
+          <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={withImages}
+              onChange={e => setWithImages(e.target.checked)}
+              className="w-3.5 h-3.5 rounded"
+              disabled={bulkRunning}
+            />
+            <ImageIcon className="h-3.5 w-3.5" />
+            С фото
+          </label>
+          {bulkRunning ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={stopBulkFill}
+              className="border-red-200 text-red-600 hover:bg-red-50"
+            >
+              Остановить
+            </Button>
+          ) : (
+            <>
+              {activeMarketplaces.length > 1 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => startBulkFill(activeMarketplaces.map(m => m.id))}
+                  disabled={bulkRunning}
+                  className="border-violet-200 text-violet-600 hover:bg-violet-50"
+                >
+                  AI все МП ({activeMarketplaces.length})
+                </Button>
+              )}
+              {activeMarketplaces.map(mp => (
+                <Button
+                  key={mp.id}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => startBulkFill([mp.id])}
+                  disabled={bulkRunning}
+                  className="border-indigo-200 text-indigo-600 hover:bg-indigo-50"
+                >
+                  AI ({mp.name})
+                </Button>
+              ))}
+            </>
+          )}
         </div>
       </div>
 
