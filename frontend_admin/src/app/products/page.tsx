@@ -75,7 +75,13 @@ export default function ProductsPage() {
   const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0, filled: 0, skipped: 0, errors: 0, currentName: '' })
   const [bulkDone, setBulkDone] = useState(false)
   const [bulkLog, setBulkLog] = useState<{ id: number; name: string; mpResults: { mp: string; status: 'filled' | 'skipped' | 'error' }[]; done: boolean }[]>([])
+  const logRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
+
+  // Auto-scroll log to bottom
+  useEffect(() => {
+    if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight
+  }, [bulkLog])
 
   const startBulkFill = async (mpIds: number[]) => {
     setBulkRunning(true)
@@ -260,6 +266,7 @@ export default function ProductsPage() {
               }
             </span>
             <div className="flex items-center gap-3 text-xs text-slate-500">
+              <span className="text-indigo-600 font-medium">{bulkLog.filter(e => e.done).length} товаров</span>
               <span className="text-emerald-600">{bulkProgress.filled} заполнено</span>
               <span>{bulkProgress.skipped} пропущено</span>
               {bulkProgress.errors > 0 && <span className="text-red-500">{bulkProgress.errors} ошибок</span>}
@@ -277,7 +284,7 @@ export default function ProductsPage() {
             </div>
           )}
           {bulkLog.length > 0 && (
-            <div className="mt-3 max-h-[250px] overflow-auto text-xs space-y-1 bg-white/60 rounded-lg p-2">
+            <div ref={logRef} className="mt-3 max-h-[250px] overflow-auto text-xs space-y-1 bg-white/60 rounded-lg p-2">
               {bulkLog.map((entry) => (
                 <div key={entry.id} className="flex items-center gap-2">
                   {entry.done ? (
