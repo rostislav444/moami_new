@@ -1273,6 +1273,35 @@ function MarketplaceForm({
   const [expandedVariants, setExpandedVariants] = useState<Set<number>>(new Set())
   const [hasChanges, setHasChanges] = useState(false)
 
+  // Load existing values from form data
+  useEffect(() => {
+    if (!form) return
+    const pv: Record<number, unknown> = {}
+    for (const attr of form.product_attributes) {
+      const iv = getInitialValue(attr)
+      if (iv !== undefined) pv[attr.mp_attribute_id] = iv
+    }
+    setProductValues(pv)
+
+    const vv: Record<string, unknown> = {}
+    const sv: Record<string, unknown> = {}
+    for (const variant of form.variants) {
+      for (const attr of variant.attributes) {
+        const iv = getInitialValue(attr)
+        if (iv !== undefined) vv[`${variant.variant_id}-${attr.mp_attribute_id}`] = iv
+      }
+      for (const size of variant.sizes) {
+        for (const attr of size.attributes) {
+          const iv = getInitialValue(attr)
+          if (iv !== undefined) sv[`${variant.variant_id}-${size.variant_size_id}-${attr.mp_attribute_id}`] = iv
+        }
+      }
+    }
+    setVariantValues(vv)
+    setSizeValues(sv)
+    setHasChanges(false)
+  }, [form])
+
   const aiFillMutation = useMutation({
     mutationFn: (withImages: boolean = false) => productAdminAPI.aiFill(productId, marketplaceId, withImages),
     onSuccess: (data) => {
