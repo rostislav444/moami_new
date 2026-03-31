@@ -307,9 +307,15 @@ class ProductAdminViewSet(viewsets.ModelViewSet):
                     variant_id=variant.id,
                     variant_size_id=vs.id,
                 )
+                # Size interpretations for auto-fill
+                size_interps = {}
+                if vs.size:
+                    size_interps = vs.size.get_interpretations_dict()
+
                 sizes_data.append({
                     'variant_size_id': vs.id,
                     'size_name': str(vs.size) if vs.size else '',
+                    'size_interpretations': size_interps,
                     'sku': vs.sku,
                     'stock': vs.stock,
                     'attributes': s_attrs,

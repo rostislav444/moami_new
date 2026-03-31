@@ -1648,20 +1648,38 @@ function MarketplaceForm({
                             </span>
                           </div>
                           <div className=" space-y-3">
-                            {size.attributes.map(attr => (
-                              <AttributeField
-                                key={attr.mp_attribute_id}
-                                attr={attr}
-                                value={sizeValues[`${variant.variant_id}-${size.variant_size_id}-${attr.mp_attribute_id}`]}
-                                onChange={val => {
-                                  setSizeValues(prev => ({
-                                    ...prev,
-                                    [`${variant.variant_id}-${size.variant_size_id}-${attr.mp_attribute_id}`]: val,
-                                  }))
-                                  setHasChanges(true)
-                                }}
-                              />
-                            ))}
+                            {size.attributes.map(attr => {
+                              const sizeKey = `${variant.variant_id}-${size.variant_size_id}-${attr.mp_attribute_id}`
+                              const isSizeAttr = /размер|розмір|size/i.test(attr.name) && (attr.attr_type === 'select' || attr.attr_type === 'multiselect')
+                              const interps = (size as Record<string, unknown>).size_interpretations as Record<string, string> | undefined
+
+                              if (isSizeAttr && interps) {
+                                return (
+                                  <SizeAttributeField
+                                    key={attr.mp_attribute_id}
+                                    attr={attr}
+                                    interps={interps}
+                                    value={sizeValues[sizeKey]}
+                                    onChange={val => {
+                                      setSizeValues(prev => ({ ...prev, [sizeKey]: val }))
+                                      setHasChanges(true)
+                                    }}
+                                  />
+                                )
+                              }
+
+                              return (
+                                <AttributeField
+                                  key={attr.mp_attribute_id}
+                                  attr={attr}
+                                  value={sizeValues[sizeKey]}
+                                  onChange={val => {
+                                    setSizeValues(prev => ({ ...prev, [sizeKey]: val }))
+                                    setHasChanges(true)
+                                  }}
+                                />
+                              )
+                            })}
                           </div>
                         </div>
                       ))}
@@ -1781,6 +1799,142 @@ function AutoSection({
           )}
         </div>
       ))}
+    </div>
+  )
+}
+
+function SizeAttributeField({
+  attr,
+  interps,
+  value,
+  onChange,
+}: {
+  attr: MarketplaceFormAttribute
+  interps: Record<string, string>
+  value: unknown
+  onChange: (value: unknown) => void
+}) {
+  const [showSelect, setShowSelect] = useState(false)
+
+  // Determine the ua size value to auto-fill
+  const uaSize = interps.ua || interps.UA || ''
+  const intSize = interps.int || interps.INT || ''
+  const euSize = interps.eu || interps.EU || ''
+
+  // Determine which interpretation fits this attr name
+  const nameLower = attr.name.toLowerCase()
+  let autoValue = uaSize
+  if (nameLower.includes('международн') || nameLower.includes('3xs') || nameLower.includes('int')) {
+    autoValue = intSize
+  } else if (nameLower.includes(' eu')) {
+    autoValue = euSize
+  } else if (nameLower.includes(' ua') || nameLower.includes('жіноч') && nameLower.includes('ua')) {
+    autoValue = uaSize
+  }
+
+  // Try to auto-match to an option
+  const options = attr.options || []
+  const findMatch = (val: string) => {
+    if (!val) return null
+    const v = val.trim().toLowerCase()
+    return options.find(o => o.name.trim().toLowerCase() === v) || null
+  }
+
+  // Current display
+  const currentVal = value !== undefined ? value : getInitialValue(attr)
+  const isSelect = attr.attr_type === 'select'
+  const isMulti = attr.attr_type === 'multiselect'
+
+  // Current option name(s) for display
+  let displayValue = ''
+  if (isSelect && typeof currentVal === 'number') {
+    displayValue = options.find(o => o.id === currentVal)?.name || String(currentVal)
+  } else if (isMulti && Array.isArray(currentVal)) {
+    displayValue = (currentVal as number[]).map(id => options.find(o => o.id === id)?.name || String(id)).join(', ')
+  }
+
+  const autoMatch = findMatch(autoValue)
+  const hasValue = isSelect ? !!currentVal : (Array.isArray(currentVal) && currentVal.length > 0)
+
+  return (
+    <div>
+      <label className="text-sm font-medium text-slate-700 flex items-center gap-1 mb-1.5">
+        {attr.name}
+        {attr.is_required && <span className="text-red-500">*</span>}
+        <span className="text-xs text-slate-400 font-normal ml-1">
+          (ua: {uaSize || '—'}, int: {intSize || '—'}, eu: {euSize || '—'})
+        </span>
+      </label>
+
+      <div className="flex items-center gap-2">
+        {/* Display current value or auto-fill */}
+        <div className="flex-1">
+          {hasValue ? (
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-2 text-sm bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg flex-1">
+                {displayValue}
+              </span>
+              <button
+                type="button"
+                onClick={() => onChange(isSelect ? null : [])}
+                className="text-xs text-red-400 hover:text-red-600"
+              >
+                ✕
+              </button>
+            </div>
+          ) : autoMatch ? (
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-2 text-sm bg-amber-50 border border-amber-200 text-amber-700 rounded-lg flex-1">
+                {autoValue} → {autoMatch.name}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  onChange(isSelect ? autoMatch.id : [autoMatch.id])
+                }}
+                className="px-2 py-1 text-xs bg-emerald-500 text-white rounded hover:bg-emerald-600"
+              >
+                Применить
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-2 text-sm bg-red-50 border border-red-200 text-red-500 rounded-lg flex-1">
+                {autoValue || '—'} (нет совпадения)
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Toggle select dropdown */}
+        <button
+          type="button"
+          onClick={() => setShowSelect(!showSelect)}
+          className="px-2 py-2 text-xs text-slate-400 hover:text-indigo-600 border border-slate-200 rounded-lg hover:border-indigo-300"
+          title="Выбрать вручную"
+        >
+          ▾
+        </button>
+      </div>
+
+      {/* Optional manual select */}
+      {showSelect && (
+        <div className="mt-2">
+          {isSelect ? (
+            <SearchableSelect
+              options={options}
+              value={(currentVal as number) || null}
+              onChange={val => { onChange(val); setShowSelect(false) }}
+            />
+          ) : (
+            <SearchableMultiSelect
+              options={options}
+              value={(currentVal as number[]) || []}
+              onChange={val => onChange(val)}
+            />
+          )}
+        </div>
+      )}
     </div>
   )
 }

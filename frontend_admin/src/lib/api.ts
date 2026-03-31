@@ -886,6 +886,7 @@ export interface MarketplaceFormData {
     sizes: {
       variant_size_id: number;
       size_name: string;
+      size_interpretations?: Record<string, string>;
       sku: string;
       stock: number;
       attributes: MarketplaceFormAttribute[];
