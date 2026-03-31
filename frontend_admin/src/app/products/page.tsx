@@ -74,6 +74,7 @@ export default function ProductsPage() {
   const bulkAbortRef = useRef(false)
   const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0, filled: 0, skipped: 0, errors: 0, currentName: '' })
   const [bulkDone, setBulkDone] = useState(false)
+  const [bulkLog, setBulkLog] = useState<{ id: number; name: string; status: 'filled' | 'skipped' | 'error'; mp: string }[]>([])
   const queryClient = useQueryClient()
 
   const startBulkFill = async (mpIds: number[]) => {
@@ -82,6 +83,7 @@ export default function ProductsPage() {
     setBulkDone(false)
     bulkAbortRef.current = false
     setBulkProgress({ current: 0, total: 0, filled: 0, skipped: 0, errors: 0, currentName: '' })
+    setBulkLog([])
 
     try {
       // Fetch all product IDs
@@ -98,12 +100,15 @@ export default function ProductsPage() {
       setBulkProgress(prev => ({ ...prev, total: totalOps }))
 
       let opIdx = 0
-      for (const mpId of mpIds) {
-        for (let i = 0; i < allProducts.length; i++) {
+      // Product-by-product, all marketplaces inside each product
+      for (let i = 0; i < allProducts.length; i++) {
+        if (bulkAbortRef.current) break
+        const p = allProducts[i]
+
+        for (const mpId of mpIds) {
           if (bulkAbortRef.current) break
           opIdx++
 
-          const p = allProducts[i]
           const mpName = activeMarketplaces.find(m => m.id === mpId)?.name || ''
           setBulkProgress(prev => ({ ...prev, current: opIdx, currentName: `${p.name} → ${mpName}` }))
 
@@ -119,21 +124,24 @@ export default function ProductsPage() {
                   size_attributes: _buildSizePayload(d.filled_sizes as Record<string, Record<string, unknown>>),
                 })
                 setBulkProgress(prev => ({ ...prev, filled: prev.filled + 1 }))
+                setBulkLog(prev => [...prev, { id: p.id, name: p.name, status: 'filled', mp: mpName }])
               } else {
                 setBulkProgress(prev => ({ ...prev, skipped: prev.skipped + 1 }))
+                setBulkLog(prev => [...prev, { id: p.id, name: p.name, status: 'skipped', mp: mpName }])
               }
             } else {
               setBulkProgress(prev => ({ ...prev, errors: prev.errors + 1 }))
+              setBulkLog(prev => [...prev, { id: p.id, name: p.name, status: 'error', mp: mpName }])
             }
           } catch {
             setBulkProgress(prev => ({ ...prev, errors: prev.errors + 1 }))
+            setBulkLog(prev => [...prev, { id: p.id, name: p.name, status: 'error', mp: mpName }])
           }
 
           if (opIdx % 5 === 0) {
             queryClient.invalidateQueries({ queryKey: ['ai-usage'] })
           }
         }
-        if (bulkAbortRef.current) break
       }
     } finally {
       setBulkRunning(false)
@@ -245,6 +253,29 @@ export default function ProductsPage() {
                 className="bg-indigo-500 h-2 rounded-full transition-all"
                 style={{ width: `${Math.round((bulkProgress.current / bulkProgress.total) * 100)}%` }}
               />
+            </div>
+          )}
+          {bulkLog.length > 0 && (
+            <div className="mt-3 max-h-[200px] overflow-auto text-xs space-y-0.5 bg-white/60 rounded-lg p-2">
+              {bulkLog.map((entry, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className={
+                    entry.status === 'filled' ? 'text-emerald-600' :
+                    entry.status === 'error' ? 'text-red-500' : 'text-slate-400'
+                  }>
+                    {entry.status === 'filled' ? '✓' : entry.status === 'error' ? '✗' : '—'}
+                  </span>
+                  <a
+                    href={`/products/${entry.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 hover:underline truncate max-w-[300px]"
+                  >
+                    {entry.name}
+                  </a>
+                  <span className="text-slate-400">→ {entry.mp}</span>
+                </div>
+              ))}
             </div>
           )}
         </div>

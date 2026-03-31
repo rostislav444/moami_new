@@ -271,11 +271,24 @@ class SaveAttributesSerializer(serializers.Serializer):
             )
 
         # Size-level attributes
+        # Cache variant_id lookups from variant_size_id
+        vs_variant_cache = {}
         for attr_data in self.validated_data.get('size_attributes', []):
             variant_size_id = attr_data.get('variant_size_id')
-            variant_id = attr_data.get('variant_id')
             if not variant_size_id:
                 continue
+            variant_id = attr_data.get('variant_id')
+            # Resolve variant_id from variant_size if not provided
+            if not variant_id:
+                if variant_size_id not in vs_variant_cache:
+                    from apps.product.models import VariantSize
+                    try:
+                        vs_variant_cache[variant_size_id] = VariantSize.objects.get(
+                            id=variant_size_id
+                        ).variant_id
+                    except VariantSize.DoesNotExist:
+                        vs_variant_cache[variant_size_id] = None
+                variant_id = vs_variant_cache[variant_size_id]
             saved += self._save_attribute(
                 product=product,
                 attr_data=attr_data,

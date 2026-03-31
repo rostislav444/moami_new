@@ -1560,7 +1560,7 @@ function MarketplaceForm({
               </button>
 
               {expandedVariants.has(variant.variant_id) && (
-                <div className="border-t border-slate-100 px-5 py-4 space-y-4">
+                <div className="border-t border-slate-100 px-5 py-4 space-y-4" onClick={e => e.stopPropagation()}>
                   {/* Color auto */}
                   {(() => {
                     const vAny = variant as unknown as Record<string, unknown>
@@ -1891,6 +1891,8 @@ function SearchableSelect({
 }) {
   const [search, setSearch] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
 
   const filtered = search
     ? options.filter(o => o.name.toLowerCase().includes(search.toLowerCase())).slice(0, 100)
@@ -1898,11 +1900,26 @@ function SearchableSelect({
 
   const selectedName = options.find(o => o.id === value)?.name
 
+  const openDropdown = () => {
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 50,
+      })
+    }
+    setIsOpen(!isOpen)
+  }
+
   return (
     <div className="relative">
       <button
+        ref={btnRef}
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={openDropdown}
         className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-slate-50 text-left flex items-center justify-between hover:bg-white focus:ring-2 focus:ring-indigo-500"
       >
         <span className={selectedName ? 'text-slate-900 truncate' : 'text-slate-400'}>
@@ -1914,7 +1931,7 @@ function SearchableSelect({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => { setIsOpen(false); setSearch('') }} />
-          <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-[300px] overflow-hidden">
+          <div style={dropdownStyle} className="bg-white border border-slate-200 rounded-xl shadow-lg max-h-[300px] overflow-hidden">
             {options.length > 10 && (
               <div className="p-2 border-b border-slate-100">
                 <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск..." className="h-8 text-sm" autoFocus />
@@ -1950,6 +1967,8 @@ function SearchableMultiSelect({
 }) {
   const [search, setSearch] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
 
   const filtered = search
     ? options.filter(o => o.name.toLowerCase().includes(search.toLowerCase())).slice(0, 100)
@@ -1961,9 +1980,23 @@ function SearchableMultiSelect({
     onChange(value.includes(id) ? value.filter(v => v !== id) : [...value, id])
   }
 
+  const openDropdown = () => {
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 50,
+      })
+    }
+    setIsOpen(!isOpen)
+  }
+
   return (
     <div className="relative">
-      <button type="button" onClick={() => setIsOpen(!isOpen)}
+      <button ref={btnRef} type="button" onClick={openDropdown}
         className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-slate-50 text-left min-h-[38px] hover:bg-white focus:ring-2 focus:ring-indigo-500">
         {selectedNames.length > 0 ? (
           <div className="flex flex-wrap gap-1">
@@ -1980,7 +2013,7 @@ function SearchableMultiSelect({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => { setIsOpen(false); setSearch('') }} />
-          <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-[300px] overflow-hidden">
+          <div style={dropdownStyle} className="bg-white border border-slate-200 rounded-xl shadow-lg max-h-[300px] overflow-hidden">
             <div className="p-2 border-b border-slate-100">
               <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск..." className="h-8 text-sm" autoFocus />
             </div>

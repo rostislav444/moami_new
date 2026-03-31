@@ -34,14 +34,19 @@ def ai_fill_product_attributes(
 
     product_info = _build_product_context(product)
 
-    # Collect all size hints from product for smart option filtering
+    # Collect size hints from product — prioritize Ukrainian (ua) sizes
     size_hints = set()
     for v in product.variants.prefetch_related('sizes__size__interpretations__grid').all():
         for vs in v.sizes.all():
             if vs.size:
                 interps = vs.size.get_interpretations_dict()
-                for val in interps.values():
-                    size_hints.add(str(val).strip())
+                # Prioritize ua size, fallback to others
+                ua_val = interps.get('ua') or interps.get('UA')
+                if ua_val:
+                    size_hints.add(str(ua_val).strip())
+                else:
+                    for val in interps.values():
+                        size_hints.add(str(val).strip())
     size_hints = list(size_hints)
 
     # Build hierarchical attribute structure for prompt
@@ -116,7 +121,7 @@ def ai_fill_product_attributes(
 - Для атрибута "Размер" (select): ищи ТОЧНОЕ совпадение с ua размером в опциях. Например ua:42 → ищи опцию "42", ua:48 → ищи "48". НЕ выбирай похожие вроде "L1", "S-30", "L-Petite" — это НЕ те размеры.
 - Если точного совпадения нет — попробуй eu или int размер.
 - Обхваты и мерки — бери из стандартных размерных таблиц ниже
-- Если не уверен — null
+- Если не уверен в размере — null, но для остальных атрибутов СТАРАЙСЯ ЗАПОЛНИТЬ МАКСИМУМ. Лучше приблизительно чем пусто.
 
 СТАНДАРТНЫЕ РАЗМЕРНЫЕ ТАБЛИЦЫ (женская одежда, см):
 UA  | EU | INT | Грудь | Талия | Бёдра
@@ -152,7 +157,9 @@ UA  | EU | INT | Грудь | Талия | Бёдра
   "reasoning": "что заполнил и почему"
 }}
 
-Значения: select→option_id(число), multiselect→[id,...], string→"текст", int/float→число, boolean→true/false, пропуск→null."""
+Значения: select→option_id(число), multiselect→[id,...], string→"текст", int/float→число, boolean→true/false, пропуск→null.
+
+ВАЖНО: Заполняй ВСЕ атрибуты которые можешь определить. Чем больше заполнишь — тем лучше. null только если совсем невозможно определить."""
 
     # Build message content
     content: List[Dict] = []
