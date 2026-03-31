@@ -8,12 +8,14 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   RefreshCw, ChevronRight, ChevronLeft, Folder, Loader2, Upload,
-  FileSpreadsheet, Save, Trash2, Layers, Search, X, Pencil, Check,
+  FileSpreadsheet, Save, Trash2, Layers, Search, X, Pencil, Check, Sparkles,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useState, useRef, useMemo } from 'react';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 const TYPE_COLORS: Record<string, string> = {
   select: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -45,6 +47,7 @@ export default function CategoryDetailPage() {
   const [selectedAttrs, setSelectedAttrs] = useState<Set<number>>(new Set());
   const [deleting, setDeleting] = useState(false);
   const [editingAttr, setEditingAttr] = useState<{ id: number; name: string; external_code: string; attr_type: string; is_required: boolean; suffix: string } | null>(null);
+  const [optimizingAttr, setOptimizingAttr] = useState<number | null>(null);
 
   // Load category + attribute set + attributes in one query
   const { data: category, isLoading: categoryLoading } = useQuery({
@@ -458,6 +461,38 @@ export default function CategoryDetailPage() {
                         <Badge variant="destructive" className="text-xs">Да</Badge>
                       )}
                     </span>
+                    {(attr.attr_type === 'select' || attr.attr_type === 'multiselect') && attr.options && attr.options.length > 30 && (
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation()
+                          if (!confirm(`Оптимизировать ${attr.options!.length} значений атрибута "${attr.name}" с помощью ИИ? Лишние будут удалены.`)) return
+                          setOptimizingAttr(attr.id)
+                          try {
+                            const res = await fetch(`${API_BASE}/marketplaces/marketplace-attributes/${attr.id}/optimize-options/`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ category_name: category?.name || '' }),
+                            })
+                            const data = await res.json()
+                            if (res.ok) {
+                              alert(`Оптимизировано: было ${data.total_before}, оставлено ${data.kept}, удалено ${data.deleted}`)
+                              refetchAttributes()
+                            } else {
+                              alert(`Ошибка: ${data.error || 'Unknown error'}`)
+                            }
+                          } catch (err) {
+                            alert('Ошибка сети')
+                          } finally {
+                            setOptimizingAttr(null)
+                          }
+                        }}
+                        disabled={optimizingAttr === attr.id}
+                        className="shrink-0 px-2 py-1 text-xs text-amber-600 bg-amber-50 hover:bg-amber-100 rounded border border-amber-200 disabled:opacity-50"
+                        title="Оптимизировать значения с ИИ"
+                      >
+                        {optimizingAttr === attr.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                      </button>
+                    )}
                     <button
                       onClick={e => {
                         e.stopPropagation()

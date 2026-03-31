@@ -140,3 +140,73 @@ class MarketplaceAttributeViewSet(viewsets.ModelViewSet):
 
         serializer = MarketplaceAttributeOptionSerializer(options, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], url_path='optimize-options')
+    def optimize_options(self, request, pk=None):
+        """
+        Use AI to filter attribute options, keeping only relevant ones.
+
+        POST /api/marketplace-attributes/{id}/optimize-options/
+        Body: { "category_name": "Куртки" }  (optional context)
+        """
+        import anthropic
+        from django.conf import settings
+
+        attribute = self.get_object()
+        if not attribute.has_options:
+            return Response({'error': 'Attribute has no options'}, status=400)
+
+        options = list(attribute.options.values_list('id', 'name', 'external_code'))
+        if len(options) <= 30:
+            return Response({'kept': len(options), 'deleted': 0, 'message': 'Too few options to optimize'})
+
+        category_name = request.data.get('category_name', '')
+        attr_set_name = attribute.attribute_set.name if attribute.attribute_set else ''
+
+        options_text = '\n'.join(f'- {name} (code: {code})' for _, name, code in options)
+
+        prompt = f"""У атрибута "{attribute.name}" ({attribute.attr_type}) в категории "{attr_set_name}" ({category_name}) есть {len(options)} значений.
+
+Это слишком много. Выбери только ОСНОВНЫЕ, наиболее распространённые и полезные значения. Удали редкие, дублирующиеся, слишком специфичные.
+
+Для цветов: оставь 30-50 основных цветов (белый, чёрный, красный, синий, зелёный, бежевый, серый, коричневый, розовый, фиолетовый, оранжевый, жёлтый, бордовый, голубой, бирюзовый, хаки, мятный, лавандовый, пудровый, молочный, айвори, тауп, кофейный, серебряный, золотой и т.п.)
+Для размеров: оставь стандартные размеры для данной категории одежды/обуви.
+Для других атрибутов: оставь 20-50 самых релевантных значений.
+
+Вот все значения:
+{options_text}
+
+Ответь ТОЛЬКО списком кодов (external_code) которые НУЖНО ОСТАВИТЬ, по одному на строку. Никакого другого текста."""
+
+        try:
+            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+            response = client.messages.create(
+                model='claude-haiku-4-5-20251001',
+                max_tokens=4096,
+                messages=[{'role': 'user', 'content': prompt}],
+            )
+            ai_text = response.content[0].text.strip()
+        except Exception as e:
+            return Response({'error': f'AI call failed: {str(e)}'}, status=500)
+
+        # Parse codes to keep
+        keep_codes = set()
+        for line in ai_text.split('\n'):
+            code = line.strip().strip('-').strip()
+            if code:
+                keep_codes.add(code)
+
+        if not keep_codes:
+            return Response({'error': 'AI returned empty result'}, status=500)
+
+        # Delete options not in keep list
+        to_delete = attribute.options.exclude(external_code__in=keep_codes)
+        deleted_count = to_delete.count()
+        to_delete.delete()
+        remaining = attribute.options.count()
+
+        return Response({
+            'kept': remaining,
+            'deleted': deleted_count,
+            'total_before': len(options),
+        })
