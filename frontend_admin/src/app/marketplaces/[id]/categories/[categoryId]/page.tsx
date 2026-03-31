@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   RefreshCw, ChevronRight, ChevronLeft, Folder, Loader2, Upload,
-  FileSpreadsheet, Save, Trash2, Layers, Search, X, Pencil, Check, Sparkles,
+  FileSpreadsheet, Save, Trash2, Layers, Search, X, Pencil, Check, Sparkles, Plus,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -48,6 +48,7 @@ export default function CategoryDetailPage() {
   const [deleting, setDeleting] = useState(false);
   const [editingAttr, setEditingAttr] = useState<{ id: number; name: string; external_code: string; attr_type: string; is_required: boolean; suffix: string } | null>(null);
   const [optimizingAttr, setOptimizingAttr] = useState<number | null>(null);
+  const [optionsModalAttr, setOptionsModalAttr] = useState<{ id: number; name: string; options: { id: number; name: string; external_code: string }[] } | null>(null);
 
   // Load category + attribute set + attributes in one query
   const { data: category, isLoading: categoryLoading } = useQuery({
@@ -407,7 +408,7 @@ export default function CategoryDetailPage() {
           <span className="shrink-0 w-20 text-center">Значений</span>
           <span className="shrink-0 w-24 text-center">Тип</span>
           <span className="shrink-0 w-14 text-center">Обяз.</span>
-          <span className="shrink-0 w-16 text-center"></span>
+          <span className="shrink-0 w-[72px]"></span>
         </div>
 
         {/* Attributes list */}
@@ -462,38 +463,49 @@ export default function CategoryDetailPage() {
                         <Badge variant="destructive" className="text-xs">Да</Badge>
                       )}
                     </span>
-                    <div className="shrink-0 w-16 flex items-center justify-end gap-1">
-                      {(attr.attr_type === 'select' || attr.attr_type === 'multiselect') && attr.options && attr.options.length > 30 && (
-                        <button
-                          onClick={async (e) => {
-                            e.stopPropagation()
-                            if (!confirm(`Оптимизировать ${attr.options!.length} значений атрибута "${attr.name}" с помощью ИИ? Лишние будут удалены.`)) return
-                            setOptimizingAttr(attr.id)
-                            try {
-                              const res = await fetch(`${API_BASE}/marketplaces/marketplace-attributes/${attr.id}/optimize-options/`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ category_name: category?.name || '' }),
-                              })
-                              const data = await res.json()
-                              if (res.ok) {
-                                alert(`Оптимизировано: было ${data.total_before}, оставлено ${data.kept}, удалено ${data.deleted}`)
-                                refetchAttributes()
-                              } else {
-                                alert(`Ошибка: ${data.error || 'Unknown error'}`)
-                              }
-                            } catch (err) {
-                              alert('Ошибка сети')
-                            } finally {
-                              setOptimizingAttr(null)
-                            }
-                          }}
-                          disabled={optimizingAttr === attr.id}
-                          className="px-2 py-1 text-xs text-amber-600 bg-amber-50 hover:bg-amber-100 rounded border border-amber-200 disabled:opacity-50"
-                          title="Оптимизировать значения с ІІ"
-                        >
-                          {optimizingAttr === attr.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                        </button>
+                    <div className="shrink-0 w-[72px] flex items-center justify-end gap-1">
+                      {(attr.attr_type === 'select' || attr.attr_type === 'multiselect') && attr.options && attr.options.length > 0 && (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setOptionsModalAttr({ id: attr.id, name: attr.name, options: attr.options! })
+                            }}
+                            className="px-1.5 py-1 text-xs text-slate-600 bg-slate-50 hover:bg-slate-100 rounded border border-slate-200"
+                            title="Управление значениями"
+                          >
+                            <Layers className="h-3 w-3" />
+                          </button>
+                          {attr.options.length > 30 && (
+                            <button
+                              onClick={async (e) => {
+                                e.stopPropagation()
+                                if (!confirm(`AI оптимизация ${attr.options!.length} значений "${attr.name}"?`)) return
+                                setOptimizingAttr(attr.id)
+                                try {
+                                  const res = await fetch(`${API_BASE}/marketplaces/marketplace-attributes/${attr.id}/optimize-options/`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ category_name: category?.name || '' }),
+                                  })
+                                  const data = await res.json()
+                                  if (res.ok) {
+                                    alert(`Было ${data.total_before}, оставлено ${data.kept}, удалено ${data.deleted}`)
+                                    refetchAttributes()
+                                  } else {
+                                    alert(data.error || 'Ошибка')
+                                  }
+                                } catch { alert('Ошибка сети') }
+                                finally { setOptimizingAttr(null) }
+                              }}
+                              disabled={optimizingAttr === attr.id}
+                              className="px-1.5 py-1 text-xs text-amber-600 bg-amber-50 hover:bg-amber-100 rounded border border-amber-200 disabled:opacity-50"
+                              title="AI оптимизация"
+                            >
+                              {optimizingAttr === attr.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                            </button>
+                          )}
+                        </>
                       )}
                       <button
                         onClick={e => {
@@ -561,6 +573,20 @@ export default function CategoryDetailPage() {
           onClose={() => setEditingAttr(null)}
           onSaved={() => {
             setEditingAttr(null)
+            refetchAttributes()
+          }}
+        />
+      )}
+
+      {/* Options management modal */}
+      {optionsModalAttr && (
+        <OptionsModal
+          attrId={optionsModalAttr.id}
+          attrName={optionsModalAttr.name}
+          initialOptions={optionsModalAttr.options}
+          onClose={() => setOptionsModalAttr(null)}
+          onChanged={() => {
+            setOptionsModalAttr(null)
             refetchAttributes()
           }}
         />
@@ -653,6 +679,176 @@ function EditAttributeModal({
           <Button size="sm" onClick={handleSave} disabled={saving}>
             {saving ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Check className="mr-2 h-3 w-3" />}
             Сохранить
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function OptionsModal({
+  attrId,
+  attrName,
+  initialOptions,
+  onClose,
+  onChanged,
+}: {
+  attrId: number
+  attrName: string
+  initialOptions: { id: number; name: string; external_code: string }[]
+  onClose: () => void
+  onChanged: () => void
+}) {
+  const [options, setOptions] = useState(initialOptions)
+  const [search, setSearch] = useState('')
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+  const [deleting, setDeleting] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newCode, setNewCode] = useState('')
+  const [adding, setAdding] = useState(false)
+
+  const filtered = search
+    ? options.filter(o => o.name.toLowerCase().includes(search.toLowerCase()) || o.external_code.includes(search))
+    : options
+
+  const toggleAll = () => {
+    if (selected.size === filtered.length) {
+      setSelected(new Set())
+    } else {
+      setSelected(new Set(filtered.map(o => o.id)))
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!confirm(`Удалить ${selected.size} значений?`)) return
+    setDeleting(true)
+    try {
+      const res = await fetch(`${API_BASE}/marketplaces/marketplace-attributes/${attrId}/delete-options/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: Array.from(selected) }),
+      })
+      if (res.ok) {
+        setOptions(prev => prev.filter(o => !selected.has(o.id)))
+        setSelected(new Set())
+      }
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const handleAdd = async () => {
+    if (!newName.trim()) return
+    setAdding(true)
+    try {
+      const res = await fetch(`${API_BASE}/marketplaces/marketplace-attributes/${attrId}/add-option/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newName.trim(), code: newCode.trim() || undefined }),
+      })
+      if (res.ok) {
+        const opt = await res.json()
+        setOptions(prev => [...prev, opt].sort((a, b) => a.name.localeCompare(b.name)))
+        setNewName('')
+        setNewCode('')
+      } else {
+        const err = await res.json()
+        alert(err.error || 'Ошибка')
+      }
+    } finally {
+      setAdding(false)
+    }
+  }
+
+  const hasChanges = options.length !== initialOptions.length
+
+  return (
+    <Dialog open onOpenChange={() => { if (hasChanges) onChanged(); else onClose() }}>
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
+        <DialogHeader>
+          <DialogTitle>{attrName} — {options.length} значений</DialogTitle>
+        </DialogHeader>
+
+        {/* Search + actions bar */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Поиск..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-8 h-8 text-sm"
+            />
+          </div>
+          <Button size="sm" variant="outline" className="h-8 text-xs" onClick={toggleAll}>
+            {selected.size === filtered.length ? 'Снять все' : 'Выбрать все'}
+          </Button>
+          {selected.size > 0 && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs text-red-600 border-red-200 hover:bg-red-50"
+              disabled={deleting}
+              onClick={handleDelete}
+            >
+              {deleting ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Trash2 className="h-3 w-3 mr-1" />}
+              Удалить ({selected.size})
+            </Button>
+          )}
+        </div>
+
+        {/* Options list */}
+        <div className="flex-1 overflow-y-auto border rounded-md min-h-0 max-h-[50vh]">
+          <div className="flex flex-wrap gap-1 p-2">
+            {filtered.map(opt => (
+              <label
+                key={opt.id}
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-xs cursor-pointer transition-colors ${
+                  selected.has(opt.id)
+                    ? 'bg-red-50 border-red-300 text-red-700'
+                    : 'bg-background border-slate-200 hover:bg-muted'
+                }`}
+                title={`code: ${opt.external_code}`}
+              >
+                <input
+                  type="checkbox"
+                  className="w-3 h-3 rounded"
+                  checked={selected.has(opt.id)}
+                  onChange={() => {
+                    const next = new Set(selected)
+                    if (next.has(opt.id)) next.delete(opt.id)
+                    else next.add(opt.id)
+                    setSelected(next)
+                  }}
+                />
+                {opt.name}
+              </label>
+            ))}
+            {filtered.length === 0 && (
+              <span className="text-sm text-muted-foreground p-4">Ничего не найдено</span>
+            )}
+          </div>
+        </div>
+
+        {/* Add new option */}
+        <div className="flex items-center gap-2 pt-1">
+          <Input
+            placeholder="Название"
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            className="h-8 text-sm flex-1"
+            onKeyDown={e => e.key === 'Enter' && handleAdd()}
+          />
+          <Input
+            placeholder="Код (опц.)"
+            value={newCode}
+            onChange={e => setNewCode(e.target.value)}
+            className="h-8 text-sm w-32 font-mono"
+            onKeyDown={e => e.key === 'Enter' && handleAdd()}
+          />
+          <Button size="sm" className="h-8" onClick={handleAdd} disabled={adding || !newName.trim()}>
+            {adding ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Plus className="h-3 w-3 mr-1" />}
+            Добавить
           </Button>
         </div>
       </DialogContent>

@@ -141,6 +141,35 @@ class MarketplaceAttributeViewSet(viewsets.ModelViewSet):
         serializer = MarketplaceAttributeOptionSerializer(options, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['post'], url_path='add-option')
+    def add_option(self, request, pk=None):
+        """Add a new option to attribute"""
+        attribute = self.get_object()
+        name = request.data.get('name', '').strip()
+        code = request.data.get('code', '').strip()
+        if not name:
+            return Response({'error': 'name is required'}, status=400)
+        if not code:
+            code = name.lower().replace(' ', '_')
+        opt, created = MarketplaceAttributeOption.objects.get_or_create(
+            attribute=attribute,
+            external_code=code,
+            defaults={'name': name},
+        )
+        if not created:
+            return Response({'error': 'Option with this code already exists'}, status=400)
+        return Response({'id': opt.id, 'name': opt.name, 'external_code': opt.external_code}, status=201)
+
+    @action(detail=True, methods=['post'], url_path='delete-options')
+    def delete_options(self, request, pk=None):
+        """Batch delete options by IDs"""
+        attribute = self.get_object()
+        ids = request.data.get('ids', [])
+        if not ids:
+            return Response({'error': 'ids list is required'}, status=400)
+        deleted = attribute.options.filter(id__in=ids).delete()[0]
+        return Response({'deleted': deleted, 'remaining': attribute.options.count()})
+
     @action(detail=True, methods=['post'], url_path='optimize-options')
     def optimize_options(self, request, pk=None):
         """
