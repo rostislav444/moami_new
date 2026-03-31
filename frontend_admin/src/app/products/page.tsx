@@ -74,7 +74,7 @@ export default function ProductsPage() {
   const bulkAbortRef = useRef(false)
   const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0, filled: 0, skipped: 0, errors: 0, currentName: '' })
   const [bulkDone, setBulkDone] = useState(false)
-  const [bulkLog, setBulkLog] = useState<{ id: number; name: string; status: 'filled' | 'skipped' | 'error'; mp: string }[]>([])
+  const [bulkLog, setBulkLog] = useState<{ id: number; name: string; mpResults: { mp: string; status: 'filled' | 'skipped' | 'error' }[]; done: boolean }[]>([])
   const queryClient = useQueryClient()
 
   const startBulkFill = async (mpIds: number[]) => {
@@ -105,6 +105,9 @@ export default function ProductsPage() {
         if (bulkAbortRef.current) break
         const p = allProducts[i]
 
+        // Add product entry to log (not done yet)
+        setBulkLog(prev => [...prev, { id: p.id, name: p.name, mpResults: [], done: false }])
+
         for (const mpId of mpIds) {
           if (bulkAbortRef.current) break
           opIdx++
@@ -112,6 +115,7 @@ export default function ProductsPage() {
           const mpName = activeMarketplaces.find(m => m.id === mpId)?.name || ''
           setBulkProgress(prev => ({ ...prev, current: opIdx, currentName: `${p.name} → ${mpName}` }))
 
+          let mpStatus: 'filled' | 'skipped' | 'error' = 'skipped'
           try {
             const result = await productAdminAPI.aiFill(p.id, mpId, withImages)
             if (result.success) {
@@ -124,24 +128,41 @@ export default function ProductsPage() {
                   size_attributes: _buildSizePayload(d.filled_sizes as Record<string, Record<string, unknown>>),
                 })
                 setBulkProgress(prev => ({ ...prev, filled: prev.filled + 1 }))
-                setBulkLog(prev => [...prev, { id: p.id, name: p.name, status: 'filled', mp: mpName }])
+                mpStatus = 'filled'
               } else {
                 setBulkProgress(prev => ({ ...prev, skipped: prev.skipped + 1 }))
-                setBulkLog(prev => [...prev, { id: p.id, name: p.name, status: 'skipped', mp: mpName }])
               }
             } else {
               setBulkProgress(prev => ({ ...prev, errors: prev.errors + 1 }))
-              setBulkLog(prev => [...prev, { id: p.id, name: p.name, status: 'error', mp: mpName }])
+              mpStatus = 'error'
             }
           } catch {
             setBulkProgress(prev => ({ ...prev, errors: prev.errors + 1 }))
-            setBulkLog(prev => [...prev, { id: p.id, name: p.name, status: 'error', mp: mpName }])
+            mpStatus = 'error'
           }
+
+          // Update product log entry with this MP result
+          setBulkLog(prev => {
+            const next = [...prev]
+            const idx = next.findIndex(e => e.id === p.id)
+            if (idx !== -1) {
+              next[idx] = { ...next[idx], mpResults: [...next[idx].mpResults, { mp: mpName, status: mpStatus }] }
+            }
+            return next
+          })
 
           if (opIdx % 5 === 0) {
             queryClient.invalidateQueries({ queryKey: ['ai-usage'] })
           }
         }
+
+        // Mark product as done (all marketplaces processed)
+        setBulkLog(prev => {
+          const next = [...prev]
+          const idx = next.findIndex(e => e.id === p.id)
+          if (idx !== -1) next[idx] = { ...next[idx], done: true }
+          return next
+        })
       }
     } finally {
       setBulkRunning(false)
@@ -256,15 +277,20 @@ export default function ProductsPage() {
             </div>
           )}
           {bulkLog.length > 0 && (
-            <div className="mt-3 max-h-[200px] overflow-auto text-xs space-y-0.5 bg-white/60 rounded-lg p-2">
-              {bulkLog.map((entry, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className={
-                    entry.status === 'filled' ? 'text-emerald-600' :
-                    entry.status === 'error' ? 'text-red-500' : 'text-slate-400'
-                  }>
-                    {entry.status === 'filled' ? '✓' : entry.status === 'error' ? '✗' : '—'}
-                  </span>
+            <div className="mt-3 max-h-[250px] overflow-auto text-xs space-y-1 bg-white/60 rounded-lg p-2">
+              {bulkLog.map((entry) => (
+                <div key={entry.id} className="flex items-center gap-2">
+                  {entry.done ? (
+                    <span className={
+                      entry.mpResults.every(r => r.status === 'filled') ? 'text-emerald-600 font-medium' :
+                      entry.mpResults.some(r => r.status === 'error') ? 'text-red-500' : 'text-slate-400'
+                    }>
+                      {entry.mpResults.every(r => r.status === 'filled') ? '✓ Обработан' :
+                       entry.mpResults.some(r => r.status === 'error') ? '✗ Ошибка' : '— Пропущен'}
+                    </span>
+                  ) : (
+                    <span className="text-indigo-500 animate-pulse">⟳</span>
+                  )}
                   <a
                     href={`/products/${entry.id}`}
                     target="_blank"
@@ -273,7 +299,14 @@ export default function ProductsPage() {
                   >
                     {entry.name}
                   </a>
-                  <span className="text-slate-400">→ {entry.mp}</span>
+                  {entry.mpResults.map((r, j) => (
+                    <span key={j} className={
+                      r.status === 'filled' ? 'text-emerald-600' :
+                      r.status === 'error' ? 'text-red-500' : 'text-slate-400'
+                    }>
+                      {r.status === 'filled' ? '✓' : r.status === 'error' ? '✗' : '—'} {r.mp}
+                    </span>
+                  ))}
                 </div>
               ))}
             </div>
