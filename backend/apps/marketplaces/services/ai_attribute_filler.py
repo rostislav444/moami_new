@@ -34,6 +34,16 @@ def ai_fill_product_attributes(
 
     product_info = _build_product_context(product)
 
+    # Collect all size hints from product for smart option filtering
+    size_hints = set()
+    for v in product.variants.prefetch_related('sizes__size__interpretations__grid').all():
+        for vs in v.sizes.all():
+            if vs.size:
+                interps = vs.size.get_interpretations_dict()
+                for val in interps.values():
+                    size_hints.add(str(val).strip())
+    size_hints = list(size_hints)
+
     # Build hierarchical attribute structure for prompt
     structure_lines = []
 
@@ -41,7 +51,7 @@ def ai_fill_product_attributes(
     product_attrs = form_data.get('product_attributes', [])
     if product_attrs:
         structure_lines.append("PRODUCT_ATTRIBUTES (общие для всего товара: пол, сезон, стиль, габариты УПАКОВКИ и т.д.):")
-        structure_lines.append(_build_attributes_prompt(product_attrs))
+        structure_lines.append(_build_attributes_prompt(product_attrs, size_hints))
 
     # Variants
     variants = form_data.get('variants', [])
@@ -51,7 +61,7 @@ def ai_fill_product_attributes(
 
         if v_attrs:
             structure_lines.append("  VARIANT_ATTRIBUTES:")
-            structure_lines.append('  ' + _build_attributes_prompt(v_attrs).replace('\n', '\n  '))
+            structure_lines.append('  ' + _build_attributes_prompt(v_attrs, size_hints).replace('\n', '\n  '))
 
         for s in v.get('sizes', []):
             # Get size interpretations from DB
@@ -74,7 +84,7 @@ def ai_fill_product_attributes(
             s_attrs = s.get('attributes', [])
             if s_attrs:
                 structure_lines.append("    SIZE_ATTRIBUTES (УНИКАЛЬНЫЕ для этого размера: размерная сетка, обхваты, длина изделия):")
-                structure_lines.append('    ' + _build_attributes_prompt(s_attrs).replace('\n', '\n    '))
+                structure_lines.append('    ' + _build_attributes_prompt(s_attrs, size_hints).replace('\n', '\n    '))
 
     attrs_structure = '\n'.join(structure_lines)
 
@@ -102,7 +112,9 @@ def ai_fill_product_attributes(
 - По фото: определи тип одежды, фасон, длину, пол
 
 РАЗМЕРЫ — для каждого SIZE заполни ОТДЕЛЬНО:
-- Размерные атрибуты (UA/EU/INT/US) — сопоставь наш размер с опциями маркетплейса
+- У каждого размера указаны интерпретации (eu, int, ua). ВСЕГДА используй УКРАИНСКИЙ размер (ua) как приоритетный.
+- Для атрибута "Размер" (select): ищи ТОЧНОЕ совпадение с ua размером в опциях. Например ua:42 → ищи опцию "42", ua:48 → ищи "48". НЕ выбирай похожие вроде "L1", "S-30", "L-Petite" — это НЕ те размеры.
+- Если точного совпадения нет — попробуй eu или int размер.
 - Обхваты и мерки — бери из стандартных размерных таблиц ниже
 - Если не уверен — null
 
@@ -314,10 +326,13 @@ def _get_product_images(product, max_images: int = 3) -> List[Dict]:
     return images
 
 
-def _build_attributes_prompt(attributes_data: List[Dict]) -> str:
-    """Только product-level атрибуты. Пропускаем entity-коды."""
+def _build_attributes_prompt(attributes_data: List[Dict], size_hints: List[str] = None) -> str:
+    """Build attribute list for prompt. Filters size options smartly."""
     lines = []
     skip_codes = {'brand', 'measure'}
+
+    # Size-related attribute names (case-insensitive matching)
+    SIZE_ATTR_KEYWORDS = {'розмір', 'размер', 'size'}
 
     for attr in attributes_data:
         code = attr.get('external_code', '')
@@ -334,10 +349,36 @@ def _build_attributes_prompt(attributes_data: List[Dict]) -> str:
 
         options = attr.get('options', [])
         if options and attr_type in ('select', 'multiselect'):
-            opts_text = ', '.join(f'{o["id"]}="{o["name"]}"' for o in options[:80])
-            if len(options) > 80:
-                opts_text += f'... (ещё {len(options) - 80})'
-            line += f"\n  Опции: {opts_text}"
+            # Smart filtering for size attributes with many options
+            is_size_attr = any(kw in name.lower() for kw in SIZE_ATTR_KEYWORDS)
+
+            if is_size_attr and len(options) > 50 and size_hints:
+                # Filter options to only those matching product sizes
+                filtered = []
+                for o in options:
+                    oname = str(o['name']).strip()
+                    for hint in size_hints:
+                        if oname == hint or oname.lower() == hint.lower():
+                            filtered.append(o)
+                            break
+                if filtered:
+                    opts_text = ', '.join(f'{o["id"]}="{o["name"]}"' for o in filtered)
+                    line += f"\n  Опции (отфильтрованы по размерам товара): {opts_text}"
+                else:
+                    # No exact match — show all simple numeric sizes
+                    simple = [o for o in options if o['name'].strip().isdigit() or
+                              o['name'].strip() in ('XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL')]
+                    show = simple[:100] if simple else options[:80]
+                    opts_text = ', '.join(f'{o["id"]}="{o["name"]}"' for o in show)
+                    if len(options) > len(show):
+                        opts_text += f'... (ещё {len(options) - len(show)})'
+                    line += f"\n  Опции: {opts_text}"
+            else:
+                show = options[:80]
+                opts_text = ', '.join(f'{o["id"]}="{o["name"]}"' for o in show)
+                if len(options) > 80:
+                    opts_text += f'... (ещё {len(options) - 80})'
+                line += f"\n  Опции: {opts_text}"
 
         lines.append(line)
 
