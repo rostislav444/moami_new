@@ -407,6 +407,7 @@ export default function CategoryDetailPage() {
           <span className="shrink-0 w-20 text-center">Значений</span>
           <span className="shrink-0 w-24 text-center">Тип</span>
           <span className="shrink-0 w-14 text-center">Обяз.</span>
+          <span className="shrink-0 w-16 text-center"></span>
         </div>
 
         {/* Attributes list */}
@@ -461,54 +462,56 @@ export default function CategoryDetailPage() {
                         <Badge variant="destructive" className="text-xs">Да</Badge>
                       )}
                     </span>
-                    {(attr.attr_type === 'select' || attr.attr_type === 'multiselect') && attr.options && attr.options.length > 30 && (
-                      <button
-                        onClick={async (e) => {
-                          e.stopPropagation()
-                          if (!confirm(`Оптимизировать ${attr.options!.length} значений атрибута "${attr.name}" с помощью ИИ? Лишние будут удалены.`)) return
-                          setOptimizingAttr(attr.id)
-                          try {
-                            const res = await fetch(`${API_BASE}/marketplaces/marketplace-attributes/${attr.id}/optimize-options/`, {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ category_name: category?.name || '' }),
-                            })
-                            const data = await res.json()
-                            if (res.ok) {
-                              alert(`Оптимизировано: было ${data.total_before}, оставлено ${data.kept}, удалено ${data.deleted}`)
-                              refetchAttributes()
-                            } else {
-                              alert(`Ошибка: ${data.error || 'Unknown error'}`)
+                    <div className="shrink-0 w-16 flex items-center justify-end gap-1">
+                      {(attr.attr_type === 'select' || attr.attr_type === 'multiselect') && attr.options && attr.options.length > 30 && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            if (!confirm(`Оптимизировать ${attr.options!.length} значений атрибута "${attr.name}" с помощью ИИ? Лишние будут удалены.`)) return
+                            setOptimizingAttr(attr.id)
+                            try {
+                              const res = await fetch(`${API_BASE}/marketplaces/marketplace-attributes/${attr.id}/optimize-options/`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ category_name: category?.name || '' }),
+                              })
+                              const data = await res.json()
+                              if (res.ok) {
+                                alert(`Оптимизировано: было ${data.total_before}, оставлено ${data.kept}, удалено ${data.deleted}`)
+                                refetchAttributes()
+                              } else {
+                                alert(`Ошибка: ${data.error || 'Unknown error'}`)
+                              }
+                            } catch (err) {
+                              alert('Ошибка сети')
+                            } finally {
+                              setOptimizingAttr(null)
                             }
-                          } catch (err) {
-                            alert('Ошибка сети')
-                          } finally {
-                            setOptimizingAttr(null)
-                          }
+                          }}
+                          disabled={optimizingAttr === attr.id}
+                          className="px-2 py-1 text-xs text-amber-600 bg-amber-50 hover:bg-amber-100 rounded border border-amber-200 disabled:opacity-50"
+                          title="Оптимизировать значения с ІІ"
+                        >
+                          {optimizingAttr === attr.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                        </button>
+                      )}
+                      <button
+                        onClick={e => {
+                          e.stopPropagation()
+                          setEditingAttr({
+                            id: attr.id,
+                            name: attr.name,
+                            external_code: attr.external_code,
+                            attr_type: attr.attr_type,
+                            is_required: attr.is_required,
+                            suffix: attr.suffix || '',
+                          })
                         }}
-                        disabled={optimizingAttr === attr.id}
-                        className="shrink-0 px-2 py-1 text-xs text-amber-600 bg-amber-50 hover:bg-amber-100 rounded border border-amber-200 disabled:opacity-50"
-                        title="Оптимизировать значения с ИИ"
+                        className="px-2 py-1 text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded border border-indigo-200"
                       >
-                        {optimizingAttr === attr.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                        <Pencil className="h-3 w-3" />
                       </button>
-                    )}
-                    <button
-                      onClick={e => {
-                        e.stopPropagation()
-                        setEditingAttr({
-                          id: attr.id,
-                          name: attr.name,
-                          external_code: attr.external_code,
-                          attr_type: attr.attr_type,
-                          is_required: attr.is_required,
-                          suffix: attr.suffix || '',
-                        })
-                      }}
-                      className="shrink-0 px-2 py-1 text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded border border-indigo-200"
-                    >
-                      <Pencil className="h-3 w-3" />
-                    </button>
+                    </div>
                   </div>
                   {/* Expanded options */}
                   {expandedAttrs.has(attr.id) && attr.options && attr.options.length > 0 && (
