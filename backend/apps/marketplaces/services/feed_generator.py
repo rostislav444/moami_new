@@ -116,6 +116,18 @@ class FeedGenerator:
         # Render header + footer
         header_xml = ''
         if templates.get('header'):
+            # Build categories list from mappings
+            categories_ctx = []
+            for cat_id, cm in self.category_map.items():
+                mp_cat = cm.marketplace_category
+                categories_ctx.append({
+                    'id': mp_cat.external_id or mp_cat.id,
+                    'rz_id': mp_cat.external_id or mp_cat.external_code,
+                    'rozetka_id': mp_cat.external_id or mp_cat.external_code,
+                    'code': mp_cat.external_code,
+                    'name': mp_cat.name,
+                })
+
             header_ctx = {
                 'shop_name': 'MOAMI',
                 'shop_url': SITE_URL,
@@ -123,6 +135,7 @@ class FeedGenerator:
                 'time': datetime.now().strftime('%Y-%m-%d %H:%M'),
                 'products_count': products_count,
                 'products_xml': products_xml,
+                'categories': categories_ctx,
             }
             header_xml = self._render_template(templates['header'], header_ctx)
 
