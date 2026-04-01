@@ -141,7 +141,7 @@ class SyncOptionsHandler(BaseStepHandler):
         return []
 
     # Entity-type attributes — skip, they use entity mappings (BrandMapping etc.)
-    SKIP_CODES = {'brand', 'country_of_origin', 'measure'}
+    SKIP_CODES = {'brand', 'country_of_origin', 'measure', '78', '7019'}  # 78=Цвет производителя, 7019=Комплект
 
     def execute(self, config: dict) -> dict:
         """
