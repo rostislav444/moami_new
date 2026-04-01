@@ -206,7 +206,7 @@ class Command(BaseCommand):
                     'name': s.name,
                     'step_type': s.step_type,
                     'config': s.config,
-                    'is_active': s.is_active,
+                    'is_active': getattr(s, 'is_active', True),
                 })
             pipelines.append({
                 'id': p.id,
