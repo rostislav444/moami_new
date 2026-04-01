@@ -11,8 +11,6 @@ class CreateTemplateHandler(BaseStepHandler):
         errors = []
         if not config.get('template_type'):
             errors.append('template_type is required (header/product/variant/footer)')
-        if not config.get('content'):
-            errors.append('content is required')
         return errors
 
     def execute(self, config: dict) -> dict:
@@ -21,7 +19,7 @@ class CreateTemplateHandler(BaseStepHandler):
         config = self.resolve_config(config)
 
         template_type = config['template_type']
-        content = config['content']
+        content = config.get('content', '') or ''
         name = config.get('name', f'{self.marketplace.name} - {template_type}')
 
         obj, created = FeedTemplate.objects.update_or_create(

@@ -116,7 +116,7 @@ const RESEARCH_PRESETS: ResearchPreset[] = [
     systemContext: `Твоя ЕДИНСТВЕННАЯ задача — создать 4 шаблона XML фида (header, product, variant, footer) для маркетплейса.
 
 НЕ НУЖНО: загружать категории, атрибуты, опции, API-вызовы. Категории и атрибуты УЖЕ загружены.
-НУЖНО ТОЛЬКО: 4 шаблона create_template. Больше НИЧЕГО в pipeline.
+НУЖНО ТОЛЬКО: 4 шаблона create_template. Больше НИЧЕГО в pipeline. НЕ добавляй generate_feed.
 
 Шаблоны используют Django Template синтаксис ({{ variable }}, {% for %}, {% if %}).
 
@@ -162,8 +162,7 @@ const RESEARCH_PRESETS: ResearchPreset[] = [
   {"type": "create_template", "name": "header", "config": {"template_type": "header", "content": "...XML..."}},
   {"type": "create_template", "name": "product", "config": {"template_type": "product", "content": "{{ product.variants_xml }}"}},
   {"type": "create_template", "name": "variant", "config": {"template_type": "variant", "content": "...XML offer..."}},
-  {"type": "create_template", "name": "footer", "config": {"template_type": "footer", "content": "<!-- end -->"}},
-  {"type": "generate_feed", "name": "Генерация", "config": {"filename": "marketplace.xml"}}
+  {"type": "create_template", "name": "footer", "config": {"template_type": "footer", "content": ""}}
 ]}
 \`\`\`
 
