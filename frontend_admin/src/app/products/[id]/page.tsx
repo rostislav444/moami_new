@@ -1940,9 +1940,11 @@ function SearchableSelect({
   const openDropdown = () => {
     if (btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect()
+      const spaceBelow = window.innerHeight - rect.bottom
+      const dropUp = spaceBelow < 320
       setDropdownStyle({
         position: 'fixed',
-        top: rect.bottom + 4,
+        ...(dropUp ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }),
         left: rect.left,
         width: rect.width,
         zIndex: 50,
@@ -2020,9 +2022,11 @@ function SearchableMultiSelect({
   const openDropdown = () => {
     if (btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect()
+      const spaceBelow = window.innerHeight - rect.bottom
+      const dropUp = spaceBelow < 320
       setDropdownStyle({
         position: 'fixed',
-        top: rect.bottom + 4,
+        ...(dropUp ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }),
         left: rect.left,
         width: rect.width,
         zIndex: 50,
