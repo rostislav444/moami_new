@@ -77,13 +77,13 @@ class StartResearchSerializer(serializers.Serializer):
     """Serializer for starting research"""
 
     marketplace_id = serializers.IntegerField()
-    initial_query = serializers.CharField(max_length=5000)
+    initial_query = serializers.CharField()
 
 
 class SendMessageSerializer(serializers.Serializer):
     """Serializer for sending user message"""
 
-    message = serializers.CharField(max_length=5000)
+    message = serializers.CharField()
 
 
 class PollMessagesSerializer(serializers.Serializer):
