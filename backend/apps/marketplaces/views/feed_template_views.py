@@ -81,7 +81,7 @@ class FeedTemplateViewSet(viewsets.ModelViewSet):
 
         # Save to file
         import os
-        feed_dir = os.path.join(settings.MEDIA_ROOT, 'feed')
+        feed_dir = os.path.join(settings.MEDIA_ROOT, 'mp_feed')
         os.makedirs(feed_dir, exist_ok=True)
         filename = marketplace.feed_filename or f'{marketplace.slug}.xml'
         filepath = os.path.join(feed_dir, filename)
@@ -94,7 +94,7 @@ class FeedTemplateViewSet(viewsets.ModelViewSet):
         marketplace.last_feed_generated = timezone.now()
         marketplace.save(update_fields=['last_feed_generated'])
 
-        result['file_path'] = f'/media/feed/{filename}'
+        result['file_path'] = f'/media/mp_feed/{filename}'
         return Response(result)
 
     @action(detail=False, methods=['get'])

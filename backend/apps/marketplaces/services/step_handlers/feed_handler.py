@@ -21,7 +21,7 @@ class GenerateFeedHandler(BaseStepHandler):
         result = generator.generate()
 
         # Save to file
-        feed_dir = os.path.join(settings.MEDIA_ROOT, 'feed')
+        feed_dir = os.path.join(settings.MEDIA_ROOT, 'mp_feed')
         os.makedirs(feed_dir, exist_ok=True)
         filename = config.get('filename') or self.marketplace.feed_filename or f'{self.marketplace.slug}.xml'
         filepath = os.path.join(feed_dir, filename)
@@ -38,6 +38,6 @@ class GenerateFeedHandler(BaseStepHandler):
         return {
             'products_count': result['products_count'],
             'generation_time': result['generation_time'],
-            'file_path': f'/media/feed/{filename}',
+            'file_path': f'/media/mp_feed/{filename}',
             'file_size': file_size,
         }
