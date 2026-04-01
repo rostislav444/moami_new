@@ -113,51 +113,61 @@ const RESEARCH_PRESETS: ResearchPreset[] = [
     description: 'Створити шаблони для генерації XML фіду маркетплейсу',
     icon: <Sparkles className="h-5 w-5" />,
     color: 'border-green-200 bg-green-50 hover:border-green-400',
-    systemContext: `Допоможи створити шаблони XML фіду для цього маркетплейсу.
+    systemContext: `Твоя ЕДИНСТВЕННАЯ задача — создать 4 шаблона XML фида (header, product, variant, footer) для маркетплейса.
 
-Система шаблонів використовує Django Template синтаксис ({{ variable }}, {% for %}, {% if %}).
-Є 4 типи шаблонів які рендеряться окремо:
+НЕ НУЖНО: загружать категории, атрибуты, опции, API-вызовы. Категории и атрибуты УЖЕ загружены.
+НУЖНО ТОЛЬКО: 4 шаблона create_template. Больше НИЧЕГО в pipeline.
 
-1. **header** — шапка XML файлу. Доступні змінні:
-   - {{ shop_name }}, {{ shop_url }}, {{ company_name }}
-   - {{ time }} — дата/час генерації
-   - {{ products_count }} — кількість товарів
-   - {{ products_xml }} — XML всіх товарів (якщо header містить offers)
+Шаблоны используют Django Template синтаксис ({{ variable }}, {% for %}, {% if %}).
 
-2. **product** — шаблон товару. Доступні змінні:
-   - {{ product.id }}, {{ product.name }}, {{ product.name_uk }}
-   - {{ product.code }}, {{ product.slug }}, {{ product.url }}
-   - {{ product.price }}, {{ product.promo_price }}, {{ product.old_price }}
-   - {{ product.description }}, {{ product.description_uk }}
-   - {{ product.brand }}, {{ product.brand_mapped.name }}, {{ product.brand_mapped.external_id }}
-   - {{ product.country }}, {{ product.country_uk }}, {{ product.country_mapped.name }}
-   - {{ product.composition }}, {{ product.composition_uk }}
-   - {{ product.category.name }}, {{ product.category.mp_category.name }}, {{ product.category.mp_category.code }}
-   - {{ product.attrs.<code>.value }}, {{ product.attrs.<code>.value_uk }} — атрибути МП по коду
-   - {{ product.variants }} — список варіантів (for variant in product.variants)
-   - {{ product.variants_xml }} — XML варіантів (якщо є variant шаблон)
-   - {{ product.attributes }} — наші атрибути [{name, value, value_uk}]
+## Доступные переменные:
 
-3. **variant** — шаблон варіанту товару (рендериться для кожного variant+size). Доступні змінні:
-   - product.* — всі поля товару
-   - {{ variant.code }}, {{ variant.slug }}
-   - {{ variant.color }}, {{ variant.color_uk }}, {{ variant.color_mapped.name }}
-   - {{ variant.images }} — список зображень [{url, image}]
-   - {{ variant.attrs.<code>.value }} — атрибути варіанту
-   - {{ size.size }}, {{ size.size_name }}, {{ size.max_size }}
-   - {{ size.stock }}, {{ size.sku }}, {{ size.mk_sku }}, {{ size.mk_full_id }}
-   - {{ size.interpretations }} — розмірні сітки {ua: "42", eu: "36", int: "S"}
-   - {{ size.size_mapped.name }} — розмір маркетплейсу
-   - {{ size.attrs.<code>.value }} — атрибути розміру
+### header — шапка XML:
+- {{ shop_name }}, {{ shop_url }}, {{ company_name }}, {{ time }}
+- {{ products_xml }} — XML всех товаров
+- {% for category in categories %} — категории: {{ category.id }}, {{ category.code }}, {{ category.name }}
 
-4. **footer** — закриваючі теги (пустий контекст)
+### product — обёртка товара:
+Обычно просто: {{ product.variants_xml }}
 
-Мені потрібно:
-1. Вивчити формат XML фіду який потребує маркетплейс
-2. Створити 4 шаблони (header, product, variant, footer) з правильними тегами
-3. Правильно замапити наші змінні на поля фіду маркетплейсу
+### variant — ОСНОВНОЙ шаблон, рендерится для каждого variant+size:
+Товар: {{ product.name }}, {{ product.name_uk }}, {{ product.code }}, {{ product.url }}
+Цены: {{ product.price }}, {{ product.old_price }}, {{ product.promo_price }}
+Описание: {{ product.description }}, {{ product.description_uk }}
+Категория: {{ product.category.mp_category.code }}, {{ product.category.mp_category.name }}
+Бренд: {{ product.brand }}, {{ product.brand_mapped.name }}, {{ product.brand_mapped.external_id }}
+Страна: {{ product.country }}, {{ product.country_uk }}, {{ product.country_mapped.name }}, {{ product.country_mapped.external_id }}
+Состав: {{ product.composition }}, {{ product.composition_uk }}
+Вариант: {{ variant.code }}, {{ variant.color }}, {{ variant.color_uk }}
+Цвет маппинг: {{ variant.color_mapped.name }}, {{ variant.color_mapped.external_id }}
+Картинки: {% for image in variant.images %}{{ image.url }}{% endfor %}
+Размер: {{ size.size }} (ua), {{ size.sku }}, {{ size.stock }}, {{ size.mk_sku }}
+Интерпретации: {{ size.interpretations.ua }}, {{ size.interpretations.eu }}, {{ size.interpretations.int }}
+Размер маппинг: {{ size.size_mapped.name }}, {{ size.size_mapped.external_id }}
 
-ВАЖНО: Створи finding з типом "pipeline" що містить готові кроки для створення шаблонів.`,
+**Атрибуты маркетплейса (ВСЕ уже заполнены через attr-mapping, разбиты по уровням):**
+- Product-level: {% for code, attr in product.attrs.items %}
+- Variant-level: {% for code, attr in variant.attrs.items %}
+- Size-level: {% for code, attr in size.attrs.items %}
+Каждый attr: {{ attr.name }}, {{ attr.value }}, {{ attr.value_uk }}, {{ attr.code }}, {{ attr.paramid }}, {{ attr.valueid }}
+
+### footer — закрывающие теги (пустой контекст)
+
+## ФОРМАТ ОТВЕТА:
+
+Создай finding с pipeline из ТОЛЬКО create_template шагов + generate_feed:
+
+\`\`\`json
+{"type": "finding", "category": "pipeline", "data": [
+  {"type": "create_template", "name": "header", "config": {"template_type": "header", "content": "...XML..."}},
+  {"type": "create_template", "name": "product", "config": {"template_type": "product", "content": "{{ product.variants_xml }}"}},
+  {"type": "create_template", "name": "variant", "config": {"template_type": "variant", "content": "...XML offer..."}},
+  {"type": "create_template", "name": "footer", "config": {"template_type": "footer", "content": "<!-- end -->"}},
+  {"type": "generate_feed", "name": "Генерация", "config": {"filename": "marketplace.xml"}}
+]}
+\`\`\`
+
+ВАЖНО: В variant шаблоне используй ТОЛЬКО переменные из списка выше. НЕ выдумывай свои.`,
     inputPlaceholder: 'Додайте посилання на документацію формату фіду маркетплейсу, приклади XML...',
     inputHint: 'Дайте посилання на документацію формату XML фіду маркетплейсу, приклади, або опишіть вимоги. Натисніть "Почати дослідження".',
   },
