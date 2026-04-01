@@ -302,6 +302,70 @@ Excel файлы маркетплейсов ВСЕГДА содержат нес
 }}
 ```
 
+8. **create_template** — Создать/обновить шаблон фида (header/product/variant/footer)
+   ```json
+   {"type": "create_template", "name": "Создать шаблон variant", "config": {
+     "template_type": "variant",
+     "content": "<offer>...</offer>"
+   }}
+   ```
+
+9. **generate_feed** — Сгенерировать XML фид
+   ```json
+   {"type": "generate_feed", "name": "Генерация фида", "config": {
+     "filename": "rozetka.xml"
+   }}
+   ```
+
+### Шаблоны фида — ОБЯЗАТЕЛЬНО используй эти переменные:
+
+Шаблоны используют Django Template Language. Вот ТОЧНЫЕ переменные:
+
+**header** — шапка XML:
+- `{{ shop_name }}`, `{{ shop_url }}`, `{{ company_name }}`, `{{ time }}`
+- `{{ products_xml }}` — сюда подставятся все товары
+- `{% for category in categories %}` — категории маркетплейса:
+  - `{{ category.id }}`, `{{ category.rz_id }}`, `{{ category.code }}`, `{{ category.name }}`
+
+**product** — обёртка товара (обычно просто `{{ product.variants_xml }}`):
+- `{{ product.variants_xml }}` — отрендеренные варианты
+
+**variant** — один offer (вариант+размер). ОСНОВНОЙ шаблон:
+- Товар: `{{ product.id }}`, `{{ product.name }}`, `{{ product.name_uk }}`, `{{ product.code }}`
+- Цены: `{{ product.price }}`, `{{ product.old_price }}`, `{{ product.promo_price }}`
+- Описание: `{{ product.description }}`, `{{ product.description_uk }}`
+- Категория: `{{ product.category.mp_category.code }}`, `{{ product.category.mp_category.name }}`
+- Бренд: `{{ product.brand }}`, `{{ product.brand_mapped.name }}`, `{{ product.brand_mapped.external_id }}`
+- Страна: `{{ product.country }}`, `{{ product.country_uk }}`, `{{ product.country_mapped.name }}`
+- URL: `{{ product.url }}`
+- Вариант: `{{ variant.code }}`, `{{ variant.color }}`, `{{ variant.color_uk }}`
+- Цвет маппинг: `{{ variant.color_mapped.name }}`, `{{ variant.color_mapped.external_id }}`
+- Картинки: `{% for image in variant.images %}{{ image.url }}{% endfor %}`
+- Размер: `{{ size.size }}` (ua интерпретация), `{{ size.sku }}`, `{{ size.stock }}`
+- Размер маппинг: `{{ size.size_mapped.name }}`, `{{ size.size_mapped.external_id }}`
+- Интерпретации: `{{ size.interpretations.ua }}`, `{{ size.interpretations.eu }}`, `{{ size.interpretations.int }}`
+
+**АТРИБУТЫ МАРКЕТПЛЕЙСА** (самое важное!):
+Атрибуты разделены по уровням через attr-mapping (product/variant/size):
+- Product-level: `{% for code, attr in product.attrs.items %}`
+- Variant-level: `{% for code, attr in variant.attrs.items %}`
+- Size-level: `{% for code, attr in size.attrs.items %}`
+
+Каждый attr содержит:
+- `{{ attr.name }}` — название атрибута
+- `{{ attr.value }}` — значение (ru)
+- `{{ attr.value_uk }}` — значение (uk)
+- `{{ attr.code }}` — external_code атрибута
+- `{{ attr.paramid }}` — ID параметра (для Rozetka)
+- `{{ attr.valueid }}` — ID значения (для Rozetka)
+
+Пример param с paramid/valueid для Rozetka:
+```xml
+<param name="{{ attr.name }}" paramid="{{ attr.paramid }}" valueid="{{ attr.valueid }}">{{ attr.value }}</param>
+```
+
+Композиция: `{{ product.composition }}`, `{{ product.composition_uk }}`
+
 ## Общие инструкции
 
 - Когда задаёшь вопрос: [QUESTION] Твой вопрос
