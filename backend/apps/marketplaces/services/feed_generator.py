@@ -274,10 +274,13 @@ class FeedGenerator:
                 # Size-level attributes
                 s_attrs = self._build_attrs_dict(product_attrs.get((variant.id, vs.id), []))
 
+                # Preferred size: ua interpretation, fallback to str(size)
+                ua_size = interps.get('ua') or interps.get('UA') or (str(vs.size) if vs.size else '')
+
                 sizes_ctx.append({
                     'id': vs.id,
-                    'size': str(vs.size) if vs.size else '',
-                    'size_name': vs.get_size if hasattr(vs, 'get_size') else str(vs.size),
+                    'size': ua_size,
+                    'size_name': vs.get_size if hasattr(vs, 'get_size') else ua_size,
                     'max_size': vs.get_max_size if hasattr(vs, 'get_max_size') else '',
                     'stock': vs.stock,
                     'sku': vs.sku,
@@ -406,19 +409,42 @@ class FeedGenerator:
         for pma in attrs_list:
             code = pma.marketplace_attribute.external_code
             attr_name = pma.marketplace_attribute.name
-            value_ru = pma.get_value_for_xml('ru')
-            value_uk = pma.get_value_for_xml('uk')
+            raw_ru = pma.get_value_for_xml('ru')
+            raw_uk = pma.get_value_for_xml('uk')
+
+            # Extract plain string from dict (select/multiselect return {'code':..,'name':..})
+            def extract(val):
+                if isinstance(val, dict):
+                    return val.get('names') or val.get('name') or ''
+                return val
+
+            value_ru = extract(raw_ru)
+            value_uk = extract(raw_uk)
+            if not value_ru and not value_uk:
+                continue
+
+            # For Rozetka params: also store paramid/valueid from external codes
+            paramid = None
+            valueid = None
+            if isinstance(raw_ru, dict):
+                paramid = pma.marketplace_attribute.external_code
+                valueid = raw_ru.get('codes') or raw_ru.get('code') or None
+
             result[code] = {
                 'name': attr_name,
                 'value': value_ru,
-                'value_uk': value_uk,
+                'value_uk': value_uk or value_ru,
                 'code': code,
+                'paramid': paramid,
+                'valueid': valueid,
             }
         return result
 
     def _render_template(self, template_content: str, context: dict) -> str:
         try:
-            template = Template(template_content)
+            # Wrap with {% autoescape off %} to avoid double-escaping XML
+            wrapped = '{% autoescape off %}' + template_content + '{% endautoescape %}'
+            template = Template(wrapped)
             return template.render(Context(context))
         except Exception as e:
             return f'<!-- Ошибка: {str(e)} -->'
