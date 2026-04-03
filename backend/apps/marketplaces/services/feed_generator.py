@@ -218,6 +218,9 @@ class FeedGenerator:
         # Build product-level attributes dict {external_code: {value, name, code}}
         mp_attrs = self._build_attrs_dict(product_attrs.get((None, None), []))
 
+        # Auto-fill attributes with level=brand/color/country/composition
+        self._auto_fill_attrs(mp_attrs, cm, product)
+
         # Compositions
         comp_parts_ru = []
         comp_parts_uk = []
@@ -253,6 +256,7 @@ class FeedGenerator:
 
             # Variant-level attributes
             v_attrs = self._build_attrs_dict(product_attrs.get((variant.id, None), []))
+            self._auto_fill_attrs(v_attrs, cm, product, variant=variant)
 
             # Images (excluding marketplace-excluded)
             images = []
@@ -402,6 +406,80 @@ class FeedGenerator:
             product_ctx['variants_xml'] = '\n'.join(variant_parts)
 
         return self._render_template(templates['product'], {'product': product_ctx})
+
+    def _auto_fill_attrs(self, mp_attrs: Dict, cm, product, variant=None):
+        """Auto-fill attrs with level=brand/color/country/composition from mappings"""
+        levels = MarketplaceAttributeLevel.objects.filter(
+            category_mapping=cm,
+            level__in=['brand', 'color', 'country', 'composition'],
+        ).select_related('marketplace_attribute')
+
+        for al in levels:
+            attr = al.marketplace_attribute
+            code = attr.external_code
+            if code in mp_attrs:
+                continue  # Already filled
+
+            if al.level == 'brand' and product.brand_id:
+                entity = self.brand_map.get(product.brand_id)
+                if entity:
+                    mp_attrs[code] = {
+                        'name': attr.name, 'value': entity.name,
+                        'value_uk': entity.name_uk or entity.name,
+                        'code': code, 'paramid': code,
+                        'valueid': entity.external_code,
+                    }
+                else:
+                    mp_attrs[code] = {
+                        'name': attr.name, 'value': product.brand.name,
+                        'value_uk': product.brand.name,
+                        'code': code, 'paramid': code, 'valueid': None,
+                    }
+
+            elif al.level == 'country' and product.country_id:
+                entity = self.country_map.get(product.country_id)
+                if entity:
+                    mp_attrs[code] = {
+                        'name': attr.name, 'value': entity.name,
+                        'value_uk': entity.name_uk or entity.name,
+                        'code': code, 'paramid': code,
+                        'valueid': entity.external_code,
+                    }
+                else:
+                    country_name = product.country.name if product.country else ''
+                    mp_attrs[code] = {
+                        'name': attr.name, 'value': country_name,
+                        'value_uk': country_name,
+                        'code': code, 'paramid': code, 'valueid': None,
+                    }
+
+            elif al.level == 'color' and variant and variant.color_id:
+                entity = self.color_map.get(variant.color_id)
+                if entity:
+                    mp_attrs[code] = {
+                        'name': attr.name, 'value': entity.name,
+                        'value_uk': entity.name_uk or entity.name,
+                        'code': code, 'paramid': code,
+                        'valueid': entity.external_code,
+                    }
+
+            elif al.level == 'composition':
+                comp_parts_ru = []
+                comp_parts_uk = []
+                for pc in product.compositions.all():
+                    comp_parts_ru.append(f"{pc.composition.name} {pc.value}%")
+                    try:
+                        uk_name = pc.composition.translations.get(language_code='uk').name
+                    except Exception:
+                        uk_name = pc.composition.name
+                    comp_parts_uk.append(f"{uk_name} {pc.value}%")
+                if comp_parts_ru:
+                    mp_attrs[code] = {
+                        'name': attr.name,
+                        'value': ', '.join(comp_parts_ru),
+                        'value_uk': ', '.join(comp_parts_uk),
+                        'code': code, 'paramid': code, 'valueid': None,
+                    }
 
     def _build_attrs_dict(self, attrs_list) -> Dict:
         """Convert list of ProductMarketplaceAttribute to dict keyed by external_code"""
