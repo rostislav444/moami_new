@@ -254,9 +254,9 @@ class FeedGenerator:
         for variant in product.variants.all():
             color_mapped = self.color_map.get(variant.color_id) if variant.color else None
 
-            # Variant-level attributes
+            # Variant-level attributes (only color auto-fill, brand/country/composition already in product)
             v_attrs = self._build_attrs_dict(product_attrs.get((variant.id, None), []))
-            self._auto_fill_attrs(v_attrs, cm, product, variant=variant)
+            self._auto_fill_color_attrs(v_attrs, cm, variant)
 
             # Images (excluding marketplace-excluded)
             images = []
@@ -480,6 +480,27 @@ class FeedGenerator:
                         'value_uk': ', '.join(comp_parts_uk),
                         'code': code, 'paramid': code, 'valueid': None,
                     }
+
+    def _auto_fill_color_attrs(self, v_attrs: Dict, cm, variant):
+        """Auto-fill only color-level attrs for variant"""
+        if not variant or not variant.color_id:
+            return
+        entity = self.color_map.get(variant.color_id)
+        if not entity:
+            return
+        levels = MarketplaceAttributeLevel.objects.filter(
+            category_mapping=cm, level='color',
+        ).select_related('marketplace_attribute')
+        for al in levels:
+            code = al.marketplace_attribute.external_code
+            if code not in v_attrs:
+                v_attrs[code] = {
+                    'name': al.marketplace_attribute.name,
+                    'value': entity.name,
+                    'value_uk': entity.name_uk or entity.name,
+                    'code': code, 'paramid': code,
+                    'valueid': entity.external_code,
+                }
 
     def _build_attrs_dict(self, attrs_list) -> Dict:
         """Convert list of ProductMarketplaceAttribute to dict keyed by external_code"""
